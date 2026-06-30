@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createMcpServer } from "./server.js";
-import { validateAuthConfig } from "./services/auth.js";
+import { validateStdioAuthConfig } from "./services/auth.js";
 
 async function main(): Promise<void> {
   try {
-    validateAuthConfig();
+    validateStdioAuthConfig();
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`ERROR: ${message}`);

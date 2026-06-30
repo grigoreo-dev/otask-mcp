@@ -1,6 +1,6 @@
 {
   "name": "otask-mcp-server",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "MCP server for O!task API — stdio locally, Streamable HTTP for n8n",
   "type": "module",
   "main": "dist/index.js",

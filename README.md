@@ -1,80 +1,79 @@
 # otask-mcp-server
 
-[MCP-сервер](https://modelcontextprotocol.io) для [O!task API](https://api.otask.ru/docs): инструменты `otask_get_task` и `otask_update_task`.
+[MCP-сервер](https://modelcontextprotocol.io) для [O!task API](https://api.otask.ru/docs).
 
-## Режимы
+## Режимы запуска
 
-| Режим | Запуск | Куда подключать |
-|-------|--------|-----------------|
-| **MCP stdio** | `bun start` | Cursor / OpenCode (локально) |
-| **MCP Streamable HTTP** | `bun run start:http` | n8n → **MCP Client Tool** |
+| Режим | Команда | Клиент |
+|-------|---------|--------|
+| MCP stdio | `bun start` | Cursor / OpenCode |
+| MCP Streamable HTTP | `bun run start:http` | n8n MCP Client Tool |
 
-## MCP HTTP (для n8n)
+## Аутентификация HTTP (`/mcp`)
 
-Транспорт: [Streamable HTTP](https://modelcontextprotocol.io) (не reverse proxy к O!task).
+Всегда через заголовок `Authorization: Bearer …` от HTTP-клиента. Два сценария:
 
-| Параметр | Значение |
-|----------|----------|
-| Endpoint | `POST` / `GET` **`/mcp`** |
-| Production URL | `https://otask-mcp.grigoreo.dev/mcp` |
-| Health | `GET /health` |
-| Порт (контейнер) | `3847` |
+### 1. Gateway (серверные credentials в env)
 
-### n8n: MCP Client Tool
+Сервер сам ходит в O!task API. Endpoint **нельзя** оставлять открытым.
 
-1. Добавь ноду **MCP Client Tool** к AI Agent.
-2. URL: `https://otask-mcp.grigoreo.dev/mcp`
-3. Transport: **HTTP Streamable** (или аналог в UI n8n).
-4. Если задан `MCP_AUTH_TOKEN` на сервере — заголовок `Authorization: Bearer <MCP_AUTH_TOKEN>`.
-
-Агент увидит tools: `otask_get_task`, `otask_update_task`.
-
-### Локальный запуск HTTP
-
-```bash
-bun install && bun run build
-OTASK_EMAIL=... OTASK_PASSWORD=... PORT=3847 bun run start:http
+```env
+OTASK_AUTH_KEY=...          # или OTASK_EMAIL + OTASK_PASSWORD
+MCP_AUTH_TOKEN=...          # обязателен в gateway-режиме
 ```
 
-Опционально защита endpoint:
+Клиент (n8n):
 
-```bash
-MCP_AUTH_TOKEN=secret bun run start:http
+```
+Authorization: Bearer <MCP_AUTH_TOKEN>
 ```
 
-## MCP-инструменты
+### 2. Passthrough (без OTASK_* в env)
 
-| Инструмент | Метод API | Описание |
-|------------|-----------|----------|
-| `otask_get_task` | `GET /api/v1/ws/{ws_slug}/tasks/{task_slug}` | Получить задачу |
-| `otask_update_task` | `POST .../tasks/{task_slug}/update` | Обновить (частичные поля, мерж с текущим) |
+Сервер **не** хранит credentials O!task. Bearer клиента пробрасывается в `api.otask.ru`.
 
-## Аутентификация O!task (сервер → api.otask.ru)
+```env
+# OTASK_* не заданы
+```
 
-Задайте **один** вариант в env приложения:
+Клиент (n8n):
 
-| Переменная | Описание |
-|------------|----------|
-| `OTASK_AUTH_KEY` | Статический Bearer-токен |
-| `OTASK_EMAIL` + `OTASK_PASSWORD` | Login `POST /api/v1/auth/login`, токен кэшируется |
+```
+Authorization: Bearer <O!task token>
+```
 
-| `MCP_AUTH_TOKEN` | Опционально: Bearer для доступа к `/mcp` (клиенты n8n) |
+Тот же токен, что для прямых вызовов O!task API.
+
+### Stdio (локально)
+
+Только gateway-логика через env (без `MCP_AUTH_TOKEN`):
+
+```env
+OTASK_AUTH_KEY=...
+# или OTASK_EMAIL + OTASK_PASSWORD
+```
+
+## MCP HTTP endpoint
+
+| | |
+|---|---|
+| URL | `https://otask-mcp.grigoreo.dev/mcp` |
+| Health | `GET /health` → `{ ok, authMode: "gateway" \| "passthrough" }` |
+| Порт | `3847` |
+
+### n8n MCP Client Tool
+
+- URL: `https://otask-mcp.grigoreo.dev/mcp`
+- Transport: **HTTP Streamable**
+- **Gateway:** credential с `MCP_AUTH_TOKEN`
+- **Passthrough:** credential с O!task Bearer (как в workflow 009)
+
+Tools: `otask_get_task`, `otask_update_task`.
 
 ## Разработка
 
-Требуется [Bun](https://bun.sh) ≥ 1.1.
-
 ```bash
-bun install
-bun run build
-bun start          # stdio для Cursor
-bun run dev:http   # hot reload HTTP
+bun install && bun run build
+bun start              # stdio
+bun run dev:http       # HTTP hot reload
 ```
-
-## Cursor / OpenCode
-
-`.cursor/mcp.json` / `opencode.json` → stdio `projects/otask-mcp/dist/index.js`. Секреты O!task — в корневом `.env`.
-
-## Slug'и
-
-Из URL `https://panel.otask.ru/ws/{ws_slug}/tasks/{task_slug}` — UUID в пути.

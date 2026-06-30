@@ -3,7 +3,13 @@ import http from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createMcpServer } from "./server.js";
-import { validateAuthConfig } from "./services/auth.js";
+import {
+  authorizeHttpMcpRequest,
+  extractBearerToken,
+  getHttpAuthMode,
+  validateHttpAuthConfig,
+} from "./services/auth.js";
+import { runWithHttpAuthContext } from "./services/http-auth-context.js";
 
 function getPort(): number {
   const raw = process.env.PORT?.trim() || "3847";
@@ -19,22 +25,12 @@ function sendJson(res: ServerResponse, status: number, body: unknown): void {
   res.end(JSON.stringify(body));
 }
 
-function isAuthorized(req: IncomingMessage): boolean {
-  const token = process.env.MCP_AUTH_TOKEN?.trim();
-  if (!token) {
-    return true;
-  }
-
-  const auth = req.headers.authorization;
-  return auth === `Bearer ${token}`;
-}
-
 async function handleMcpRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  if (!isAuthorized(req)) {
-    sendJson(res, 401, {
-      error: "Unauthorized",
-      hint: "Set Authorization: Bearer <MCP_AUTH_TOKEN> when MCP_AUTH_TOKEN is configured",
-    });
+  const clientBearer = extractBearerToken(req.headers.authorization);
+  const auth = authorizeHttpMcpRequest(clientBearer);
+
+  if (!auth.ok) {
+    sendJson(res, auth.status, { error: auth.error, hint: auth.hint });
     return;
   }
 
@@ -49,15 +45,31 @@ async function handleMcpRequest(req: IncomingMessage, res: ServerResponse): Prom
     void transport.close();
   });
 
-  await server.connect(transport);
-  await transport.handleRequest(req, res);
+  const runMcp = async (): Promise<void> => {
+    await server.connect(transport);
+    await transport.handleRequest(req, res);
+  };
+
+  if (auth.passthroughToken) {
+    await runWithHttpAuthContext(
+      { passthroughToken: auth.passthroughToken },
+      runMcp,
+    );
+    return;
+  }
+
+  await runMcp();
 }
 
 async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
   const requestUrl = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
 
   if (requestUrl.pathname === "/health") {
-    sendJson(res, 200, { ok: true, mode: "mcp-streamable-http" });
+    sendJson(res, 200, {
+      ok: true,
+      mode: "mcp-streamable-http",
+      authMode: getHttpAuthMode(),
+    });
     return;
   }
 
@@ -73,10 +85,11 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
 }
 
 function main(): void {
-  validateAuthConfig();
+  validateHttpAuthConfig();
 
   const port = getPort();
   const host = process.env.HOST?.trim() || "0.0.0.0";
+  const authMode = getHttpAuthMode();
 
   const httpServer = http.createServer((req, res) => {
     handleRequest(req, res).catch((error) => {
@@ -91,7 +104,9 @@ function main(): void {
   });
 
   httpServer.listen(port, host, () => {
-    console.error(`O!task MCP (Streamable HTTP) listening on http://${host}:${port}/mcp`);
+    console.error(
+      `O!task MCP HTTP on http://${host}:${port}/mcp (auth: ${authMode})`,
+    );
   });
 }
 

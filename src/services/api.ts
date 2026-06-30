@@ -104,7 +104,7 @@ export function formatApiError(error: unknown): string {
       return `Error: Task or workspace not found. Check ws_slug and task_slug. ${error.message}`;
     }
     if (error.status === 401 || error.status === 403) {
-      return `Error: Authentication failed or access denied. Verify OTASK_AUTH_KEY or OTASK_EMAIL/OTASK_PASSWORD. ${error.message}`;
+      return `Error: Authentication failed or access denied. Check Bearer token (passthrough) or server OTASK_* / MCP_AUTH_TOKEN (gateway). ${error.message}`;
     }
     if (error.status === 429) {
       return "Error: Rate limit exceeded. Wait before retrying.";
