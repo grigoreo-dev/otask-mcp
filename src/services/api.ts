@@ -1,11 +1,11 @@
-import { API_BASE_URL } from "../constants.js";
-import { getAuthHeaders } from "./auth.js";
+import type { OtaskAuthResolver } from "./auth.js";
 import type {
   OtaskApiResponse,
   OtaskTask,
   UpdateTaskBody,
   UpdateTaskResult,
 } from "../types.js";
+import { API_BASE_URL } from "../constants.js";
 
 export class OtaskApiError extends Error {
   constructor(
@@ -36,11 +36,16 @@ async function parseResponse<T>(response: Response): Promise<T> {
   return body as T;
 }
 
+async function headersFor(auth: OtaskAuthResolver): Promise<Record<string, string>> {
+  return auth();
+}
+
 export async function getTask(
   wsSlug: string,
   taskSlug: string,
+  auth: OtaskAuthResolver,
 ): Promise<OtaskTask> {
-  const headers = await getAuthHeaders();
+  const headers = await headersFor(auth);
   const response = await fetch(
     `${API_BASE_URL}/api/v1/ws/${encodeURIComponent(wsSlug)}/tasks/${encodeURIComponent(taskSlug)}`,
     { method: "GET", headers },
@@ -62,8 +67,9 @@ export async function updateTask(
   wsSlug: string,
   taskSlug: string,
   body: UpdateTaskBody,
+  auth: OtaskAuthResolver,
 ): Promise<UpdateTaskResult> {
-  const headers = await getAuthHeaders();
+  const headers = await headersFor(auth);
   const response = await fetch(
     `${API_BASE_URL}/api/v1/ws/${encodeURIComponent(wsSlug)}/tasks/${encodeURIComponent(taskSlug)}/update`,
     {
@@ -104,7 +110,7 @@ export function formatApiError(error: unknown): string {
       return `Error: Task or workspace not found. Check ws_slug and task_slug. ${error.message}`;
     }
     if (error.status === 401 || error.status === 403) {
-      return `Error: Authentication failed or access denied. Check Bearer token (passthrough) or server OTASK_* / MCP_AUTH_TOKEN (gateway). ${error.message}`;
+      return `Error: O!task auth failed. Check Bearer token. ${error.message}`;
     }
     if (error.status === 429) {
       return "Error: Rate limit exceeded. Wait before retrying.";

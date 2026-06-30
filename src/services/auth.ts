@@ -1,6 +1,5 @@
 import { API_BASE_URL } from "../constants.js";
 import type { LoginResponse } from "../types.js";
-import { getPassthroughToken } from "./http-auth-context.js";
 
 interface TokenCache {
   token: string;
@@ -10,6 +9,9 @@ interface TokenCache {
 let cachedToken: TokenCache | null = null;
 
 export type HttpAuthMode = "gateway" | "passthrough";
+
+/** Resolves headers for O!task API calls (per MCP request in HTTP mode). */
+export type OtaskAuthResolver = () => Promise<Record<string, string>>;
 
 function getStaticAuthKey(): string | undefined {
   return process.env.OTASK_AUTH_KEY?.trim() || undefined;
@@ -32,21 +34,18 @@ export function getHttpAuthMode(): HttpAuthMode {
   return hasServerOtaskCredentials() ? "gateway" : "passthrough";
 }
 
-/** Stdio MCP: O!task credentials must be in process env */
 export function validateStdioAuthConfig(): void {
-  if (hasServerOtaskCredentials()) {
-    return;
+  if (!hasServerOtaskCredentials()) {
+    throw new Error(
+      "Set OTASK_AUTH_KEY or OTASK_EMAIL + OTASK_PASSWORD for stdio MCP",
+    );
   }
-  throw new Error(
-    "Authentication required: set OTASK_AUTH_KEY or OTASK_EMAIL + OTASK_PASSWORD in environment",
-  );
 }
 
-/** HTTP MCP startup: gateway mode requires MCP_AUTH_TOKEN */
 export function validateHttpAuthConfig(): void {
   if (hasServerOtaskCredentials() && !process.env.MCP_AUTH_TOKEN?.trim()) {
     throw new Error(
-      "MCP_AUTH_TOKEN is required when OTASK_AUTH_KEY or OTASK_EMAIL + OTASK_PASSWORD are set (gateway mode)",
+      "MCP_AUTH_TOKEN is required when OTASK_* credentials are set in env",
     );
   }
 }
@@ -61,28 +60,23 @@ export function extractBearerToken(
   return token || undefined;
 }
 
-/**
- * Validates client Bearer for /mcp.
- * - gateway: Bearer must match MCP_AUTH_TOKEN; O!task calls use server env
- * - passthrough: Bearer is forwarded to O!task API
- */
 export function authorizeHttpMcpRequest(clientBearer: string | undefined): {
   ok: true;
-  passthroughToken?: string;
+  otaskBearer?: string;
 } | {
   ok: false;
   status: number;
   error: string;
   hint: string;
 } {
-  if (getHttpAuthMode() === "gateway") {
+  if (hasServerOtaskCredentials()) {
     const mcpToken = process.env.MCP_AUTH_TOKEN?.trim();
     if (!clientBearer || clientBearer !== mcpToken) {
       return {
         ok: false,
         status: 401,
         error: "Unauthorized",
-        hint: "Gateway mode: send Authorization: Bearer <MCP_AUTH_TOKEN>",
+        hint: "Gateway: Authorization: Bearer <MCP_AUTH_TOKEN>",
       };
     }
     return { ok: true };
@@ -93,11 +87,21 @@ export function authorizeHttpMcpRequest(clientBearer: string | undefined): {
       ok: false,
       status: 401,
       error: "Unauthorized",
-      hint: "Passthrough mode: send Authorization: Bearer <O!task token>",
+      hint: "Passthrough: Authorization: Bearer <O!task token>",
     };
   }
 
-  return { ok: true, passthroughToken: clientBearer };
+  return { ok: true, otaskBearer: clientBearer };
+}
+
+export function createPassthroughAuthResolver(
+  otaskBearer: string,
+): OtaskAuthResolver {
+  return async () => ({
+    Authorization: `Bearer ${otaskBearer}`,
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  });
 }
 
 async function loginWithPassword(email: string, password: string): Promise<string> {
@@ -143,28 +147,19 @@ async function getServerAuthToken(): Promise<string> {
 
   const credentials = getEmailPassword();
   if (!credentials) {
-    throw new Error(
-      "No server O!task credentials: set OTASK_AUTH_KEY or OTASK_EMAIL + OTASK_PASSWORD",
-    );
+    throw new Error("No OTASK_* credentials in env");
   }
 
   return loginWithPassword(credentials.email, credentials.password);
 }
 
-export async function getAuthToken(): Promise<string> {
-  const passthrough = getPassthroughToken();
-  if (passthrough) {
-    return passthrough;
-  }
-
-  return getServerAuthToken();
-}
-
-export async function getAuthHeaders(): Promise<Record<string, string>> {
-  const token = await getAuthToken();
-  return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-    Accept: "application/json",
+export function createEnvAuthResolver(): OtaskAuthResolver {
+  return async () => {
+    const token = await getServerAuthToken();
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
   };
 }

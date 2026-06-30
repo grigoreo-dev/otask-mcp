@@ -4,7 +4,12 @@ import { GetTaskInputSchema } from "../schemas/task.js";
 import { formatApiError, getTask } from "../services/api.js";
 import { summarizeTask } from "../services/task-mapper.js";
 
-export function registerGetTaskTool(server: McpServer): void {
+import type { OtaskAuthResolver } from "../services/auth.js";
+
+export function registerGetTaskTool(
+  server: McpServer,
+  auth: OtaskAuthResolver,
+): void {
   server.registerTool(
     "otask_get_task",
     {
@@ -30,7 +35,7 @@ Docs: https://api.otask.ru/docs#zadaci-GETapi-v1-ws--ws_slug--tasks--task_slug`,
     },
     async ({ ws_slug, task_slug }) => {
       try {
-        const task = await getTask(ws_slug, task_slug);
+        const task = await getTask(ws_slug, task_slug, auth);
         const summary = summarizeTask(task);
         let text = JSON.stringify(summary, null, 2);
 

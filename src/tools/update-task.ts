@@ -7,7 +7,12 @@ import {
   summarizeTask,
 } from "../services/task-mapper.js";
 
-export function registerUpdateTaskTool(server: McpServer): void {
+import type { OtaskAuthResolver } from "../services/auth.js";
+
+export function registerUpdateTaskTool(
+  server: McpServer,
+  auth: OtaskAuthResolver,
+): void {
   server.registerTool(
     "otask_update_task",
     {
@@ -41,7 +46,7 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
       const { ws_slug, task_slug, ...changes } = params;
 
       try {
-        const current = await getTask(ws_slug, task_slug);
+        const current = await getTask(ws_slug, task_slug, auth);
         const body = buildUpdateBodyFromTask(current, {
           ...(changes.name !== undefined ? { name: changes.name } : {}),
           ...(changes.board_id !== undefined
@@ -73,7 +78,7 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
           ...(changes.tags !== undefined ? { tags: changes.tags } : {}),
         });
 
-        const result = await updateTask(ws_slug, task_slug, body);
+        const result = await updateTask(ws_slug, task_slug, body, auth);
         const summary = summarizeTask(result.task);
 
         let text = JSON.stringify(
