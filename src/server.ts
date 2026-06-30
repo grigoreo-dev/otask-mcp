@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { OtaskAuthResolver } from "./services/auth.js";
-import { registerGetTaskTool } from "./tools/get-task.js";
-import { registerUpdateTaskTool } from "./tools/update-task.js";
+import { createOtaskClient } from "./services/client.js";
+import { registerAllTools } from "./tools/register.js";
 
 export function createMcpServer(auth: OtaskAuthResolver): McpServer {
   const server = new McpServer({
@@ -9,8 +9,7 @@ export function createMcpServer(auth: OtaskAuthResolver): McpServer {
     version: "1.0.0",
   });
 
-  registerGetTaskTool(server, auth);
-  registerUpdateTaskTool(server, auth);
+  registerAllTools(server, { api: createOtaskClient(auth) });
 
   return server;
 }

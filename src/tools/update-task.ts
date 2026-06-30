@@ -1,21 +1,18 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { CHARACTER_LIMIT } from "../constants.js";
-import { UpdateTaskInputSchema } from "../schemas/task.js";
-import { formatApiError, getTask, updateTask } from "../services/api.js";
+import {
+  UpdateTaskInputSchema,
+  type UpdateTaskInput,
+} from "../schemas/task.js";
 import {
   buildUpdateBodyFromTask,
   summarizeTask,
 } from "../services/task-mapper.js";
+import { jsonToolResult, toolError } from "./helpers.js";
+import type { ToolDefinition, ToolDeps } from "./types.js";
 
-import type { OtaskAuthResolver } from "../services/auth.js";
-
-export function registerUpdateTaskTool(
-  server: McpServer,
-  auth: OtaskAuthResolver,
-): void {
-  server.registerTool(
-    "otask_update_task",
-    {
+export function createUpdateTaskTool({ api }: ToolDeps): ToolDefinition<UpdateTaskInput> {
+  return {
+    name: "otask_update_task",
+    config: {
       title: "Update O!task Task",
       description: `Update an existing O!task task. Sends POST /api/v1/ws/{ws_slug}/tasks/{task_slug}/update.
 
@@ -42,11 +39,11 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
         openWorldHint: true,
       },
     },
-    async (params) => {
+    handler: async (params) => {
       const { ws_slug, task_slug, ...changes } = params;
 
       try {
-        const current = await getTask(ws_slug, task_slug, auth);
+        const current = await api.getTask(ws_slug, task_slug);
         const body = buildUpdateBodyFromTask(current, {
           ...(changes.name !== undefined ? { name: changes.name } : {}),
           ...(changes.board_id !== undefined
@@ -78,10 +75,10 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
           ...(changes.tags !== undefined ? { tags: changes.tags } : {}),
         });
 
-        const result = await updateTask(ws_slug, task_slug, body, auth);
+        const result = await api.updateTask(ws_slug, task_slug, body);
         const summary = summarizeTask(result.task);
 
-        let text = JSON.stringify(
+        return jsonToolResult(
           {
             success: result.success,
             message: result.message,
@@ -89,28 +86,15 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
             is_recovery: result.is_recovery,
             is_detach_parent: result.is_detach_parent,
           },
-          null,
-          2,
-        );
-
-        if (text.length > CHARACTER_LIMIT) {
-          text = text.slice(0, CHARACTER_LIMIT) + "\n… (truncated)";
-        }
-
-        return {
-          content: [{ type: "text", text }],
-          structuredContent: {
+          {
             success: result.success,
             message: result.message,
             task: summary,
           },
-        };
+        );
       } catch (error) {
-        return {
-          content: [{ type: "text", text: formatApiError(error) }],
-          isError: true,
-        };
+        return toolError(error);
       }
     },
-  );
+  };
 }

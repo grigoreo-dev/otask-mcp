@@ -1,18 +1,12 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { CHARACTER_LIMIT } from "../constants.js";
-import { GetTaskInputSchema } from "../schemas/task.js";
-import { formatApiError, getTask } from "../services/api.js";
+import { GetTaskInputSchema, type GetTaskInput } from "../schemas/task.js";
 import { summarizeTask } from "../services/task-mapper.js";
+import { jsonToolResult, toolError } from "./helpers.js";
+import type { ToolDefinition, ToolDeps } from "./types.js";
 
-import type { OtaskAuthResolver } from "../services/auth.js";
-
-export function registerGetTaskTool(
-  server: McpServer,
-  auth: OtaskAuthResolver,
-): void {
-  server.registerTool(
-    "otask_get_task",
-    {
+export function createGetTaskTool({ api }: ToolDeps): ToolDefinition<GetTaskInput> {
+  return {
+    name: "otask_get_task",
+    config: {
       title: "Get O!task Task",
       description: `Fetch a task from O!task by workspace and task slug.
 
@@ -33,28 +27,14 @@ Docs: https://api.otask.ru/docs#zadaci-GETapi-v1-ws--ws_slug--tasks--task_slug`,
         openWorldHint: true,
       },
     },
-    async ({ ws_slug, task_slug }) => {
+    handler: async ({ ws_slug, task_slug }) => {
       try {
-        const task = await getTask(ws_slug, task_slug, auth);
+        const task = await api.getTask(ws_slug, task_slug);
         const summary = summarizeTask(task);
-        let text = JSON.stringify(summary, null, 2);
-
-        if (text.length > CHARACTER_LIMIT) {
-          text =
-            text.slice(0, CHARACTER_LIMIT) +
-            "\n… (truncated; use specific field queries via get + update)";
-        }
-
-        return {
-          content: [{ type: "text", text }],
-          structuredContent: { task: summary },
-        };
+        return jsonToolResult(summary, { task: summary });
       } catch (error) {
-        return {
-          content: [{ type: "text", text: formatApiError(error) }],
-          isError: true,
-        };
+        return toolError(error);
       }
     },
-  );
+  };
 }

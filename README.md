@@ -70,6 +70,45 @@ OTASK_AUTH_KEY=...
 
 Tools: `otask_get_task`, `otask_update_task`.
 
+## Добавление нового tool
+
+1. **`src/services/api.ts`** — низкоуровневый fetch (если нужен новый endpoint)
+2. **`src/services/client.ts`** — метод на `OtaskClient` (bind auth уже внутри)
+3. **`src/schemas/`** — Zod-схема входных параметров
+4. **`src/tools/my-tool.ts`** — фабрика `createMyTool({ api })` → `ToolDefinition`
+5. **`src/tools/registry.ts`** — одна строка в массив `toolFactories`
+
+Пример скелета:
+
+```typescript
+// src/tools/my-tool.ts
+import { MyInputSchema, type MyInput } from "../schemas/my.js";
+import { jsonToolResult, toolError } from "./helpers.js";
+import type { ToolDefinition, ToolDeps } from "./types.js";
+
+export function createMyTool({ api }: ToolDeps): ToolDefinition<MyInput> {
+  return {
+    name: "otask_my_tool",
+    config: {
+      title: "...",
+      description: "...",
+      inputSchema: MyInputSchema,
+      annotations: { readOnlyHint: true },
+    },
+    handler: async (input) => {
+      try {
+        const data = await api.myMethod(input);
+        return jsonToolResult(data);
+      } catch (error) {
+        return toolError(error);
+      }
+    },
+  };
+}
+```
+
+`server.ts` и `register.ts` трогать не нужно — регистрация централизована.
+
 ## Разработка
 
 ```bash
