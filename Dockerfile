@@ -21,4 +21,4 @@ COPY --from=builder /app/dist ./dist
 ENV PORT=3847
 EXPOSE 3847
 
-CMD ["bun", "run", "dist/http-server.js"]
+CMD ["bun", "run", "dist/mcp-http.js"]

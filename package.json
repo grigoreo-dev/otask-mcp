@@ -1,18 +1,18 @@
 {
   "name": "otask-mcp-server",
-  "version": "1.0.0",
-  "description": "MCP server for O!task API — tasks and authentication",
+  "version": "1.1.0",
+  "description": "MCP server for O!task API — stdio locally, Streamable HTTP for n8n",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
     "otask-mcp": "dist/index.js",
-    "otask-proxy": "dist/http-server.js"
+    "otask-mcp-http": "dist/mcp-http.js"
   },
   "scripts": {
     "start": "bun run dist/index.js",
-    "start:http": "bun run dist/http-server.js",
+    "start:http": "bun run dist/mcp-http.js",
     "dev": "bun --watch src/index.ts",
-    "dev:http": "bun --watch src/http-server.ts",
+    "dev:http": "bun --watch src/mcp-http.ts",
     "build": "tsc",
     "clean": "rm -rf dist"
   },
