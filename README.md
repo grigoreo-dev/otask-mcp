@@ -1,20 +1,20 @@
 # otask-mcp-server
 
-[MCP server](https://modelcontextprotocol.io) and HTTP proxy for [O!task API](https://api.otask.ru/docs).
+[MCP-сервер](https://modelcontextprotocol.io) и HTTP-прокси для [O!task API](https://api.otask.ru/docs).
 
-## Modes
+## Режимы
 
-| Mode | Entry | Auth |
-|------|-------|------|
-| MCP (stdio) | `pnpm start` | `OTASK_AUTH_KEY` or `OTASK_EMAIL` + `OTASK_PASSWORD` |
-| HTTP proxy | `pnpm start:http` | `AUTH_TOKEN` only — transparent pass-through to `api.otask.ru` |
+| Режим | Запуск | Аутентификация |
+|-------|--------|----------------|
+| MCP (stdio) | `bun start` | `OTASK_AUTH_KEY` или `OTASK_EMAIL` + `OTASK_PASSWORD` |
+| HTTP proxy | `bun run start:http` | только `AUTH_TOKEN` — прозрачный прокси на `api.otask.ru` |
 
 ## HTTP proxy
 
-Transparent reverse proxy: same paths, methods, bodies, and response as O!task API.
+Прозрачный reverse proxy: те же пути, методы, тела запросов и ответы, что у O!task API.
 
 ```bash
-AUTH_TOKEN=your-otask-bearer-token PORT=3847 pnpm start:http
+AUTH_TOKEN=your-otask-bearer-token PORT=3847 bun run start:http
 ```
 
 ```bash
@@ -24,38 +24,42 @@ curl -sS \
   "http://localhost:3847/api/v1/ws/{ws_slug}/tasks/{task_slug}"
 ```
 
-- Forwards `GET|POST|PUT|PATCH|DELETE|HEAD` on `/api/*` → `https://api.otask.ru/api/*`
-- Client must send `Authorization: Bearer <AUTH_TOKEN>` (same token used upstream)
-- `GET /health` — liveness check (no auth)
+- Проксирует `GET|POST|PUT|PATCH|DELETE|HEAD` на `/api/*` → `https://api.otask.ru/api/*`
+- Клиент обязан передать `Authorization: Bearer <AUTH_TOKEN>` (тот же токен уходит upstream)
+- `GET /health` — проверка живости (без auth)
 
-## MCP tools
+**Production:** [https://otask-mcp.grigoreo.dev](https://otask-mcp.grigoreo.dev) (Dokploy, проект n8n на msk).
 
-| Tool | Method | Description |
-|------|--------|-------------|
-| `otask_get_task` | `GET /api/v1/ws/{ws_slug}/tasks/{task_slug}` | Fetch task by slug |
-| `otask_update_task` | `POST .../tasks/{task_slug}/update` | Update task (partial fields; merges with current state) |
+## MCP-инструменты
 
-## Authentication
+| Инструмент | Метод | Описание |
+|------------|-------|----------|
+| `otask_get_task` | `GET /api/v1/ws/{ws_slug}/tasks/{task_slug}` | Получить задачу по slug |
+| `otask_update_task` | `POST .../tasks/{task_slug}/update` | Обновить задачу (частичные поля; мерж с текущим состоянием) |
 
-Set **one** of:
+## Аутентификация
 
-| Env | Description |
-|-----|-------------|
-| `OTASK_AUTH_KEY` | Static Bearer token |
-| `OTASK_EMAIL` + `OTASK_PASSWORD` | Login via `POST /api/v1/auth/login` (token cached in memory) |
+Задайте **один** из вариантов:
 
-## Development
+| Переменная | Описание |
+|------------|----------|
+| `OTASK_AUTH_KEY` | Статический Bearer-токен |
+| `OTASK_EMAIL` + `OTASK_PASSWORD` | Логин через `POST /api/v1/auth/login` (токен кэшируется в памяти) |
+
+## Разработка
+
+Требуется [Bun](https://bun.sh) ≥ 1.1.
 
 ```bash
-pnpm install
-pnpm build
-pnpm start
+bun install
+bun run build
+bun start
 ```
 
 ## Cursor / OpenCode
 
-Configured in workspace `.cursor/mcp.json` and `opencode.json`. Credentials live in root `.env`.
+Подключение в workspace: `.cursor/mcp.json` и `opencode.json`. Секреты — в корневом `.env`.
 
-## Slugs
+## Slug'и
 
-From a task URL like `https://panel.otask.ru/ws/{ws_slug}/tasks/{task_slug}` — use those UUIDs as `ws_slug` and `task_slug`.
+Из URL задачи `https://panel.otask.ru/ws/{ws_slug}/tasks/{task_slug}` — UUID в пути используйте как `ws_slug` и `task_slug`.

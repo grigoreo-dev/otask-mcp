@@ -1,28 +1,24 @@
-FROM node:22-alpine AS builder
+FROM oven/bun:1 AS builder
 
 WORKDIR /app
 
-RUN corepack enable
-
-COPY package.json pnpm-lock.yaml .npmrc pnpm-workspace.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
 COPY tsconfig.json ./
 COPY src ./src
-RUN pnpm build
+RUN bun run build
 
-FROM node:22-alpine
+FROM oven/bun:1-slim
 
 WORKDIR /app
 
-RUN corepack enable
-
-COPY package.json pnpm-lock.yaml .npmrc pnpm-workspace.yaml ./
-RUN pnpm install --frozen-lockfile --prod
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --production
 
 COPY --from=builder /app/dist ./dist
 
 ENV PORT=3847
 EXPOSE 3847
 
-CMD ["node", "dist/http-server.js"]
+CMD ["bun", "run", "dist/http-server.js"]
