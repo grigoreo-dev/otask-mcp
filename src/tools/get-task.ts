@@ -1,9 +1,12 @@
 import { GetTaskInputSchema, type GetTaskInput } from "../schemas/task.js";
-import { summarizeTask } from "../services/task-mapper.js";
+import { compactTask } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
-export function createGetTaskTool({ api }: ToolDeps): ToolDefinition<GetTaskInput> {
+export function createGetTaskTool({
+  api,
+  guard,
+}: ToolDeps): ToolDefinition<GetTaskInput> {
   return {
     name: "otask_get_task",
     config: {
@@ -11,6 +14,7 @@ export function createGetTaskTool({ api }: ToolDeps): ToolDefinition<GetTaskInpu
       description: `Fetch a task from O!task by workspace and task slug.
 
 Use before otask_update_task to inspect current field values (board_id, performers, tags, etc.).
+Project must be on the allow-list when configured (checked via task.project_id).
 
 Args:
   - ws_slug: Workspace UUID from panel.otask.ru URL (/ws/{ws_slug}/...)
@@ -30,7 +34,13 @@ Docs: https://api.otask.ru/docs#zadaci-GETapi-v1-ws--ws_slug--tasks--task_slug`,
     handler: async ({ ws_slug, task_slug }) => {
       try {
         const task = await api.getTask(ws_slug, task_slug);
-        const summary = summarizeTask(task);
+        const projectSlug =
+          typeof task.project_slug === "string" ? task.project_slug : undefined;
+        guard.assertAllowed({
+          id: task.project_id,
+          slug: projectSlug,
+        });
+        const summary = compactTask(task);
         return jsonToolResult(summary, { task: summary });
       } catch (error) {
         return toolError(error);

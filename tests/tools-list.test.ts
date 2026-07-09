@@ -1,0 +1,312 @@
+import { describe, expect, mock, test } from "bun:test";
+import {
+  createProjectGuard,
+  parseProjectAllowList,
+} from "../src/services/project-guard.ts";
+import type { OtaskClient } from "../src/services/client.ts";
+import type { OtaskTask } from "../src/types.ts";
+import type { ToolDeps } from "../src/tools/types.ts";
+import { createListProjectsTool } from "../src/tools/list-projects.ts";
+import { createListProjectTasksTool } from "../src/tools/list-project-tasks.ts";
+import { createListBoardTool } from "../src/tools/list-board.ts";
+import { createListMembersTool } from "../src/tools/list-members.ts";
+import { createListTagsTool } from "../src/tools/list-tags.ts";
+import { createGetTaskTool } from "../src/tools/get-task.ts";
+import { toolFactories } from "../src/tools/registry.ts";
+
+function sampleTask(overrides: Partial<OtaskTask> = {}): OtaskTask {
+  return {
+    id: 10,
+    slug: "task-10",
+    name: "Do thing",
+    description: "details",
+    end_at: "2026-07-01T00:00:00Z",
+    priority_id: 2,
+    project_id: 5,
+    board_id: 1,
+    board_column_id: 3,
+    status_id: 7,
+    performers: [{ id: 100 }],
+    tags: [{ id: 9 }],
+    subtasks: [],
+    files: [],
+    ...overrides,
+  };
+}
+
+function mockApi(partial: Partial<OtaskClient> = {}): OtaskClient {
+  return {
+    getTask: mock(async () => sampleTask()),
+    updateTask: mock(async () => ({
+      success: true,
+      task: sampleTask(),
+    })),
+    listProjects: mock(async () => []),
+    listProjectTasks: mock(async () => ({ tasks: [] })),
+    listBoard: mock(async () => ({ boards: [], columns: [] })),
+    listMembers: mock(async () => []),
+    listTags: mock(async () => []),
+    listComments: mock(async () => ({})),
+    addComment: mock(async () => ({})),
+    createTask: mock(async () => sampleTask()),
+    archiveTask: mock(async () => sampleTask()),
+    ...partial,
+  };
+}
+
+function deps(
+  apiPartial: Partial<OtaskClient> = {},
+  allowList = "",
+): ToolDeps {
+  return {
+    api: mockApi(apiPartial),
+    guard: createProjectGuard(parseProjectAllowList(allowList)),
+  };
+}
+
+function parseContent(result: {
+  content: Array<{ type: string; text: string }>;
+}): unknown {
+  return JSON.parse(result.content[0]!.text);
+}
+
+describe("otask_list_projects", () => {
+  test("filters by allow-list and returns compact agent list", async () => {
+    const d = deps(
+      {
+        listProjects: mock(async () => [
+          { id: 1, slug: "a", name: "Alpha", status_id: 1, noise: true },
+          { id: 2, slug: "b", name: "Beta" },
+          { id: 3, slug: "c", name: "Gamma" },
+        ]),
+      },
+      "a,2",
+    );
+    const tool = createListProjectsTool(d);
+    const result = await tool.handler({ ws_slug: "ws-1" });
+    expect(result.isError).toBeUndefined();
+    const body = parseContent(result) as {
+      summary: string;
+      items: Array<{ id: number; slug: string; name: string }>;
+      next: null;
+    };
+    expect(body.next).toBeNull();
+    expect(body.items).toEqual([
+      { id: 1, slug: "a", name: "Alpha", status_id: 1 },
+      { id: 2, slug: "b", name: "Beta" },
+    ]);
+    expect(body.items[0]).not.toHaveProperty("noise");
+    expect(body.summary).toMatch(/2/);
+    expect(d.api.listProjects).toHaveBeenCalledWith("ws-1");
+  });
+
+  test("returns all projects when allow-list empty", async () => {
+    const d = deps({
+      listProjects: mock(async () => [
+        { id: 1, slug: "a", name: "Alpha" },
+        { id: 2, slug: "b", name: "Beta" },
+      ]),
+    });
+    const tool = createListProjectsTool(d);
+    const body = parseContent(
+      await tool.handler({ ws_slug: "ws" }),
+    ) as { items: unknown[] };
+    expect(body.items).toHaveLength(2);
+  });
+});
+
+describe("otask_list_project_tasks", () => {
+  test("asserts project slug then returns compact tasks", async () => {
+    const d = deps(
+      {
+        listProjectTasks: mock(async () => ({
+          tasks: [
+            sampleTask({ id: 1, slug: "t1", name: "One", project_id: 5 }),
+            sampleTask({ id: 2, slug: "t2", name: "Two", project_id: 5 }),
+          ],
+          meta: { page: 1 },
+        })),
+      },
+      "proj-a",
+    );
+    const tool = createListProjectTasksTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws-1",
+      project_slug: "proj-a",
+    });
+    expect(result.isError).toBeUndefined();
+    const body = parseContent(result) as {
+      summary: string;
+      items: Array<{ id: number; slug: string; name: string }>;
+      next: unknown;
+    };
+    expect(body.items).toHaveLength(2);
+    expect(body.items[0]).toMatchObject({ id: 1, slug: "t1", name: "One" });
+    expect(body.items[0]).not.toHaveProperty("files");
+    expect(body.next).toEqual({ page: 1 });
+    expect(d.api.listProjectTasks).toHaveBeenCalledWith(
+      "ws-1",
+      "proj-a",
+      undefined,
+    );
+  });
+
+  test("blocks disallowed project_slug", async () => {
+    const d = deps(
+      {
+        listProjectTasks: mock(async () => ({ tasks: [] })),
+      },
+      "allowed-only",
+    );
+    const tool = createListProjectTasksTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws",
+      project_slug: "forbidden",
+    });
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).toMatch(/Project not allowed/);
+    expect(d.api.listProjectTasks).not.toHaveBeenCalled();
+  });
+});
+
+describe("otask_list_board", () => {
+  test("asserts project and returns boards/columns", async () => {
+    const d = deps(
+      {
+        listBoard: mock(async () => ({
+          boards: [{ id: 1, name: "Main" }],
+          columns: [{ id: 10, name: "Todo" }],
+        })),
+      },
+      "p1",
+    );
+    const tool = createListBoardTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws",
+      project_slug: "p1",
+    });
+    expect(result.isError).toBeUndefined();
+    const body = parseContent(result) as {
+      summary: string;
+      boards: unknown[];
+      columns: unknown[];
+      next: null;
+    };
+    expect(body.boards).toEqual([{ id: 1, name: "Main" }]);
+    expect(body.columns).toEqual([{ id: 10, name: "Todo" }]);
+    expect(body.next).toBeNull();
+    expect(d.api.listBoard).toHaveBeenCalledWith("ws", "p1", undefined);
+  });
+
+  test("blocks disallowed project", async () => {
+    const d = deps({}, "only-this");
+    const tool = createListBoardTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws",
+      project_slug: "nope",
+    });
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).toMatch(/Project not allowed/);
+  });
+});
+
+describe("otask_list_members", () => {
+  test("returns compact members without guard", async () => {
+    const d = deps({
+      listMembers: mock(async () => [
+        {
+          user_id: 55,
+          full_name: "Grace Hopper",
+          email: "g@example.com",
+          status_text: "active",
+          role: "admin",
+        },
+      ]),
+    });
+    const tool = createListMembersTool(d);
+    const body = parseContent(
+      await tool.handler({ ws_slug: "ws" }),
+    ) as { items: Array<Record<string, unknown>>; next: null };
+    expect(body.items).toEqual([
+      {
+        id: 55,
+        name: "Grace Hopper",
+        email: "g@example.com",
+        status_text: "active",
+      },
+    ]);
+    expect(body.items[0]).not.toHaveProperty("role");
+    expect(body.next).toBeNull();
+  });
+});
+
+describe("otask_list_tags", () => {
+  test("returns tags as agent list", async () => {
+    const d = deps({
+      listTags: mock(async () => [
+        { id: 1, name: "bug" },
+        { id: 2, name: "feature" },
+      ]),
+    });
+    const tool = createListTagsTool(d);
+    const body = parseContent(
+      await tool.handler({ ws_slug: "ws" }),
+    ) as { summary: string; items: unknown[]; next: null };
+    expect(body.items).toEqual([
+      { id: 1, name: "bug" },
+      { id: 2, name: "feature" },
+    ]);
+    expect(body.next).toBeNull();
+    expect(d.api.listTags).toHaveBeenCalledWith("ws");
+  });
+});
+
+describe("otask_get_task guard", () => {
+  test("returns compact task when project allowed", async () => {
+    const d = deps(
+      {
+        getTask: mock(async () =>
+          sampleTask({ project_id: 5, name: "Allowed" }),
+        ),
+      },
+      "5",
+    );
+    const tool = createGetTaskTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws",
+      task_slug: "task-10",
+    });
+    expect(result.isError).toBeUndefined();
+    const body = parseContent(result) as { id: number; name: string };
+    expect(body).toMatchObject({ id: 10, name: "Allowed", project_id: 5 });
+    expect(body).not.toHaveProperty("files");
+  });
+
+  test("errors when project_id not allowed", async () => {
+    const d = deps(
+      {
+        getTask: mock(async () => sampleTask({ project_id: 99 })),
+      },
+      "5",
+    );
+    const tool = createGetTaskTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws",
+      task_slug: "task-10",
+    });
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).toMatch(/Project not allowed/);
+  });
+});
+
+describe("registry", () => {
+  test("registers all read tools", () => {
+    const names = toolFactories.map((f) => f(deps()).name);
+    expect(names).toContain("otask_list_projects");
+    expect(names).toContain("otask_list_project_tasks");
+    expect(names).toContain("otask_list_board");
+    expect(names).toContain("otask_list_members");
+    expect(names).toContain("otask_list_tags");
+    expect(names).toContain("otask_get_task");
+  });
+});
