@@ -14,7 +14,9 @@
     "dev": "bun --watch src/index.ts",
     "dev:http": "bun --watch src/mcp-http.ts",
     "build": "tsc",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "bun test",
+    "docs:parse": "bun run scripts/parse-docs.ts"
   },
   "engines": {
     "bun": ">=1.1.0"
