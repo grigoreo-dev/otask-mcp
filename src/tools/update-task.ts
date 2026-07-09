@@ -86,6 +86,10 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
           ...(changes.tags !== undefined ? { tags: changes.tags } : {}),
         });
 
+        if (changes.project_id !== undefined) {
+          guard.assertAllowed({ id: changes.project_id });
+        }
+
         const result = await api.updateTask(ws_slug, task_slug, body);
         const summary = summarizeTask(result.task);
 

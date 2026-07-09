@@ -2,6 +2,7 @@ import {
   CreateTaskInputSchema,
   type CreateTaskInput,
 } from "../schemas/task.js";
+import { assertProjectIdAllowed } from "../services/project-guard.js";
 import { compactTask } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
@@ -38,7 +39,11 @@ Docs: https://api.otask.ru/docs`,
     handler: async (params) => {
       try {
         const { ws_slug, ...body } = params;
-        guard.assertAllowed({ id: body.project_id });
+        await assertProjectIdAllowed(
+          guard,
+          () => api.listProjects(ws_slug),
+          body.project_id,
+        );
         const task = await api.createTask(ws_slug, body);
         const summary = compactTask(task);
         return jsonToolResult(summary, { task: summary });

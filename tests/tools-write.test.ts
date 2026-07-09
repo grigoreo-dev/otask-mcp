@@ -117,6 +117,31 @@ describe("otask_create_task", () => {
     const body = parseContent(result) as { id: number; name: string };
     expect(body).toMatchObject({ id: 99, name: "New", project_id: 5 });
   });
+
+  test("slug-only allow-list allows create when listProjects returns matching id+slug", async () => {
+    const created = sampleTask({ id: 99, name: "New", project_id: 42 });
+    const d = deps(
+      {
+        listProjects: mock(async () => [
+          { id: 42, slug: "allowed-proj", name: "Allowed" },
+        ]),
+        createTask: mock(async () => created),
+      },
+      "allowed-proj",
+    );
+    const tool = createCreateTaskTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws",
+      project_id: 42,
+      name: "New",
+      board_id: 1,
+      board_column_id: 2,
+      end_at: "2026-08-01T00:00:00Z",
+    });
+    expect(result.isError).toBeUndefined();
+    expect(d.api.listProjects).toHaveBeenCalledWith("ws");
+    expect(d.api.createTask).toHaveBeenCalled();
+  });
 });
 
 describe("otask_move_task", () => {
@@ -346,6 +371,24 @@ describe("otask_update_task guard", () => {
     });
     expect(result.isError).toBeUndefined();
     expect(d.api.updateTask).toHaveBeenCalled();
+  });
+
+  test("blocks update when destination project_id outside allow-list", async () => {
+    const d = deps(
+      {
+        getTask: mock(async () => sampleTask({ project_id: 5 })),
+      },
+      "5",
+    );
+    const tool = createUpdateTaskTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws",
+      task_slug: "task-10",
+      project_id: 99,
+    });
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).toMatch(/Project not allowed/);
+    expect(d.api.updateTask).not.toHaveBeenCalled();
   });
 });
 
