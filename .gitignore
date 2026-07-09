@@ -3,5 +3,8 @@ dist/
 *.log
 .env
 .env.local
+opencode.json
+opencode.jsonc
 
 .worktrees/
+.codegraph/
