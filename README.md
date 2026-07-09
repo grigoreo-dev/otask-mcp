@@ -100,7 +100,7 @@ Registered in `src/tools/registry.ts` (one-line intents for agents):
 | `otask_list_tags` | List workspace tags for labeling |
 | `otask_list_comments` | List comments on a task |
 | `otask_add_comment` | Add a comment (optional `parent_id` for replies) |
-| `otask_create_task` | Create a task (`board_id` + `board_column_id` required) |
+| `otask_create_task` | Create a task (required: `ws_slug`, `project_id`, `name`, `board_id`, `board_column_id`, `end_at`) |
 | `otask_move_task` | Move a task to another board column (status) |
 | `otask_archive_task` | Archive a task |
 
@@ -128,13 +128,13 @@ X-Otask-Allowed-Projects: product-roadmap,42
 
 ## API docs snapshot
 
-Regenerate the local OpenAPI-derived notes used while developing tools:
+Regenerate the local API catalog from O!task HTML docs (Scribe):
 
 ```bash
 bun run docs:parse
 ```
 
-Writes under `docs/` from the live O!task OpenAPI (or cached sources as implemented by `scripts/parse-docs.ts`).
+Writes under `docs/catalog/` from the live HTML docs page (or `bun run docs:parse --file path` for offline HTML).
 
 ## Development
 
