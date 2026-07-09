@@ -1,53 +1,53 @@
 # otask-mcp-server
 
-[MCP server](https://modelcontextprotocol.io) for the [O!task API](https://api.otask.ru/docs). Exposes O!task workspace/task operations as MCP tools for agents (Cursor, OpenCode, n8n MCP Client Tool).
+[MCP-сервер](https://modelcontextprotocol.io) для [O!task API](https://api.otask.ru/docs). Отдаёт операции O!task (воркспейс/задачи) как MCP-инструменты для агентов (Cursor, OpenCode, n8n MCP Client Tool).
 
-## Modes
+## Режимы
 
-| Mode | Command | How it is chosen | Client auth |
-|------|---------|------------------|-------------|
-| **stdio** | `bun start` | Local process; always uses server env credentials | No HTTP; set `OTASK_*` in env |
-| **HTTP gateway** | `bun run start:http` | Any `OTASK_AUTH_KEY` **or** `OTASK_EMAIL`+`OTASK_PASSWORD` present | `Authorization: Bearer <MCP_AUTH_TOKEN>` |
-| **HTTP passthrough** | `bun run start:http` | No `OTASK_*` credentials in env | `Authorization: Bearer <O!task token>` (forwarded to API) |
+| Режим | Команда | Как выбирается | Авторизация клиента |
+|-------|---------|----------------|---------------------|
+| **stdio** | `bun start` | Локальный процесс; всегда берёт credentials из env сервера | Без HTTP; задайте `OTASK_*` в env |
+| **HTTP gateway** | `bun run start:http` | Есть `OTASK_AUTH_KEY` **или** `OTASK_EMAIL`+`OTASK_PASSWORD` | `Authorization: Bearer <MCP_AUTH_TOKEN>` |
+| **HTTP passthrough** | `bun run start:http` | Нет credentials `OTASK_*` в env | `Authorization: Bearer <токен O!task>` (проксируется в API) |
 
-Detection is `hasServerOtaskCredentials()`: gateway if static key or email+password are set; otherwise passthrough. Check `GET /health` → `authMode: "gateway" | "passthrough"`.
+Определение: `hasServerOtaskCredentials()` — gateway, если задан статический ключ или email+password; иначе passthrough. Проверка: `GET /health` → `authMode: "gateway" | "passthrough"`.
 
-stdio requires `OTASK_*` (fails at startup without them). Gateway HTTP requires `MCP_AUTH_TOKEN` when `OTASK_*` are set (fails at startup otherwise).
+stdio требует `OTASK_*` (без них падает при старте). HTTP gateway требует `MCP_AUTH_TOKEN`, если заданы `OTASK_*` (иначе падает при старте).
 
-## Environment variables
+## Переменные окружения
 
-| Variable | Used in | Required when | Purpose |
-|----------|---------|---------------|---------|
-| `OTASK_AUTH_KEY` | stdio, HTTP gateway | stdio **or** gateway (alt: email/password) | Static O!task Bearer used by the server |
-| `OTASK_EMAIL` | stdio, HTTP gateway | with `OTASK_PASSWORD` as alt to key | Login to obtain token |
-| `OTASK_PASSWORD` | stdio, HTTP gateway | with `OTASK_EMAIL` | Login password |
-| `MCP_AUTH_TOKEN` | HTTP gateway | gateway mode | Shared secret clients must send; **not** an O!task token |
-| `OTASK_ALLOWED_PROJECTS` | stdio, HTTP gateway | optional | Comma-separated project slugs and/or numeric IDs |
-| `PORT` | HTTP | optional (default `3847`) | Listen port |
-| `HOST` | HTTP | optional (default `0.0.0.0`) | Bind address |
+| Переменная | Где используется | Когда обязательна | Назначение |
+|------------|------------------|-------------------|------------|
+| `OTASK_AUTH_KEY` | stdio, HTTP gateway | stdio **или** gateway (альтернатива: email/password) | Статический O!task Bearer, которым пользуется сервер |
+| `OTASK_EMAIL` | stdio, HTTP gateway | вместе с `OTASK_PASSWORD` как альтернатива ключу | Логин для получения токена |
+| `OTASK_PASSWORD` | stdio, HTTP gateway | вместе с `OTASK_EMAIL` | Пароль для логина |
+| `MCP_AUTH_TOKEN` | HTTP gateway | режим gateway | Общий секрет, который должен отправлять клиент; **не** токен O!task |
+| `OTASK_ALLOWED_PROJECTS` | stdio, HTTP gateway | опционально | Список slug и/или числовых ID проектов через запятую |
+| `PORT` | HTTP | опционально (по умолчанию `3847`) | Порт прослушивания |
+| `HOST` | HTTP | опционально (по умолчанию `0.0.0.0`) | Адрес привязки |
 
-## HTTP headers
+## HTTP-заголовки
 
-| Header | Mode | Purpose |
-|--------|------|---------|
-| `Authorization: Bearer …` | gateway | Must equal `MCP_AUTH_TOKEN` |
-| `Authorization: Bearer …` | passthrough | O!task API token; proxied on every API call |
-| `X-Otask-Allowed-Projects` | **passthrough only** | Comma-separated slugs/IDs; ignored in gateway (use env instead) |
+| Заголовок | Режим | Назначение |
+|-----------|-------|------------|
+| `Authorization: Bearer …` | gateway | Должен совпадать с `MCP_AUTH_TOKEN` |
+| `Authorization: Bearer …` | passthrough | Токен O!task API; проксируется на каждый запрос к API |
+| `X-Otask-Allowed-Projects` | **только passthrough** | Slug/ID через запятую; в gateway игнорируется (используйте env) |
 
-## Endpoints (HTTP)
+## Эндпоинты (HTTP)
 
 | | |
 |---|---|
 | MCP | `POST`/`GET` `/mcp` (Streamable HTTP) |
-| Health | `GET /health` → `{ ok, mode, authMode, projectGuard }` where `projectGuard` is `"env" \| "header" \| "off"` |
+| Health | `GET /health` → `{ ok, mode, authMode, projectGuard }`, где `projectGuard` — `"env" \| "header" \| "off"` |
 
-Example deploy: `https://otask-mcp.grigoreo.dev/mcp` (port `3847` in Docker).
+Пример деплоя: `https://otask-mcp.grigoreo.dev/mcp` (порт `3847` в Docker).
 
-## n8n examples
+## Примеры для n8n
 
-### Gateway (server holds O!task credentials)
+### Gateway (credentials O!task хранит сервер)
 
-Server env:
+Env сервера:
 
 ```env
 OTASK_AUTH_KEY=...
@@ -60,24 +60,24 @@ n8n **MCP Client Tool**:
 - URL: `https://otask-mcp.example/mcp`
 - Transport: **HTTP Streamable**
 - Credential / header: `Authorization: Bearer super-secret-mcp-token`
-- Do **not** send `X-Otask-Allowed-Projects` (allow-list comes from server env)
+- **Не** отправляйте `X-Otask-Allowed-Projects` (allow-list берётся из env сервера)
 
-### Passthrough (client holds O!task token)
+### Passthrough (токен O!task у клиента)
 
-Server env: no `OTASK_AUTH_KEY` / `OTASK_EMAIL` / `OTASK_PASSWORD`.
+Env сервера: без `OTASK_AUTH_KEY` / `OTASK_EMAIL` / `OTASK_PASSWORD`.
 
 n8n **MCP Client Tool**:
 
 - URL: `https://otask-mcp.example/mcp`
 - Transport: **HTTP Streamable**
-- Credential / header: `Authorization: Bearer <same token as api.otask.ru>`
-- Optional: `X-Otask-Allowed-Projects: eng-backlog,99`
+- Credential / header: `Authorization: Bearer <тот же токен, что и для api.otask.ru>`
+- Опционально: `X-Otask-Allowed-Projects: eng-backlog,99`
 
 ### Stdio (Cursor / OpenCode)
 
 ```env
 OTASK_AUTH_KEY=...
-# or OTASK_EMAIL + OTASK_PASSWORD
+# или OTASK_EMAIL + OTASK_PASSWORD
 OTASK_ALLOWED_PROJECTS=my-project
 ```
 
@@ -85,30 +85,30 @@ OTASK_ALLOWED_PROJECTS=my-project
 bun start
 ```
 
-## Tools
+## Инструменты
 
-Registered in `src/tools/registry.ts` (one-line intents for agents):
+Регистрируются в `src/tools/registry.ts` (краткие intent для агентов):
 
-| Tool | Intent |
-|------|--------|
-| `otask_get_task` | Fetch one task by workspace + task slug (inspect fields before update) |
-| `otask_update_task` | Patch an existing task (name, board, performers, tags, description, …) |
-| `otask_list_projects` | List workspace projects (filtered by allow-list when set) |
-| `otask_list_project_tasks` | List tasks in a project |
-| `otask_list_board` | List boards/columns (statuses) for a project — discover `board_id` / `board_column_id` |
-| `otask_list_members` | List workspace members (performer IDs for assignment) |
-| `otask_list_tags` | List workspace tags for labeling |
-| `otask_list_comments` | List comments on a task |
-| `otask_add_comment` | Add a comment (optional `parent_id` for replies) |
-| `otask_create_task` | Create a task (required: `ws_slug`, `project_id`, `name`, `board_id`, `board_column_id`, `end_at`) |
-| `otask_move_task` | Move a task to another board column (status) |
-| `otask_archive_task` | Archive a task |
+| Инструмент | Назначение |
+|------------|------------|
+| `otask_get_task` | Получить одну задачу по workspace + slug задачи (посмотреть поля перед обновлением) |
+| `otask_update_task` | Обновить существующую задачу (name, board, performers, tags, description, …) |
+| `otask_list_projects` | Список проектов воркспейса (с фильтром по allow-list, если задан) |
+| `otask_list_project_tasks` | Список задач в проекте |
+| `otask_list_board` | Список досок/колонок (статусов) проекта — узнать `board_id` / `board_column_id` |
+| `otask_list_members` | Список участников воркспейса (ID исполнителей для назначения) |
+| `otask_list_tags` | Список тегов воркспейса для меток |
+| `otask_list_comments` | Список комментариев к задаче |
+| `otask_add_comment` | Добавить комментарий (опционально `parent_id` для ответов) |
+| `otask_create_task` | Создать задачу (обязательно: `ws_slug`, `project_id`, `name`, `board_id`, `board_column_id`, `end_at`) |
+| `otask_move_task` | Переместить задачу в другую колонку доски (статус) |
+| `otask_archive_task` | Архивировать задачу |
 
-When a project allow-list is active, project-scoped tools assert membership (or filter list results); empty allow-list = all projects allowed.
+Если активен allow-list проектов, project-scoped инструменты проверяют членство (или фильтруют списки); пустой allow-list = доступны все проекты.
 
-## Project allow-list
+## Allow-list проектов
 
-Format: comma-separated **slugs** and/or **numeric IDs** (whitespace trimmed). Empty / unset = off.
+Формат: **slug** и/или **числовые ID** через запятую (пробелы обрезаются). Пусто / не задано = выключено.
 
 ### Gateway / stdio — env
 
@@ -116,27 +116,27 @@ Format: comma-separated **slugs** and/or **numeric IDs** (whitespace trimmed). E
 OTASK_ALLOWED_PROJECTS=product-roadmap,eng-backlog,42
 ```
 
-`GET /health` → `projectGuard: "env"` when non-empty.
+`GET /health` → `projectGuard: "env"`, если значение непустое.
 
-### Passthrough — request header
+### Passthrough — заголовок запроса
 
 ```http
 X-Otask-Allowed-Projects: product-roadmap,42
 ```
 
-`GET /health` (with that header) → `projectGuard: "header"`. Gateway ignores this header and always uses `OTASK_ALLOWED_PROJECTS`.
+`GET /health` (с этим заголовком) → `projectGuard: "header"`. Gateway этот заголовок игнорирует и всегда использует `OTASK_ALLOWED_PROJECTS`.
 
-## API docs snapshot
+## Снимок API-документации
 
-Regenerate the local API catalog from O!task HTML docs (Scribe):
+Пересобрать локальный каталог API из HTML-доки O!task (Scribe):
 
 ```bash
 bun run docs:parse
 ```
 
-Writes under `docs/catalog/` from the live HTML docs page (or `bun run docs:parse --file path` for offline HTML).
+Пишет в `docs/catalog/` с живой HTML-страницы доки (или `bun run docs:parse --file path` для офлайн HTML).
 
-## Development
+## Разработка
 
 ```bash
 bun install
@@ -148,11 +148,11 @@ bun run dev            # stdio hot reload
 bun run dev:http       # HTTP hot reload
 ```
 
-### Adding a tool
+### Добавление инструмента
 
-1. `src/services/api.ts` / `client.ts` — API method if needed  
+1. `src/services/api.ts` / `client.ts` — метод API при необходимости  
 2. `src/schemas/` — Zod input schema  
 3. `src/tools/my-tool.ts` — `createMyTool({ api, guard })` → `ToolDefinition`  
-4. `src/tools/registry.ts` — append factory to `toolFactories`  
+4. `src/tools/registry.ts` — добавить factory в `toolFactories`  
 
-`server.ts` / `register.ts` need no edits — registration is centralized.
+`server.ts` / `register.ts` править не нужно — регистрация централизована.
