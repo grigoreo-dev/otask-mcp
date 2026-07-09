@@ -5,7 +5,10 @@ export const WsSlugSchema = z
     ws_slug: z
       .string()
       .min(1)
-      .describe("Workspace slug (UUID from panel.otask.ru URL)"),
+      .optional()
+      .describe(
+        "Workspace slug (UUID from panel.otask.ru). Optional if OTASK_DEFAULT_WS is set.",
+      ),
   })
   .strict();
 
@@ -15,7 +18,10 @@ export const ProjectSlugSchema = WsSlugSchema.extend({
   project_slug: z
     .string()
     .min(1)
-    .describe("Project slug (UUID from panel.otask.ru URL)"),
+    .optional()
+    .describe(
+      "Project slug (UUID from panel.otask.ru). Optional if OTASK_DEFAULT_PROJECT is set.",
+    ),
 }).strict();
 
 export type ProjectSlugInput = z.infer<typeof ProjectSlugSchema>;
@@ -34,7 +40,10 @@ export const ListProjectTasksInputSchema = ProjectSlugSchema.extend({
 export type ListProjectTasksInput = z.infer<typeof ListProjectTasksInputSchema>;
 
 export const ListBoardInputSchema = ProjectSlugSchema.extend({
-  type: z.string().optional().describe("Board type filter"),
+  type: z
+    .string()
+    .optional()
+    .describe('Board type filter (API requires "status"; defaulted by tool)'),
   board_slug: z.string().optional().describe("Specific board slug"),
 }).strict();
 

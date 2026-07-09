@@ -2,14 +2,17 @@ import {
   CreateTaskInputSchema,
   type CreateTaskInput,
 } from "../schemas/task.js";
-import { assertProjectIdAllowed } from "../services/project-guard.js";
+import {
+  resolveProjectId,
+  resolveWsSlug,
+} from "../services/scope.js";
 import { compactTask } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
 export function createCreateTaskTool({
   api,
-  guard,
+  scope,
 }: ToolDeps): ToolDefinition<CreateTaskInput> {
   return {
     name: "otask_create_task",
@@ -20,8 +23,7 @@ export function createCreateTaskTool({
 You must supply board_id and board_column_id (discover via otask_list_board for the project).
 
 Args:
-  - ws_slug: Workspace UUID
-  - project_id: Project numeric ID
+  - ws_slug, project_id: optional if OTASK_DEFAULT_WS / OTASK_DEFAULT_PROJECT set
   - name, board_id, board_column_id, end_at: required
   - description, comment, priority_id, performers, tags: optional
 
@@ -38,13 +40,14 @@ Docs: https://api.otask.ru/docs`,
     },
     handler: async (params) => {
       try {
-        const { ws_slug, ...body } = params;
-        await assertProjectIdAllowed(
-          guard,
-          () => api.listProjects(ws_slug),
-          body.project_id,
+        const { ws_slug, project_id: projectIdArg, ...rest } = params;
+        const ws = resolveWsSlug(ws_slug, scope);
+        const project_id = await resolveProjectId(
+          projectIdArg,
+          scope,
+          () => api.listProjects(ws),
         );
-        const task = await api.createTask(ws_slug, body);
+        const task = await api.createTask(ws, { ...rest, project_id });
         const summary = compactTask(task);
         return jsonToolResult(summary, { task: summary });
       } catch (error) {

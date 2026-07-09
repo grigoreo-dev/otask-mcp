@@ -8,14 +8,14 @@ import {
   createEnvAuthResolver,
   createPassthroughAuthResolver,
   extractBearerToken,
-  extractProjectAllowListHeader,
   getHttpAuthMode,
   validateHttpAuthConfig,
 } from "./services/auth.js";
 import {
-  projectGuardMode,
-  resolveHttpProjectGuard,
-} from "./services/project-guard.js";
+  assertDefaultsAllowed,
+  resolveHttpScope,
+  scopeFromEnv,
+} from "./services/scope.js";
 
 function getPort(): number {
   const raw = process.env.PORT?.trim() || "3847";
@@ -29,6 +29,28 @@ function getPort(): number {
 function sendJson(res: ServerResponse, status: number, body: unknown): void {
   res.writeHead(status, { "Content-Type": "application/json" });
   res.end(JSON.stringify(body));
+}
+
+function scopeModes(
+  authMode: "gateway" | "passthrough",
+  scope: ReturnType<typeof resolveHttpScope>,
+) {
+  return {
+    wsGuard: scope.wsGuard.list.isEmpty
+      ? "off"
+      : authMode === "gateway"
+        ? "env"
+        : "header",
+    projectGuard: scope.projectGuard.list.isEmpty
+      ? "off"
+      : authMode === "gateway"
+        ? "env"
+        : "header",
+    defaults: {
+      ws: Boolean(scope.defaultWs),
+      project: Boolean(scope.defaultProject),
+    },
+  };
 }
 
 async function handleMcpRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
@@ -48,11 +70,10 @@ async function handleMcpRequest(req: IncomingMessage, res: ServerResponse): Prom
     : createEnvAuthResolver();
 
   const authMode = getHttpAuthMode();
-  const headerRaw = extractProjectAllowListHeader(req.headers);
-  const guard = resolveHttpProjectGuard({
+  const scope = resolveHttpScope({
     authMode,
     env: process.env,
-    headerRaw,
+    headers: req.headers,
   });
 
   const transport = new StreamableHTTPServerTransport({
@@ -60,7 +81,7 @@ async function handleMcpRequest(req: IncomingMessage, res: ServerResponse): Prom
     enableJsonResponse: true,
   });
 
-  const server = createMcpServer(auth, guard);
+  const server = createMcpServer(auth, scope);
 
   res.on("close", () => {
     void transport.close();
@@ -75,17 +96,19 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
 
   if (requestUrl.pathname === "/health") {
     const authMode = getHttpAuthMode();
-    const headerRaw = extractProjectAllowListHeader(req.headers);
-    const guard = resolveHttpProjectGuard({
+    const scope = resolveHttpScope({
       authMode,
       env: process.env,
-      headerRaw,
+      headers: req.headers,
     });
+    const modes = scopeModes(authMode, scope);
     sendJson(res, 200, {
       ok: true,
       mode: "mcp-streamable-http",
       authMode,
-      projectGuard: projectGuardMode(authMode, guard),
+      projectGuard: modes.projectGuard,
+      wsGuard: modes.wsGuard,
+      defaults: modes.defaults,
     });
     return;
   }
@@ -103,6 +126,7 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
 
 function main(): void {
   validateHttpAuthConfig();
+  assertDefaultsAllowed(scopeFromEnv());
 
   const port = getPort();
   const host = process.env.HOST?.trim() || "0.0.0.0";

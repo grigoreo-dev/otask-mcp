@@ -32,9 +32,14 @@ stdio требует `OTASK_*` (без них падает при старте).
 | `OTASK_EMAIL` | stdio, HTTP gateway | вместе с `OTASK_PASSWORD` как альтернатива ключу | Логин для получения токена |
 | `OTASK_PASSWORD` | stdio, HTTP gateway | вместе с `OTASK_EMAIL` | Пароль для логина |
 | `MCP_AUTH_TOKEN` | HTTP gateway | режим gateway | Общий секрет, который должен отправлять клиент; **не** токен O!task |
-| `OTASK_ALLOWED_PROJECTS` | stdio, HTTP gateway | опционально | Список slug и/или числовых ID проектов через запятую |
+| `OTASK_DEFAULT_WS` | stdio, HTTP | опционально | Workspace slug по умолчанию (если tool не передал `ws_slug`) |
+| `OTASK_DEFAULT_PROJECT` | stdio, HTTP | опционально | Project slug **или** numeric id по умолчанию |
+| `OTASK_ALLOWED_WS` | stdio, HTTP gateway | опционально | Allow-list workspace slug через запятую |
+| `OTASK_ALLOWED_PROJECTS` | stdio, HTTP gateway | опционально | Allow-list project slug и/или numeric id через запятую |
 | `PORT` | HTTP | опционально (по умолчанию `3847`) | Порт прослушивания |
 | `HOST` | HTTP | опционально (по умолчанию `0.0.0.0`) | Адрес привязки |
+
+Default должен входить в allow-list, если list непустой (иначе сервер падает при старте).
 
 ## HTTP-заголовки
 
@@ -42,14 +47,17 @@ stdio требует `OTASK_*` (без них падает при старте).
 |-----------|-------|------------|
 | `Authorization: Bearer …` | gateway | Должен совпадать с `MCP_AUTH_TOKEN` |
 | `Authorization: Bearer …` | passthrough | Токен O!task API; проксируется на каждый запрос к API |
-| `X-Otask-Allowed-Projects` | **только passthrough** | Slug/ID через запятую; в gateway игнорируется (используйте env) |
+| `X-Otask-Allowed-Projects` | **только passthrough** | Allow-list projects; в gateway — env |
+| `X-Otask-Allowed-Ws` | **только passthrough** | Allow-list workspaces |
+| `X-Otask-Default-Ws` | **passthrough** (override env) | Default workspace slug |
+| `X-Otask-Default-Project` | **passthrough** (override env) | Default project slug/id |
 
 ## Эндпоинты (HTTP)
 
 | | |
 |---|---|
 | MCP | `POST`/`GET` `/mcp` (Streamable HTTP) |
-| Health | `GET /health` → `{ ok, mode, authMode, projectGuard }`, где `projectGuard` — `"env" \| "header" \| "off"` |
+| Health | `GET /health` → `{ ok, mode, authMode, projectGuard, wsGuard, defaults }` (`"env" \| "header" \| "off"`) |
 
 Пример деплоя: `https://otask-mcp.grigoreo.dev/mcp` (порт `3847` в Docker).
 
@@ -62,7 +70,10 @@ Env сервера:
 ```env
 OTASK_AUTH_KEY=...
 MCP_AUTH_TOKEN=super-secret-mcp-token
-OTASK_ALLOWED_PROJECTS=my-project,42
+OTASK_DEFAULT_WS=246cd090-27a2-4f00-b4d6-2018d4d7ffe1
+OTASK_DEFAULT_PROJECT=3156e838-b2b8-4537-8379-97131c22f60b
+OTASK_ALLOWED_WS=246cd090-27a2-4f00-b4d6-2018d4d7ffe1
+OTASK_ALLOWED_PROJECTS=3156e838-b2b8-4537-8379-97131c22f60b,35747
 ```
 
 n8n **MCP Client Tool**:
@@ -70,7 +81,7 @@ n8n **MCP Client Tool**:
 - URL: `https://otask-mcp.example/mcp`
 - Transport: **HTTP Streamable**
 - Credential / header: `Authorization: Bearer super-secret-mcp-token`
-- **Не** отправляйте `X-Otask-Allowed-Projects` (allow-list берётся из env сервера)
+- **Не** отправляйте `X-Otask-*` allow/default headers (берутся из env сервера)
 
 ### Passthrough (токен O!task у клиента)
 
@@ -81,13 +92,16 @@ n8n **MCP Client Tool**:
 - URL: `https://otask-mcp.example/mcp`
 - Transport: **HTTP Streamable**
 - Credential / header: `Authorization: Bearer <тот же токен, что и для api.otask.ru>`
-- Опционально: `X-Otask-Allowed-Projects: eng-backlog,99`
+- Опционально: `X-Otask-Allowed-Projects`, `X-Otask-Allowed-Ws`, `X-Otask-Default-Ws`, `X-Otask-Default-Project`
 
 ### Stdio (Cursor / OpenCode)
 
 ```env
 OTASK_AUTH_KEY=...
 # или OTASK_EMAIL + OTASK_PASSWORD
+OTASK_DEFAULT_WS=...
+OTASK_DEFAULT_PROJECT=my-project
+OTASK_ALLOWED_WS=...
 OTASK_ALLOWED_PROJECTS=my-project
 ```
 
@@ -116,25 +130,25 @@ bun start
 
 Если активен allow-list проектов, project-scoped инструменты проверяют членство (или фильтруют списки); пустой allow-list = доступны все проекты.
 
-## Allow-list проектов
+## Defaults и allow-list (ws + projects)
 
-Формат: **slug** и/или **числовые ID** через запятую (пробелы обрезаются). Пусто / не задано = выключено.
+| Что | Env (gateway/stdio) | Header (passthrough) |
+|-----|---------------------|----------------------|
+| Default workspace | `OTASK_DEFAULT_WS` | `X-Otask-Default-Ws` (override) |
+| Default project | `OTASK_DEFAULT_PROJECT` (slug или id) | `X-Otask-Default-Project` |
+| Limit workspaces | `OTASK_ALLOWED_WS` | `X-Otask-Allowed-Ws` |
+| Limit projects | `OTASK_ALLOWED_PROJECTS` | `X-Otask-Allowed-Projects` |
 
-### Gateway / stdio — env
+Формат allow-list: значения через запятую (пробелы обрезаются). Projects: **slug** и/или **numeric id**. WS: только slug. Пусто = off.
 
 ```env
-OTASK_ALLOWED_PROJECTS=product-roadmap,eng-backlog,42
+OTASK_DEFAULT_WS=246cd090-27a2-4f00-b4d6-2018d4d7ffe1
+OTASK_DEFAULT_PROJECT=3156e838-b2b8-4537-8379-97131c22f60b
+OTASK_ALLOWED_WS=246cd090-27a2-4f00-b4d6-2018d4d7ffe1
+OTASK_ALLOWED_PROJECTS=3156e838-b2b8-4537-8379-97131c22f60b,product-roadmap,42
 ```
 
-`GET /health` → `projectGuard: "env"`, если значение непустое.
-
-### Passthrough — заголовок запроса
-
-```http
-X-Otask-Allowed-Projects: product-roadmap,42
-```
-
-`GET /health` (с этим заголовком) → `projectGuard: "header"`. Gateway этот заголовок игнорирует и всегда использует `OTASK_ALLOWED_PROJECTS`.
+`otask_list_board` по умолчанию шлёт `type=status` (так требует O!task API).
 
 ## Снимок API-документации
 

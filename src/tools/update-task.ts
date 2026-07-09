@@ -3,6 +3,7 @@ import {
   type UpdateTaskInput,
 } from "../schemas/task.js";
 import { assertProjectIdAllowed } from "../services/project-guard.js";
+import { resolveWsSlug } from "../services/scope.js";
 import {
   buildUpdateBodyFromTask,
   summarizeTask,
@@ -13,6 +14,7 @@ import type { ToolDefinition, ToolDeps } from "./types.js";
 export function createUpdateTaskTool({
   api,
   guard,
+  scope,
 }: ToolDeps): ToolDefinition<UpdateTaskInput> {
   return {
     name: "otask_update_task",
@@ -29,8 +31,9 @@ Common updates:
   - comment: optional note recorded with the update
 
 Args:
-  - ws_slug, task_slug: UUIDs from panel.otask.ru
-  - Any task fields to change (all optional except slugs)
+  - ws_slug: optional if OTASK_DEFAULT_WS is set
+  - task_slug: UUID from panel.otask.ru
+  - Any task fields to change (all optional except task_slug)
 
 Returns updated task summary on success.
 
@@ -47,14 +50,15 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
       const { ws_slug, task_slug, ...changes } = params;
 
       try {
-        const current = await api.getTask(ws_slug, task_slug);
+        const ws = resolveWsSlug(ws_slug, scope);
+        const current = await api.getTask(ws, task_slug);
         const projectSlug =
           typeof current.project_slug === "string"
             ? current.project_slug
             : undefined;
         await assertProjectIdAllowed(
           guard,
-          () => api.listProjects(ws_slug),
+          () => api.listProjects(ws),
           current.project_id,
           projectSlug,
         );
@@ -92,12 +96,12 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
         if (changes.project_id !== undefined) {
           await assertProjectIdAllowed(
             guard,
-            () => api.listProjects(ws_slug),
+            () => api.listProjects(ws),
             changes.project_id,
           );
         }
 
-        const result = await api.updateTask(ws_slug, task_slug, body);
+        const result = await api.updateTask(ws, task_slug, body);
         const summary = summarizeTask(result.task);
 
         return jsonToolResult(

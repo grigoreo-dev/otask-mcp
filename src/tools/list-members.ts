@@ -3,12 +3,14 @@ import {
   type WsSlugInput,
 } from "../schemas/workspace.js";
 import { agentListResult } from "../services/format.js";
+import { resolveWsSlug } from "../services/scope.js";
 import { compactMember } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
 export function createListMembersTool({
   api,
+  scope,
 }: ToolDeps): ToolDefinition<WsSlugInput> {
   return {
     name: "otask_list_members",
@@ -17,7 +19,7 @@ export function createListMembersTool({
       description: `List workspace members (performers for assignment).
 
 Args:
-  - ws_slug: Workspace UUID from panel.otask.ru
+  - ws_slug: optional if OTASK_DEFAULT_WS is set
 
 Returns compact members: id, name, email, status_text.
 
@@ -32,7 +34,8 @@ Docs: https://api.otask.ru/docs`,
     },
     handler: async ({ ws_slug }) => {
       try {
-        const members = await api.listMembers(ws_slug);
+        const ws = resolveWsSlug(ws_slug, scope);
+        const members = await api.listMembers(ws);
         const items = members.map((m) =>
           compactMember(
             (m ?? {}) as {

@@ -3,6 +3,11 @@ import {
   createProjectGuard,
   parseProjectAllowList,
 } from "../src/services/project-guard.ts";
+import {
+  createWsGuard,
+  parseWsAllowList,
+  type ScopeContext,
+} from "../src/services/scope.ts";
 import type { OtaskClient } from "../src/services/client.ts";
 import type { OtaskTask } from "../src/types.ts";
 import type { ToolDeps } from "../src/tools/types.ts";
@@ -54,13 +59,22 @@ function mockApi(partial: Partial<OtaskClient> = {}): OtaskClient {
   };
 }
 
+function emptyScope(projectAllow = ""): ScopeContext {
+  return {
+    wsGuard: createWsGuard(parseWsAllowList(undefined)),
+    projectGuard: createProjectGuard(parseProjectAllowList(projectAllow)),
+  };
+}
+
 function deps(
   apiPartial: Partial<OtaskClient> = {},
   allowList = "",
 ): ToolDeps {
+  const scope = emptyScope(allowList);
   return {
     api: mockApi(apiPartial),
-    guard: createProjectGuard(parseProjectAllowList(allowList)),
+    guard: scope.projectGuard,
+    scope,
   };
 }
 
@@ -277,7 +291,7 @@ describe("otask_list_board", () => {
     expect(body.boards[0]).not.toHaveProperty("localtz");
     expect(body.columns[0]).not.toHaveProperty("pivot");
     expect(body.next).toBeNull();
-    expect(d.api.listBoard).toHaveBeenCalledWith("ws", "p1", undefined);
+    expect(d.api.listBoard).toHaveBeenCalledWith("ws", "p1", { type: "status" });
   });
 
   test("blocks disallowed project", async () => {

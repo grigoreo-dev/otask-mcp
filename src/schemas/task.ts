@@ -5,7 +5,10 @@ export const WsTaskSlugSchema = z
     ws_slug: z
       .string()
       .min(1)
-      .describe("Workspace slug (UUID from panel.otask.ru URL)"),
+      .optional()
+      .describe(
+        "Workspace slug (UUID from panel.otask.ru). Optional if OTASK_DEFAULT_WS is set.",
+      ),
     task_slug: z
       .string()
       .min(1)
@@ -73,8 +76,17 @@ export const CreateTaskInputSchema = z
     ws_slug: z
       .string()
       .min(1)
-      .describe("Workspace slug (UUID from panel.otask.ru URL)"),
-    project_id: z.number().int().describe("Project ID (must be allow-listed)"),
+      .optional()
+      .describe(
+        "Workspace slug. Optional if OTASK_DEFAULT_WS is set.",
+      ),
+    project_id: z
+      .number()
+      .int()
+      .optional()
+      .describe(
+        "Project ID (must be allow-listed). Optional if OTASK_DEFAULT_PROJECT is set.",
+      ),
     name: z.string().min(1).describe("Task title"),
     board_id: z
       .number()

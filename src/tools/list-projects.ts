@@ -3,6 +3,7 @@ import {
   type WsSlugInput,
 } from "../schemas/workspace.js";
 import { agentListResult } from "../services/format.js";
+import { resolveWsSlug } from "../services/scope.js";
 import { compactProject } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
@@ -10,6 +11,7 @@ import type { ToolDefinition, ToolDeps } from "./types.js";
 export function createListProjectsTool({
   api,
   guard,
+  scope,
 }: ToolDeps): ToolDefinition<WsSlugInput> {
   return {
     name: "otask_list_projects",
@@ -18,7 +20,7 @@ export function createListProjectsTool({
       description: `List projects in a workspace. Results are filtered by the project allow-list when configured.
 
 Args:
-  - ws_slug: Workspace UUID from panel.otask.ru
+  - ws_slug: optional if OTASK_DEFAULT_WS is set
 
 Returns compact projects: id, slug, name, status_id.
 
@@ -33,7 +35,8 @@ Docs: https://api.otask.ru/docs`,
     },
     handler: async ({ ws_slug }) => {
       try {
-        const projects = await api.listProjects(ws_slug);
+        const ws = resolveWsSlug(ws_slug, scope);
+        const projects = await api.listProjects(ws);
         const allowed = guard.filterProjects(projects);
         const items = allowed.map((p) => compactProject(p));
         const payload = agentListResult(

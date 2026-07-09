@@ -3,6 +3,10 @@ import {
   createProjectGuard,
   parseProjectAllowList,
 } from "../src/services/project-guard.ts";
+import {
+  createWsGuard,
+  parseWsAllowList,
+} from "../src/services/scope.ts";
 import type { OtaskClient } from "../src/services/client.ts";
 import type { OtaskTask } from "../src/types.ts";
 import type { ToolDeps } from "../src/tools/types.ts";
@@ -58,9 +62,14 @@ function deps(
   apiPartial: Partial<OtaskClient> = {},
   allowList = "",
 ): ToolDeps {
+  const projectGuard = createProjectGuard(parseProjectAllowList(allowList));
   return {
     api: mockApi(apiPartial),
-    guard: createProjectGuard(parseProjectAllowList(allowList)),
+    guard: projectGuard,
+    scope: {
+      wsGuard: createWsGuard(parseWsAllowList(undefined)),
+      projectGuard,
+    },
   };
 }
 

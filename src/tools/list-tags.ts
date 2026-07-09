@@ -3,12 +3,14 @@ import {
   type WsSlugInput,
 } from "../schemas/workspace.js";
 import { agentListResult } from "../services/format.js";
+import { resolveWsSlug } from "../services/scope.js";
 import { compactTag } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
 export function createListTagsTool({
   api,
+  scope,
 }: ToolDeps): ToolDefinition<WsSlugInput> {
   return {
     name: "otask_list_tags",
@@ -17,7 +19,7 @@ export function createListTagsTool({
       description: `List workspace tags for labeling tasks.
 
 Args:
-  - ws_slug: Workspace UUID from panel.otask.ru
+  - ws_slug: optional if OTASK_DEFAULT_WS is set
 
 Returns compact tags (id, name, slug?, color?) as agent list envelope.
 
@@ -32,7 +34,8 @@ Docs: https://api.otask.ru/docs`,
     },
     handler: async ({ ws_slug }) => {
       try {
-        const tags = await api.listTags(ws_slug);
+        const ws = resolveWsSlug(ws_slug, scope);
+        const tags = await api.listTags(ws);
         const items = tags.map((t) =>
           compactTag(t as { id: number; name: string; slug?: string; color?: string }),
         );
