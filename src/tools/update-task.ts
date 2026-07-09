@@ -9,14 +9,17 @@ import {
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
-export function createUpdateTaskTool({ api }: ToolDeps): ToolDefinition<UpdateTaskInput> {
+export function createUpdateTaskTool({
+  api,
+  guard,
+}: ToolDeps): ToolDefinition<UpdateTaskInput> {
   return {
     name: "otask_update_task",
     config: {
       title: "Update O!task Task",
       description: `Update an existing O!task task. Sends POST /api/v1/ws/{ws_slug}/tasks/{task_slug}/update.
 
-The O!task API requires a full task payload. This tool fetches the current task, merges your changes, then submits the update. Only pass fields you want to change.
+The O!task API requires a full task payload. This tool fetches the current task, merges your changes, then submits the update. Only pass fields you want to change. Project must be allow-listed when configured.
 
 Common updates:
   - board_column_id: move task to another column/status
@@ -44,6 +47,14 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
 
       try {
         const current = await api.getTask(ws_slug, task_slug);
+        const projectSlug =
+          typeof current.project_slug === "string"
+            ? current.project_slug
+            : undefined;
+        guard.assertAllowed({
+          id: current.project_id,
+          slug: projectSlug,
+        });
         const body = buildUpdateBodyFromTask(current, {
           ...(changes.name !== undefined ? { name: changes.name } : {}),
           ...(changes.board_id !== undefined
