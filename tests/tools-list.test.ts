@@ -17,6 +17,8 @@ import { createListBoardTool } from "../src/tools/list-board.ts";
 import { createListMembersTool } from "../src/tools/list-members.ts";
 import { createListTagsTool } from "../src/tools/list-tags.ts";
 import { createGetTaskTool } from "../src/tools/get-task.ts";
+import { createMeTool } from "../src/tools/me.ts";
+import { createMeCache } from "../src/services/me-cache.ts";
 import { toolFactories } from "../src/tools/registry.ts";
 
 function sampleTask(overrides: Partial<OtaskTask> = {}): OtaskTask {
@@ -41,6 +43,12 @@ function sampleTask(overrides: Partial<OtaskTask> = {}): OtaskTask {
 
 function mockApi(partial: Partial<OtaskClient> = {}): OtaskClient {
   return {
+    getMe: mock(async () => ({
+      id: 11458,
+      full_name: "Test User",
+      email: "t@e.st",
+      timezone: "Europe/Moscow",
+    })),
     getTask: mock(async () => sampleTask()),
     updateTask: mock(async () => ({
       success: true,
@@ -48,6 +56,10 @@ function mockApi(partial: Partial<OtaskClient> = {}): OtaskClient {
     })),
     listProjects: mock(async () => []),
     listProjectTasks: mock(async () => ({ tasks: [] })),
+    listWorkspaceTasks: mock(async () => ({
+      tasks: [],
+      meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 },
+    })),
     listBoard: mock(async () => ({ boards: [], columns: [] })),
     listMembers: mock(async () => []),
     listTags: mock(async () => []),
@@ -443,9 +455,39 @@ describe("otask_get_task guard", () => {
   });
 });
 
+describe("otask_me", () => {
+  test("returns compact me via cache", async () => {
+    const getMe = mock(async () => ({
+      id: 11458,
+      full_name: "Test User",
+      email: "t@e.st",
+      timezone: "Europe/Moscow",
+      params: { noise: 1 },
+    }));
+    const d = deps({ getMe });
+    d.meCache = createMeCache(() => d.api.getMe());
+    const tool = createMeTool(d);
+    const result = await tool.handler({});
+    expect(result.isError).toBeUndefined();
+    const body = parseContent(result) as {
+      id: number;
+      full_name: string;
+      timezone: string;
+    };
+    expect(body).toEqual({
+      id: 11458,
+      full_name: "Test User",
+      email: "t@e.st",
+      timezone: "Europe/Moscow",
+    });
+    expect(body).not.toHaveProperty("params");
+  });
+});
+
 describe("registry", () => {
   test("registers all read tools", () => {
     const names = toolFactories.map((f) => f(deps()).name);
+    expect(names).toContain("otask_me");
     expect(names).toContain("otask_list_projects");
     expect(names).toContain("otask_list_project_tasks");
     expect(names).toContain("otask_list_board");

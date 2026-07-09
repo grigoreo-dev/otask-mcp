@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { OtaskAuthResolver } from "./services/auth.js";
 import { createOtaskClient } from "./services/client.js";
+import { createMeCache } from "./services/me-cache.js";
 import {
   scopeFromEnv,
   type ScopeContext,
@@ -16,10 +17,12 @@ export function createMcpServer(
     version: "1.3.0",
   });
 
+  const api = createOtaskClient(auth);
   registerAllTools(server, {
-    api: createOtaskClient(auth),
+    api,
     guard: scope.projectGuard,
     scope,
+    meCache: createMeCache(() => api.getMe()),
   });
 
   return server;

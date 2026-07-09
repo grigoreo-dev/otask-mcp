@@ -8,11 +8,13 @@ import { createListMembersTool } from "./list-members.js";
 import { createListProjectTasksTool } from "./list-project-tasks.js";
 import { createListProjectsTool } from "./list-projects.js";
 import { createListTagsTool } from "./list-tags.js";
+import { createMeTool } from "./me.js";
 import { createMoveTaskTool } from "./move-task.js";
 import { createUpdateTaskTool } from "./update-task.js";
 
 /** Add new tools here — one factory per file. */
 export const toolFactories = [
+  createMeTool,
   createGetTaskTool,
   createUpdateTaskTool,
   createListProjectsTool,

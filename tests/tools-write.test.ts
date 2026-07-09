@@ -40,6 +40,12 @@ function sampleTask(overrides: Partial<OtaskTask> = {}): OtaskTask {
 
 function mockApi(partial: Partial<OtaskClient> = {}): OtaskClient {
   return {
+    getMe: mock(async () => ({
+      id: 11458,
+      full_name: "Test User",
+      email: "t@e.st",
+      timezone: "Europe/Moscow",
+    })),
     getTask: mock(async () => sampleTask()),
     updateTask: mock(async () => ({
       success: true,
@@ -47,6 +53,10 @@ function mockApi(partial: Partial<OtaskClient> = {}): OtaskClient {
     })),
     listProjects: mock(async () => []),
     listProjectTasks: mock(async () => ({ tasks: [] })),
+    listWorkspaceTasks: mock(async () => ({
+      tasks: [],
+      meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 },
+    })),
     listBoard: mock(async () => ({ boards: [], columns: [] })),
     listMembers: mock(async () => []),
     listTags: mock(async () => []),
