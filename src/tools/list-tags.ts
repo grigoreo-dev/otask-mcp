@@ -3,6 +3,7 @@ import {
   type WsSlugInput,
 } from "../schemas/workspace.js";
 import { agentListResult } from "../services/format.js";
+import { compactTag } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
@@ -18,7 +19,7 @@ export function createListTagsTool({
 Args:
   - ws_slug: Workspace UUID from panel.otask.ru
 
-Returns tags as agent list envelope.
+Returns compact tags (id, name, slug?, color?) as agent list envelope.
 
 Docs: https://api.otask.ru/docs`,
       inputSchema: WsSlugSchema,
@@ -32,7 +33,10 @@ Docs: https://api.otask.ru/docs`,
     handler: async ({ ws_slug }) => {
       try {
         const tags = await api.listTags(ws_slug);
-        const payload = agentListResult(`${tags.length} tag(s)`, tags);
+        const items = tags.map((t) =>
+          compactTag(t as { id: number; name: string; slug?: string; color?: string }),
+        );
+        const payload = agentListResult(`${items.length} tag(s)`, items);
         return jsonToolResult(payload, payload as unknown as Record<string, unknown>);
       } catch (error) {
         return toolError(error);

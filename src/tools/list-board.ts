@@ -2,6 +2,8 @@ import {
   ListBoardInputSchema,
   type ListBoardInput,
 } from "../schemas/workspace.js";
+import { assertProjectSlugAllowed } from "../services/project-guard.js";
+import { compactBoard, compactColumn } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
@@ -21,7 +23,7 @@ Args:
   - ws_slug, project_slug: UUIDs from panel.otask.ru
   - type, board_slug: optional filters
 
-Returns boards and columns arrays.
+Returns compact boards and columns (id, name, slug?, color?, board_id?).
 
 Docs: https://api.otask.ru/docs`,
       inputSchema: ListBoardInputSchema,
@@ -34,16 +36,34 @@ Docs: https://api.otask.ru/docs`,
     },
     handler: async ({ ws_slug, project_slug, type, board_slug }) => {
       try {
-        guard.assertAllowed({ slug: project_slug });
+        await assertProjectSlugAllowed(
+          guard,
+          () => api.listProjects(ws_slug),
+          project_slug,
+        );
         const query =
           type !== undefined || board_slug !== undefined
             ? { type, board_slug }
             : undefined;
         const result = await api.listBoard(ws_slug, project_slug, query);
+        const boards = result.boards.map((b) =>
+          compactBoard(b as { id: number; name: string; slug?: string; color?: string }),
+        );
+        const columns = result.columns.map((c) =>
+          compactColumn(
+            c as {
+              id: number;
+              name: string;
+              slug?: string;
+              color?: string;
+              board_id?: number;
+            },
+          ),
+        );
         const payload = {
-          summary: `${result.boards.length} board(s), ${result.columns.length} column(s)`,
-          boards: result.boards,
-          columns: result.columns,
+          summary: `${boards.length} board(s), ${columns.length} column(s)`,
+          boards,
+          columns,
           next: null,
         };
         return jsonToolResult(payload, payload);

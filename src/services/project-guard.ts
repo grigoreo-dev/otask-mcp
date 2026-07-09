@@ -58,6 +58,21 @@ export function createProjectGuard(list: ProjectAllowList): ProjectGuard {
   };
 }
 
+/** Resolve project by slug (for id), then assert allow-list. */
+export async function assertProjectSlugAllowed(
+  guard: ProjectGuard,
+  listProjects: () => Promise<Array<{ id: number; slug: string }>>,
+  project_slug: string,
+): Promise<void> {
+  const projects = await listProjects();
+  const project = projects.find((p) => p.slug === project_slug);
+  if (project) {
+    guard.assertAllowed({ slug: project.slug, id: project.id });
+  } else {
+    guard.assertAllowed({ slug: project_slug });
+  }
+}
+
 export function projectGuardFromEnv(
   env: NodeJS.ProcessEnv = process.env,
 ): ProjectGuard {

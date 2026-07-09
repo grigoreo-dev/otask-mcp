@@ -31,6 +31,28 @@ export interface CompactMember {
   status_text?: string;
 }
 
+export interface CompactBoard {
+  id: number;
+  name: string;
+  slug?: string;
+  color?: string;
+}
+
+export interface CompactColumn {
+  id: number;
+  name: string;
+  slug?: string;
+  color?: string;
+  board_id?: number;
+}
+
+export interface CompactTag {
+  id: number;
+  name: string;
+  slug?: string;
+  color?: string;
+}
+
 function performerIds(task: OtaskTask): string[] {
   if (!Array.isArray(task.performers)) {
     return [];
@@ -172,6 +194,44 @@ export function compactMember(m: {
   if (m.status_text !== undefined) {
     out.status_text = m.status_text;
   }
+  return out;
+}
+
+export function compactBoard(b: {
+  id: number;
+  name: string;
+  slug?: string;
+  color?: string;
+}): CompactBoard {
+  const out: CompactBoard = { id: b.id, name: b.name };
+  if (b.slug !== undefined) out.slug = b.slug;
+  if (b.color !== undefined) out.color = b.color;
+  return out;
+}
+
+export function compactColumn(c: {
+  id: number;
+  name: string;
+  slug?: string;
+  color?: string;
+  board_id?: number;
+}): CompactColumn {
+  const out: CompactColumn = { id: c.id, name: c.name };
+  if (c.slug !== undefined) out.slug = c.slug;
+  if (c.color !== undefined) out.color = c.color;
+  if (c.board_id !== undefined) out.board_id = c.board_id;
+  return out;
+}
+
+export function compactTag(t: {
+  id: number;
+  name: string;
+  slug?: string;
+  color?: string;
+}): CompactTag {
+  const out: CompactTag = { id: t.id, name: t.name };
+  if (t.slug !== undefined) out.slug = t.slug;
+  if (t.color !== undefined) out.color = t.color;
   return out;
 }
 

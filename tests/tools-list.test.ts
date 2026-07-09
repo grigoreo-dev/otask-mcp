@@ -154,6 +154,9 @@ describe("otask_list_project_tasks", () => {
   test("blocks disallowed project_slug", async () => {
     const d = deps(
       {
+        listProjects: mock(async () => [
+          { id: 1, slug: "forbidden", name: "Forbidden" },
+        ]),
         listProjectTasks: mock(async () => ({ tasks: [] })),
       },
       "allowed-only",
@@ -167,15 +170,87 @@ describe("otask_list_project_tasks", () => {
     expect(result.content[0]!.text).toMatch(/Project not allowed/);
     expect(d.api.listProjectTasks).not.toHaveBeenCalled();
   });
+
+  test("allow-list numeric id only resolves project and succeeds", async () => {
+    const d = deps(
+      {
+        listProjects: mock(async () => [
+          { id: 42, slug: "proj-by-id", name: "By Id" },
+        ]),
+        listProjectTasks: mock(async () => ({
+          tasks: [sampleTask({ id: 1, slug: "t1", project_id: 42 })],
+        })),
+      },
+      "42",
+    );
+    const tool = createListProjectTasksTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws-1",
+      project_slug: "proj-by-id",
+    });
+    expect(result.isError).toBeUndefined();
+    const body = parseContent(result) as { items: unknown[] };
+    expect(body.items).toHaveLength(1);
+    expect(d.api.listProjects).toHaveBeenCalledWith("ws-1");
+    expect(d.api.listProjectTasks).toHaveBeenCalledWith(
+      "ws-1",
+      "proj-by-id",
+      undefined,
+    );
+  });
+
+  test("forwards optional page and status_id query to api", async () => {
+    const d = deps(
+      {
+        listProjects: mock(async () => [
+          { id: 5, slug: "proj-a", name: "A" },
+        ]),
+        listProjectTasks: mock(async () => ({ tasks: [] })),
+      },
+      "proj-a",
+    );
+    const tool = createListProjectTasksTool(d);
+    await tool.handler({
+      ws_slug: "ws-1",
+      project_slug: "proj-a",
+      page: 2,
+      status_id: 7,
+    });
+    expect(d.api.listProjectTasks).toHaveBeenCalledWith("ws-1", "proj-a", {
+      page: 2,
+      status_id: 7,
+    });
+  });
 });
 
 describe("otask_list_board", () => {
-  test("asserts project and returns boards/columns", async () => {
+  test("asserts project and returns compact boards/columns", async () => {
     const d = deps(
       {
+        listProjects: mock(async () => [
+          { id: 1, slug: "p1", name: "P1" },
+        ]),
         listBoard: mock(async () => ({
-          boards: [{ id: 1, name: "Main" }],
-          columns: [{ id: 10, name: "Todo" }],
+          boards: [
+            {
+              id: 1,
+              name: "Main",
+              slug: "main",
+              color: "#fff",
+              pivot: { noise: true },
+              localtz: "UTC",
+            },
+          ],
+          columns: [
+            {
+              id: 10,
+              name: "Todo",
+              board_id: 1,
+              slug: "todo",
+              pivot: { x: 1 },
+              localtz: "UTC",
+            },
+          ],
         })),
       },
       "p1",
@@ -188,18 +263,32 @@ describe("otask_list_board", () => {
     expect(result.isError).toBeUndefined();
     const body = parseContent(result) as {
       summary: string;
-      boards: unknown[];
-      columns: unknown[];
+      boards: Array<Record<string, unknown>>;
+      columns: Array<Record<string, unknown>>;
       next: null;
     };
-    expect(body.boards).toEqual([{ id: 1, name: "Main" }]);
-    expect(body.columns).toEqual([{ id: 10, name: "Todo" }]);
+    expect(body.boards).toEqual([
+      { id: 1, name: "Main", slug: "main", color: "#fff" },
+    ]);
+    expect(body.columns).toEqual([
+      { id: 10, name: "Todo", slug: "todo", board_id: 1 },
+    ]);
+    expect(body.boards[0]).not.toHaveProperty("pivot");
+    expect(body.boards[0]).not.toHaveProperty("localtz");
+    expect(body.columns[0]).not.toHaveProperty("pivot");
     expect(body.next).toBeNull();
     expect(d.api.listBoard).toHaveBeenCalledWith("ws", "p1", undefined);
   });
 
   test("blocks disallowed project", async () => {
-    const d = deps({}, "only-this");
+    const d = deps(
+      {
+        listProjects: mock(async () => [
+          { id: 9, slug: "nope", name: "Nope" },
+        ]),
+      },
+      "only-this",
+    );
     const tool = createListBoardTool(d);
     const result = await tool.handler({
       ws_slug: "ws",
@@ -241,21 +330,23 @@ describe("otask_list_members", () => {
 });
 
 describe("otask_list_tags", () => {
-  test("returns tags as agent list", async () => {
+  test("returns compact tags as agent list", async () => {
     const d = deps({
       listTags: mock(async () => [
-        { id: 1, name: "bug" },
-        { id: 2, name: "feature" },
+        { id: 1, name: "bug", color: "#f00", slug: "bug", pivot: { x: 1 } },
+        { id: 2, name: "feature", localtz: "UTC" },
       ]),
     });
     const tool = createListTagsTool(d);
     const body = parseContent(
       await tool.handler({ ws_slug: "ws" }),
-    ) as { summary: string; items: unknown[]; next: null };
+    ) as { summary: string; items: Array<Record<string, unknown>>; next: null };
     expect(body.items).toEqual([
-      { id: 1, name: "bug" },
+      { id: 1, name: "bug", slug: "bug", color: "#f00" },
       { id: 2, name: "feature" },
     ]);
+    expect(body.items[0]).not.toHaveProperty("pivot");
+    expect(body.items[1]).not.toHaveProperty("localtz");
     expect(body.next).toBeNull();
     expect(d.api.listTags).toHaveBeenCalledWith("ws");
   });

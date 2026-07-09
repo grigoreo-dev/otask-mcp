@@ -3,6 +3,7 @@ import {
   type ListProjectTasksInput,
 } from "../schemas/workspace.js";
 import { agentListResult } from "../services/format.js";
+import { assertProjectSlugAllowed } from "../services/project-guard.js";
 import { compactTask } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
@@ -41,7 +42,11 @@ Docs: https://api.otask.ru/docs`,
       board_column_id,
     }) => {
       try {
-        guard.assertAllowed({ slug: project_slug });
+        await assertProjectSlugAllowed(
+          guard,
+          () => api.listProjects(ws_slug),
+          project_slug,
+        );
         const query: Record<string, string | number | undefined> = {};
         if (page !== undefined) query.page = page;
         if (status_id !== undefined) query.status_id = status_id;
