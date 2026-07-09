@@ -60,6 +60,15 @@ export function extractBearerToken(
   return token || undefined;
 }
 
+export function extractProjectAllowListHeader(
+  headers: { [k: string]: string | string[] | undefined },
+): string | undefined {
+  const raw = headers["x-otask-allowed-projects"];
+  if (typeof raw === "string") return raw;
+  if (Array.isArray(raw) && typeof raw[0] === "string") return raw[0];
+  return undefined;
+}
+
 export function authorizeHttpMcpRequest(clientBearer: string | undefined): {
   ok: true;
   otaskBearer?: string;

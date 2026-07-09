@@ -63,3 +63,24 @@ export function projectGuardFromEnv(
 ): ProjectGuard {
   return createProjectGuard(parseProjectAllowList(env.OTASK_ALLOWED_PROJECTS));
 }
+
+export function resolveHttpProjectGuard(opts: {
+  authMode: "gateway" | "passthrough";
+  env: NodeJS.ProcessEnv;
+  headerRaw: string | undefined;
+}): ProjectGuard {
+  if (opts.authMode === "gateway") {
+    return createProjectGuard(
+      parseProjectAllowList(opts.env.OTASK_ALLOWED_PROJECTS),
+    );
+  }
+  return createProjectGuard(parseProjectAllowList(opts.headerRaw));
+}
+
+export function projectGuardMode(
+  authMode: "gateway" | "passthrough",
+  guard: ProjectGuard,
+): "env" | "header" | "off" {
+  if (guard.list.isEmpty) return "off";
+  return authMode === "gateway" ? "env" : "header";
+}

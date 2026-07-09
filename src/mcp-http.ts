@@ -8,9 +8,14 @@ import {
   createEnvAuthResolver,
   createPassthroughAuthResolver,
   extractBearerToken,
+  extractProjectAllowListHeader,
   getHttpAuthMode,
   validateHttpAuthConfig,
 } from "./services/auth.js";
+import {
+  projectGuardMode,
+  resolveHttpProjectGuard,
+} from "./services/project-guard.js";
 
 function getPort(): number {
   const raw = process.env.PORT?.trim() || "3847";
@@ -42,12 +47,20 @@ async function handleMcpRequest(req: IncomingMessage, res: ServerResponse): Prom
     ? createPassthroughAuthResolver(authResult.otaskBearer)
     : createEnvAuthResolver();
 
+  const authMode = getHttpAuthMode();
+  const headerRaw = extractProjectAllowListHeader(req.headers);
+  const guard = resolveHttpProjectGuard({
+    authMode,
+    env: process.env,
+    headerRaw,
+  });
+
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true,
   });
 
-  const server = createMcpServer(auth);
+  const server = createMcpServer(auth, guard);
 
   res.on("close", () => {
     void transport.close();
@@ -61,10 +74,18 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
   const requestUrl = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
 
   if (requestUrl.pathname === "/health") {
+    const authMode = getHttpAuthMode();
+    const headerRaw = extractProjectAllowListHeader(req.headers);
+    const guard = resolveHttpProjectGuard({
+      authMode,
+      env: process.env,
+      headerRaw,
+    });
     sendJson(res, 200, {
       ok: true,
       mode: "mcp-streamable-http",
-      authMode: getHttpAuthMode(),
+      authMode,
+      projectGuard: projectGuardMode(authMode, guard),
     });
     return;
   }

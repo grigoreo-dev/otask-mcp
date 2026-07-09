@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createEnvAuthResolver, validateStdioAuthConfig } from "./services/auth.js";
+import { projectGuardFromEnv } from "./services/project-guard.js";
 import { createMcpServer } from "./server.js";
 
 async function main(): Promise<void> {
@@ -12,7 +13,10 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const server = createMcpServer(createEnvAuthResolver());
+  const server = createMcpServer(
+    createEnvAuthResolver(),
+    projectGuardFromEnv(),
+  );
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
