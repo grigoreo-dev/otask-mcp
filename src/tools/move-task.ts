@@ -2,6 +2,7 @@ import {
   MoveTaskInputSchema,
   type MoveTaskInput,
 } from "../schemas/task.js";
+import { assertProjectIdAllowed } from "../services/project-guard.js";
 import {
   buildUpdateBodyFromTask,
   compactTask,
@@ -44,10 +45,12 @@ Docs: https://api.otask.ru/docs`,
           typeof current.project_slug === "string"
             ? current.project_slug
             : undefined;
-        guard.assertAllowed({
-          id: current.project_id,
-          slug: projectSlug,
-        });
+        await assertProjectIdAllowed(
+          guard,
+          () => api.listProjects(ws_slug),
+          current.project_id,
+          projectSlug,
+        );
         const body = buildUpdateBodyFromTask(current, {
           board_column_id,
           ...(board_id !== undefined ? { board_id } : {}),

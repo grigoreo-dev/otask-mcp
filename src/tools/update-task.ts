@@ -2,6 +2,7 @@ import {
   UpdateTaskInputSchema,
   type UpdateTaskInput,
 } from "../schemas/task.js";
+import { assertProjectIdAllowed } from "../services/project-guard.js";
 import {
   buildUpdateBodyFromTask,
   summarizeTask,
@@ -51,10 +52,12 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
           typeof current.project_slug === "string"
             ? current.project_slug
             : undefined;
-        guard.assertAllowed({
-          id: current.project_id,
-          slug: projectSlug,
-        });
+        await assertProjectIdAllowed(
+          guard,
+          () => api.listProjects(ws_slug),
+          current.project_id,
+          projectSlug,
+        );
         const body = buildUpdateBodyFromTask(current, {
           ...(changes.name !== undefined ? { name: changes.name } : {}),
           ...(changes.board_id !== undefined
@@ -87,7 +90,11 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
         });
 
         if (changes.project_id !== undefined) {
-          guard.assertAllowed({ id: changes.project_id });
+          await assertProjectIdAllowed(
+            guard,
+            () => api.listProjects(ws_slug),
+            changes.project_id,
+          );
         }
 
         const result = await api.updateTask(ws_slug, task_slug, body);

@@ -78,7 +78,12 @@ export async function assertProjectIdAllowed(
   guard: ProjectGuard,
   listProjects: () => Promise<Array<{ id: number; slug: string }>>,
   project_id: number,
+  knownSlug?: string | null,
 ): Promise<void> {
+  if (knownSlug) {
+    guard.assertAllowed({ id: project_id, slug: knownSlug });
+    return;
+  }
   const projects = await listProjects();
   const project = projects.find((p) => p.id === project_id);
   if (project) {

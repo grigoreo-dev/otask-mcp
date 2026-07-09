@@ -388,6 +388,45 @@ describe("otask_get_task guard", () => {
     expect(result.isError).toBe(true);
     expect(result.content[0]!.text).toMatch(/Project not allowed/);
   });
+
+  test("slug-only allow-list allows get when listProjects maps project_id to slug", async () => {
+    const d = deps(
+      {
+        getTask: mock(async () => sampleTask({ project_id: 42 })),
+        listProjects: mock(async () => [
+          { id: 42, slug: "allowed-proj", name: "Allowed" },
+        ]),
+      },
+      "allowed-proj",
+    );
+    const tool = createGetTaskTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws",
+      task_slug: "task-10",
+    });
+    expect(result.isError).toBeUndefined();
+    expect(d.api.listProjects).toHaveBeenCalledWith("ws");
+  });
+
+  test("slug-only allow-list denies get when project_id maps to other slug", async () => {
+    const d = deps(
+      {
+        getTask: mock(async () => sampleTask({ project_id: 99 })),
+        listProjects: mock(async () => [
+          { id: 42, slug: "allowed-proj", name: "Allowed" },
+          { id: 99, slug: "other", name: "Other" },
+        ]),
+      },
+      "allowed-proj",
+    );
+    const tool = createGetTaskTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws",
+      task_slug: "task-10",
+    });
+    expect(result.isError).toBe(true);
+    expect(result.content[0]!.text).toMatch(/Project not allowed/);
+  });
 });
 
 describe("registry", () => {

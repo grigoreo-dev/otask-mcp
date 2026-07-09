@@ -196,6 +196,51 @@ describe("otask_move_task", () => {
     expect(d.api.updateTask).not.toHaveBeenCalled();
   });
 
+  test("slug-only allow-list allows move when listProjects maps project_id", async () => {
+    const d = deps(
+      {
+        getTask: mock(async () => sampleTask({ project_id: 42 })),
+        listProjects: mock(async () => [
+          { id: 42, slug: "allowed-proj", name: "Allowed" },
+        ]),
+        updateTask: mock(async () => ({
+          success: true,
+          task: sampleTask({ project_id: 42, board_column_id: 8 }),
+        })),
+      },
+      "allowed-proj",
+    );
+    const tool = createMoveTaskTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws",
+      task_slug: "task-10",
+      board_column_id: 8,
+    });
+    expect(result.isError).toBeUndefined();
+    expect(d.api.listProjects).toHaveBeenCalledWith("ws");
+    expect(d.api.updateTask).toHaveBeenCalled();
+  });
+
+  test("slug-only allow-list denies move for wrong project", async () => {
+    const d = deps(
+      {
+        getTask: mock(async () => sampleTask({ project_id: 99 })),
+        listProjects: mock(async () => [
+          { id: 99, slug: "other", name: "Other" },
+        ]),
+      },
+      "allowed-proj",
+    );
+    const tool = createMoveTaskTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws",
+      task_slug: "task-10",
+      board_column_id: 8,
+    });
+    expect(result.isError).toBe(true);
+    expect(d.api.updateTask).not.toHaveBeenCalled();
+  });
+
   test("passes optional board_id override", async () => {
     const d = deps(
       {
@@ -389,6 +434,31 @@ describe("otask_update_task guard", () => {
     expect(result.isError).toBe(true);
     expect(result.content[0]!.text).toMatch(/Project not allowed/);
     expect(d.api.updateTask).not.toHaveBeenCalled();
+  });
+
+  test("slug-only allow-list allows update when listProjects maps project_id", async () => {
+    const d = deps(
+      {
+        getTask: mock(async () => sampleTask({ project_id: 42 })),
+        listProjects: mock(async () => [
+          { id: 42, slug: "allowed-proj", name: "Allowed" },
+        ]),
+        updateTask: mock(async () => ({
+          success: true,
+          task: sampleTask({ project_id: 42, name: "Renamed" }),
+        })),
+      },
+      "allowed-proj",
+    );
+    const tool = createUpdateTaskTool(d);
+    const result = await tool.handler({
+      ws_slug: "ws",
+      task_slug: "task-10",
+      name: "Renamed",
+    });
+    expect(result.isError).toBeUndefined();
+    expect(d.api.listProjects).toHaveBeenCalledWith("ws");
+    expect(d.api.updateTask).toHaveBeenCalled();
   });
 });
 

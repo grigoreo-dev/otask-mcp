@@ -2,6 +2,7 @@ import {
   ArchiveTaskInputSchema,
   type ArchiveTaskInput,
 } from "../schemas/task.js";
+import { assertProjectIdAllowed } from "../services/project-guard.js";
 import { compactTask } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
@@ -37,10 +38,12 @@ Docs: https://api.otask.ru/docs`,
           typeof current.project_slug === "string"
             ? current.project_slug
             : undefined;
-        guard.assertAllowed({
-          id: current.project_id,
-          slug: projectSlug,
-        });
+        await assertProjectIdAllowed(
+          guard,
+          () => api.listProjects(ws_slug),
+          current.project_id,
+          projectSlug,
+        );
         const task = await api.archiveTask(ws_slug, task_slug);
         const summary = compactTask(task);
         return jsonToolResult(summary, { task: summary });
