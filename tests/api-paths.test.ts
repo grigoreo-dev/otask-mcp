@@ -347,4 +347,45 @@ describe("api paths and envelopes", () => {
     const client = createOtaskClient(auth);
     await expect(client.listProjects("ws")).rejects.toBeInstanceOf(OtaskApiError);
   });
+
+  test("getMe hits /api/v1/me", async () => {
+    let calledUrl = "";
+    mockJsonFetch((url) => {
+      calledUrl = url;
+      return {
+        success: true,
+        data: { id: 9, full_name: "T", timezone: "UTC" },
+      };
+    });
+    const client = createOtaskClient(auth);
+    const me = await client.getMe();
+    expect(calledUrl).toBe(`${API_BASE_URL}/api/v1/me`);
+    expect(me).toEqual({ id: 9, full_name: "T", timezone: "UTC" });
+  });
+
+  test("listWorkspaceTasks encodes performer_ids and page", async () => {
+    let calledUrl = "";
+    mockJsonFetch((url) => {
+      calledUrl = url;
+      return {
+        success: true,
+        data: {
+          tasks: [],
+          meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 },
+        },
+      };
+    });
+    const client = createOtaskClient(auth);
+    await client.listWorkspaceTasks("ws-1", {
+      page: 2,
+      performer_ids: [11458],
+      project_ids: [35747],
+      priority_ids: [1],
+    });
+    expect(calledUrl).toContain(`${API_BASE_URL}/api/v1/ws/ws-1/tasks?`);
+    expect(calledUrl).toContain("page=2");
+    expect(calledUrl).toContain("performer_ids%5B0%5D=11458");
+    expect(calledUrl).toContain("project_ids");
+    expect(calledUrl).toContain("priority_ids");
+  });
 });

@@ -3,6 +3,7 @@ import {
   addComment,
   archiveTask,
   createTask,
+  getMe,
   getTask,
   listBoard,
   listComments,
@@ -10,12 +11,15 @@ import {
   listProjects,
   listProjectTasks,
   listTags,
+  listWorkspaceTasks,
   updateTask,
 } from "./api.js";
 import type {
   CreateTaskBody,
   ListBoardResult,
   ListProjectTasksResult,
+  ListWorkspaceTasksQuery,
+  ListWorkspaceTasksResult,
   OtaskProjectSummary,
   OtaskTask,
   UpdateTaskBody,
@@ -24,6 +28,7 @@ import type {
 
 /** O!task API bound to a single auth resolver (per MCP server / HTTP request). */
 export interface OtaskClient {
+  getMe(): Promise<unknown>;
   getTask(wsSlug: string, taskSlug: string): Promise<OtaskTask>;
   updateTask(
     wsSlug: string,
@@ -36,6 +41,10 @@ export interface OtaskClient {
     projectSlug: string,
     query?: Record<string, string | number | undefined>,
   ): Promise<ListProjectTasksResult>;
+  listWorkspaceTasks(
+    wsSlug: string,
+    query?: ListWorkspaceTasksQuery,
+  ): Promise<ListWorkspaceTasksResult>;
   listBoard(
     wsSlug: string,
     projectSlug: string,
@@ -60,12 +69,15 @@ export interface OtaskClient {
 
 export function createOtaskClient(auth: OtaskAuthResolver): OtaskClient {
   return {
+    getMe: () => getMe(auth),
     getTask: (wsSlug, taskSlug) => getTask(wsSlug, taskSlug, auth),
     updateTask: (wsSlug, taskSlug, body) =>
       updateTask(wsSlug, taskSlug, body, auth),
     listProjects: (wsSlug) => listProjects(wsSlug, auth),
     listProjectTasks: (wsSlug, projectSlug, query) =>
       listProjectTasks(wsSlug, projectSlug, query, auth),
+    listWorkspaceTasks: (wsSlug, query) =>
+      listWorkspaceTasks(wsSlug, query, auth),
     listBoard: (wsSlug, projectSlug, query) =>
       listBoard(wsSlug, projectSlug, query, auth),
     listMembers: (wsSlug) => listMembers(wsSlug, auth),

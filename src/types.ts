@@ -91,6 +91,24 @@ export interface ListProjectTasksResult {
   meta?: unknown;
 }
 
+export interface ListWorkspaceTasksQuery {
+  page?: number;
+  performer_ids?: number[];
+  project_ids?: number[];
+  priority_ids?: number[];
+}
+
+export interface ListWorkspaceTasksResult {
+  tasks: OtaskTask[];
+  meta?: {
+    current_page?: number;
+    last_page?: number;
+    per_page?: number;
+    total?: number;
+    [key: string]: unknown;
+  };
+}
+
 export interface ListBoardResult {
   boards: unknown[];
   columns: unknown[];

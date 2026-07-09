@@ -3,6 +3,8 @@ import type {
   CreateTaskBody,
   ListBoardResult,
   ListProjectTasksResult,
+  ListWorkspaceTasksQuery,
+  ListWorkspaceTasksResult,
   OtaskApiResponse,
   OtaskProjectSummary,
   OtaskTask,
@@ -97,6 +99,64 @@ function pickTask(data: unknown): OtaskTask {
     return obj.task as OtaskTask;
   }
   return data as OtaskTask;
+}
+
+export async function getMe(auth: OtaskAuthResolver): Promise<unknown> {
+  const headers = await headersFor(auth);
+  const response = await fetch(`${API_BASE_URL}/api/v1/me`, {
+    method: "GET",
+    headers,
+  });
+  const result = await parseResponse<OtaskApiResponse<unknown>>(response);
+  return assertSuccess(result, response.status, "Failed to get me");
+}
+
+function appendArrayParams(
+  params: URLSearchParams,
+  key: string,
+  values: number[] | undefined,
+): void {
+  if (!values?.length) return;
+  values.forEach((v, i) => {
+    params.set(`${key}[${i}]`, String(v));
+  });
+}
+
+export async function listWorkspaceTasks(
+  wsSlug: string,
+  query: ListWorkspaceTasksQuery | undefined,
+  auth: OtaskAuthResolver,
+): Promise<ListWorkspaceTasksResult> {
+  const headers = await headersFor(auth);
+  const params = new URLSearchParams();
+  if (query?.page !== undefined) params.set("page", String(query.page));
+  appendArrayParams(params, "performer_ids", query?.performer_ids);
+  appendArrayParams(params, "project_ids", query?.project_ids);
+  appendArrayParams(params, "priority_ids", query?.priority_ids);
+  const qs = params.toString();
+  const url = wsUrl(wsSlug, "/tasks") + (qs ? `?${qs}` : "");
+  const response = await fetch(url, { method: "GET", headers });
+  const result = await parseResponse<OtaskApiResponse<unknown>>(response);
+  const data = assertSuccess(
+    result,
+    response.status,
+    "Failed to list workspace tasks",
+  );
+  if (Array.isArray(data)) {
+    return { tasks: data as OtaskTask[] };
+  }
+  const obj = asRecord(data);
+  if (obj && Array.isArray(obj.tasks)) {
+    return {
+      tasks: obj.tasks as OtaskTask[],
+      meta: asRecord(obj.meta) ?? undefined,
+    };
+  }
+  throw new OtaskApiError(
+    'Unexpected API response: missing array field "tasks"',
+    response.status,
+    data,
+  );
 }
 
 export async function getTask(
