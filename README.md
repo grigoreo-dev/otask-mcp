@@ -2,6 +2,16 @@
 
 [MCP-сервер](https://modelcontextprotocol.io) для [O!task API](https://api.otask.ru/docs). Отдаёт операции O!task (воркспейс/задачи) как MCP-инструменты для агентов (Cursor, OpenCode, n8n MCP Client Tool).
 
+## Установка
+
+```bash
+npm i -g @grigoreo-dev/otask-mcp
+# или: npx @grigoreo-dev/otask-mcp
+# HTTP: npx otask-mcp-http   # bin name stays unscoped
+```
+
+Публикация на npm: push tag `vX.Y.Z` (версия в tag = `package.json`). CI: `.github/workflows/publish.yml` (OIDC Trusted Publisher, без `NPM_TOKEN`).
+
 ## Режимы
 
 | Режим | Команда | Как выбирается | Авторизация клиента |
