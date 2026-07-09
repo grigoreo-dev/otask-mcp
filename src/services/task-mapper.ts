@@ -1,5 +1,36 @@
 import type { OtaskTask, OtaskSubtask, UpdateTaskBody } from "../types.js";
 
+export interface CompactTask {
+  id: number;
+  slug: string;
+  name: string;
+  description?: string | null;
+  end_at: string | null;
+  priority_id: number;
+  project_id: number;
+  board_id: number;
+  board_column_id: number;
+  status_id?: number;
+  performers: Array<{ id: string; name?: string }>;
+  tags: Array<{ id: string; name?: string }>;
+  comments_count?: number;
+  subtasks_count?: number;
+}
+
+export interface CompactProject {
+  id: number;
+  slug: string;
+  name: string;
+  status_id?: number;
+}
+
+export interface CompactMember {
+  id?: number;
+  name?: string;
+  email?: string;
+  status_text?: string;
+}
+
 function performerIds(task: OtaskTask): string[] {
   if (!Array.isArray(task.performers)) {
     return [];
@@ -21,6 +52,25 @@ function tagIds(task: OtaskTask): string[] {
       return String((t as { id: number }).id);
     }
     return String(t);
+  });
+}
+
+function compactRefs(
+  value: unknown,
+): Array<{ id: string; name?: string }> {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value.map((item) => {
+    if (typeof item === "object" && item !== null && "id" in item) {
+      const obj = item as { id: unknown; name?: unknown };
+      const ref: { id: string; name?: string } = { id: String(obj.id) };
+      if (typeof obj.name === "string") {
+        ref.name = obj.name;
+      }
+      return ref;
+    }
+    return { id: String(item) };
   });
 }
 
@@ -59,8 +109,8 @@ export function buildUpdateBodyFromTask(
   return { ...base, ...overrides };
 }
 
-export function summarizeTask(task: OtaskTask): Record<string, unknown> {
-  return {
+export function compactTask(task: OtaskTask): CompactTask {
+  const out: CompactTask = {
     id: task.id,
     slug: task.slug,
     name: task.name,
@@ -71,8 +121,60 @@ export function summarizeTask(task: OtaskTask): Record<string, unknown> {
     board_id: task.board_id,
     board_column_id: task.board_column_id,
     status_id: task.status_id,
-    performers: performerIds(task),
-    tags: tagIds(task),
+    performers: compactRefs(task.performers),
+    tags: compactRefs(task.tags),
     subtasks_count: Array.isArray(task.subtasks) ? task.subtasks.length : 0,
   };
+
+  if (typeof task.comments_count === "number") {
+    out.comments_count = task.comments_count;
+  }
+
+  return out;
+}
+
+export function compactProject(p: {
+  id: number;
+  slug: string;
+  name: string;
+  status_id?: number;
+}): CompactProject {
+  const out: CompactProject = {
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+  };
+  if (p.status_id !== undefined) {
+    out.status_id = p.status_id;
+  }
+  return out;
+}
+
+export function compactMember(m: {
+  id?: number;
+  user_id?: number;
+  full_name?: string;
+  email?: string;
+  status_text?: string;
+}): CompactMember {
+  const out: CompactMember = {};
+  if (m.id !== undefined) {
+    out.id = m.id;
+  } else if (m.user_id !== undefined) {
+    out.id = m.user_id;
+  }
+  if (m.full_name !== undefined) {
+    out.name = m.full_name;
+  }
+  if (m.email !== undefined) {
+    out.email = m.email;
+  }
+  if (m.status_text !== undefined) {
+    out.status_text = m.status_text;
+  }
+  return out;
+}
+
+export function summarizeTask(task: OtaskTask): CompactTask {
+  return compactTask(task);
 }
