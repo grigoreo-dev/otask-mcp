@@ -1,5 +1,5 @@
 {
-  "name": "otask-mcp-server",
+  "name": "@grigoreo-dev/otask-mcp",
   "version": "1.2.0",
   "description": "MCP server for O!task API — stdio locally, Streamable HTTP for n8n",
   "type": "module",
@@ -8,6 +8,18 @@
     "otask-mcp": "dist/index.js",
     "otask-mcp-http": "dist/mcp-http.js"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/grigoreo-dev/otask-mcp.git"
+  },
+  "license": "MIT",
   "scripts": {
     "start": "bun run dist/index.js",
     "start:http": "bun run dist/mcp-http.js",
