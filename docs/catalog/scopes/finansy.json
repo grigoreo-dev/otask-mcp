@@ -1,0 +1,246 @@
+{
+  "id": "finansy",
+  "title": "Финансы",
+  "endpoints": [
+    {
+      "id": "finansy-GETapi-v1-ws--ws_slug--payments",
+      "title": "Получить платежи",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/payments",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-GETapi-v1-ws--ws_slug--payments"
+    },
+    {
+      "id": "finansy-GETapi-v1-ws--ws_slug--payments-members",
+      "title": "Получить список участников команды для платежей",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/payments/members",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-GETapi-v1-ws--ws_slug--payments-members"
+    },
+    {
+      "id": "finansy-POSTapi-v1-ws--ws_slug--payments-create",
+      "title": "Создать платеж",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/payments/create",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-POSTapi-v1-ws--ws_slug--payments-create"
+    },
+    {
+      "id": "finansy-GETapi-v1-ws--ws_slug--payments-analytics",
+      "title": "Получить аналитику финансов",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/payments/analytics",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-GETapi-v1-ws--ws_slug--payments-analytics"
+    },
+    {
+      "id": "finansy-POSTapi-v1-ws--ws_slug--payments-export",
+      "title": "Экспорт платежей",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/payments/export",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-POSTapi-v1-ws--ws_slug--payments-export"
+    },
+    {
+      "id": "finansy-POSTapi-v1-ws--ws_slug--payments-example-import",
+      "title": "Скачать пример файла для импорта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/payments/example-import",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-POSTapi-v1-ws--ws_slug--payments-example-import"
+    },
+    {
+      "id": "finansy-POSTapi-v1-ws--ws_slug--payments-import",
+      "title": "Импорт платежей",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/payments/import",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-POSTapi-v1-ws--ws_slug--payments-import"
+    },
+    {
+      "id": "finansy-POSTapi-v1-ws--ws_slug--payments--payment_slug--update",
+      "title": "Обновление платежа",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/payments/{payment_slug}/update",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "payment_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-POSTapi-v1-ws--ws_slug--payments--payment_slug--update"
+    },
+    {
+      "id": "finansy-DELETEapi-v1-ws--ws_slug--payments-destroy",
+      "title": "Удалить платежи",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/payments/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-DELETEapi-v1-ws--ws_slug--payments-destroy"
+    },
+    {
+      "id": "finansy-GETapi-v1-ws--ws_slug--payments-categories",
+      "title": "Получить категории",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/payments/categories",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-GETapi-v1-ws--ws_slug--payments-categories"
+    },
+    {
+      "id": "finansy-POSTapi-v1-ws--ws_slug--payments-categories",
+      "title": "Создать категорию",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/payments/categories",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-POSTapi-v1-ws--ws_slug--payments-categories"
+    },
+    {
+      "id": "finansy-GETapi-v1-ws--ws_slug--payments-categories--category-",
+      "title": "Получить категорию",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/payments/categories/{category}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "category",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-GETapi-v1-ws--ws_slug--payments-categories--category-"
+    },
+    {
+      "id": "finansy-PATCHapi-v1-ws--ws_slug--payments-categories--category-",
+      "title": "Обновить категорию",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/payments/categories/{category}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "category",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-PATCHapi-v1-ws--ws_slug--payments-categories--category-"
+    },
+    {
+      "id": "finansy-DELETEapi-v1-ws--ws_slug--payments-categories--category-",
+      "title": "Удалить категорию",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/payments/categories/{category}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "category",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#finansy-DELETEapi-v1-ws--ws_slug--payments-categories--category-"
+    }
+  ]
+}

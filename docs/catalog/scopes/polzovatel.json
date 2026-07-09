@@ -1,0 +1,171 @@
+{
+  "id": "polzovatel",
+  "title": "Пользователь",
+  "endpoints": [
+    {
+      "id": "polzovatel-GETapi-v1-me",
+      "title": "Получить информацию о пользователе",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-GETapi-v1-me"
+    },
+    {
+      "id": "polzovatel-DELETEapi-v1-remove-account",
+      "title": "Удаление аккаунта пользователя",
+      "method": "DELETE",
+      "path": "/api/v1/remove-account",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-DELETEapi-v1-remove-account"
+    },
+    {
+      "id": "polzovatel-POSTapi-v1-analytics-1",
+      "title": "Первый шаг онбординга",
+      "method": "POST",
+      "path": "/api/v1/analytics/1",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-POSTapi-v1-analytics-1"
+    },
+    {
+      "id": "polzovatel-POSTapi-v1-analytics-2",
+      "title": "Второй шаг онбординга",
+      "method": "POST",
+      "path": "/api/v1/analytics/2",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-POSTapi-v1-analytics-2"
+    },
+    {
+      "id": "polzovatel-POSTapi-v1-auth-login",
+      "title": "Вход",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "authRequired": false,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-POSTapi-v1-auth-login"
+    },
+    {
+      "id": "polzovatel-POSTapi-v1-auth-register",
+      "title": "Регистрация",
+      "method": "POST",
+      "path": "/api/v1/auth/register",
+      "authRequired": false,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-POSTapi-v1-auth-register"
+    },
+    {
+      "id": "polzovatel-POSTapi-v1-auth-reset",
+      "title": "Сброс пароля",
+      "method": "POST",
+      "path": "/api/v1/auth/reset",
+      "authRequired": false,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-POSTapi-v1-auth-reset"
+    },
+    {
+      "id": "polzovatel-POSTapi-v1-auth-logout",
+      "title": "Выход",
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-POSTapi-v1-auth-logout"
+    },
+    {
+      "id": "polzovatel-GETapi-v1-users",
+      "title": "Получить информацию о пользователе #2",
+      "method": "GET",
+      "path": "/api/v1/users",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-GETapi-v1-users"
+    },
+    {
+      "id": "polzovatel-POSTapi-v1-users-update-settings",
+      "title": "Изменить настройки пользователя",
+      "method": "POST",
+      "path": "/api/v1/users/update-settings",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-POSTapi-v1-users-update-settings"
+    },
+    {
+      "id": "polzovatel-POSTapi-v1-users-update",
+      "title": "Изменить данные пользователя",
+      "method": "POST",
+      "path": "/api/v1/users/update",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-POSTapi-v1-users-update"
+    },
+    {
+      "id": "polzovatel-POSTapi-v1-users-updatePassword",
+      "title": "Изменить пароль",
+      "method": "POST",
+      "path": "/api/v1/users/updatePassword",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-POSTapi-v1-users-updatePassword"
+    },
+    {
+      "id": "polzovatel-POSTapi-v1-users-pictureUpdate",
+      "title": "Изменить аватарку пользователя",
+      "method": "POST",
+      "path": "/api/v1/users/pictureUpdate",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-POSTapi-v1-users-pictureUpdate"
+    },
+    {
+      "id": "polzovatel-POSTapi-v1-users-start-partner",
+      "title": "Стать партнером",
+      "method": "POST",
+      "path": "/api/v1/users/start-partner",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-POSTapi-v1-users-start-partner"
+    },
+    {
+      "id": "polzovatel-POSTapi-v1-users-subscribes-update",
+      "title": "Изменить уведомления",
+      "method": "POST",
+      "path": "/api/v1/users/subscribes/update",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#polzovatel-POSTapi-v1-users-subscribes-update"
+    }
+  ]
+}

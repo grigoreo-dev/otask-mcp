@@ -3,6 +3,54 @@
   "title": "Задачи",
   "endpoints": [
     {
+      "id": "zadaci-GETapi-v1-ws--ws_slug--kanbans",
+      "title": "Получить канбан задач",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/kanbans",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-GETapi-v1-ws--ws_slug--kanbans"
+    },
+    {
+      "id": "zadaci-GETapi-v1-ws--ws_slug--kanbans-tags",
+      "title": "Получить метки",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/kanbans/tags",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-GETapi-v1-ws--ws_slug--kanbans-tags"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--kanbans-tasks",
+      "title": "Получить еще задачи в колонку канбана",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/kanbans/tasks",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--kanbans-tasks"
+    },
+    {
       "id": "zadaci-GETapi-v1-ws--ws_slug--tasks",
       "title": "Получить список задач",
       "method": "GET",
@@ -17,6 +65,1170 @@
       "queryParams": [],
       "bodyParams": [],
       "docsAnchor": "#zadaci-GETapi-v1-ws--ws_slug--tasks"
+    },
+    {
+      "id": "zadaci-GETapi-v1-ws--ws_slug--tasks-calendar",
+      "title": "Получить недельный календарь",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/tasks/calendar",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-GETapi-v1-ws--ws_slug--tasks-calendar"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-calendar-days",
+      "title": "Получить еще задачи в колонку недельного календаря",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/calendar/days",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-calendar-days"
+    },
+    {
+      "id": "zadaci-GETapi-v1-ws--ws_slug--tasks-month-calendar",
+      "title": "Получить календарь",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/tasks/month-calendar",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-GETapi-v1-ws--ws_slug--tasks-month-calendar"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-month-calendar-days",
+      "title": "Получить еще задачи для дня в календаре",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/month-calendar/days",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-month-calendar-days"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-create",
+      "title": "Создать задачу",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/create",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-create"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-upload",
+      "title": "Загрузка файла во временное хранилище",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/upload",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-upload"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-export",
+      "title": "Экспорт задач",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/export",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-export"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-example-import",
+      "title": "Скачать пример файла для импорта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/example-import",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-example-import"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-import",
+      "title": "Импорт задач",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/import",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-import"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-list-get",
+      "title": "Получить список задач",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/list/get",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-list-get"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-list-get-more",
+      "title": "Получить еще задачи в список",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/list/get-more",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-list-get-more"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-list-get-children",
+      "title": "Получить подзадачи в списке задач",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/list/get-children",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-list-get-children"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-columns",
+      "title": "Создать статус задачи",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/columns",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-columns"
+    },
+    {
+      "id": "zadaci-DELETEapi-v1-ws--ws_slug--tasks-columns--taskColumn_id-",
+      "title": "Удалить статус задачи",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/tasks/columns/{taskColumn_id}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "taskColumn_id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-DELETEapi-v1-ws--ws_slug--tasks-columns--taskColumn_id-"
+    },
+    {
+      "id": "zadaci-PUTapi-v1-ws--ws_slug--tasks-columns--taskColumn_id-",
+      "title": "Обновить статус задачи",
+      "method": "PUT",
+      "path": "/api/v1/ws/{ws_slug}/tasks/columns/{taskColumn_id}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "taskColumn_id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-PUTapi-v1-ws--ws_slug--tasks-columns--taskColumn_id-"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-custom-fields",
+      "title": "Создать поле пользователя для задач",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/custom-fields",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-custom-fields"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-custom-fields-change-position",
+      "title": "Изменить порядок полей пользователя в задачах",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/custom-fields/change-position",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-custom-fields-change-position"
+    },
+    {
+      "id": "zadaci-PUTapi-v1-ws--ws_slug--tasks-custom-fields--tasksCustomField_id-",
+      "title": "Обновить поле пользователя в задачах",
+      "method": "PUT",
+      "path": "/api/v1/ws/{ws_slug}/tasks/custom-fields/{tasksCustomField_id}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "tasksCustomField_id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-PUTapi-v1-ws--ws_slug--tasks-custom-fields--tasksCustomField_id-"
+    },
+    {
+      "id": "zadaci-DELETEapi-v1-ws--ws_slug--tasks-custom-fields--tasksCustomField_id-",
+      "title": "Удалить поле пользователя в задачах",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/tasks/custom-fields/{tasksCustomField_id}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "tasksCustomField_id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-DELETEapi-v1-ws--ws_slug--tasks-custom-fields--tasksCustomField_id-"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks-custom-fields--tasksCustomField_id--options",
+      "title": "Создать вариант значения для кастомного поля задачи",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/custom-fields/{tasksCustomField_id}/options",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "tasksCustomField_id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks-custom-fields--tasksCustomField_id--options"
+    },
+    {
+      "id": "zadaci-PATCHapi-v1-ws--ws_slug--tasks-custom-fields--tasksCustomField_id--options--option_id-",
+      "title": "Обновить вариант значения для кастомного поля задачи",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/tasks/custom-fields/{tasksCustomField_id}/options/{option_id}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "tasksCustomField_id",
+          "required": true
+        },
+        {
+          "name": "option_id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-PATCHapi-v1-ws--ws_slug--tasks-custom-fields--tasksCustomField_id--options--option_id-"
+    },
+    {
+      "id": "zadaci-DELETEapi-v1-ws--ws_slug--tasks-custom-fields--tasksCustomField_id--options--option_id-",
+      "title": "Удалить вариант значения для кастомного поля задачи",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/tasks/custom-fields/{tasksCustomField_id}/options/{option_id}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "tasksCustomField_id",
+          "required": true
+        },
+        {
+          "name": "option_id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-DELETEapi-v1-ws--ws_slug--tasks-custom-fields--tasksCustomField_id--options--option_id-"
+    },
+    {
+      "id": "zadaci-GETapi-v1-ws--ws_slug--tasks--task_slug-",
+      "title": "Получить задачу",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-GETapi-v1-ws--ws_slug--tasks--task_slug-"
+    },
+    {
+      "id": "zadaci-PUTapi-v1-ws--ws_slug--tasks--task_slug--custom-fields--customFieldId-",
+      "title": "Обновить значение поля пользователя",
+      "method": "PUT",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/custom-fields/{customFieldId}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        },
+        {
+          "name": "customFieldId",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-PUTapi-v1-ws--ws_slug--tasks--task_slug--custom-fields--customFieldId-"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--custom-fields--customFieldId-",
+      "title": "Прикрепить поле пользователя к задаче",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/custom-fields/{customFieldId}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        },
+        {
+          "name": "customFieldId",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--custom-fields--customFieldId-"
+    },
+    {
+      "id": "zadaci-DELETEapi-v1-ws--ws_slug--tasks--task_slug--custom-fields--customFieldId-",
+      "title": "Открепить поле пользователя от задачи",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/custom-fields/{customFieldId}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        },
+        {
+          "name": "customFieldId",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-DELETEapi-v1-ws--ws_slug--tasks--task_slug--custom-fields--customFieldId-"
+    },
+    {
+      "id": "zadaci-GETapi-v1-ws--ws_slug--tasks--task_slug--search",
+      "title": "Поиск родительской задачи",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/search",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-GETapi-v1-ws--ws_slug--tasks--task_slug--search"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--move-calendar",
+      "title": "Переместить задачу в календаре",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/move-calendar",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--move-calendar"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--update",
+      "title": "Обновить задачу",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/update",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--update"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--update-picture",
+      "title": "Обновить обложку задачи",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/update-picture",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--update-picture"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--move",
+      "title": "Переместить задачу",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/move",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--move"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--update-recurring",
+      "title": "Обновить повторение задачи",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/update-recurring",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--update-recurring"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--disable-recurring",
+      "title": "Выключить повторение задачи",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/disable-recurring",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--disable-recurring"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--reminder",
+      "title": "Установить напоминание о задаче",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/reminder",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--reminder"
+    },
+    {
+      "id": "zadaci-DELETEapi-v1-ws--ws_slug--tasks--task_slug--reminder",
+      "title": "Выключить напоминание о задаче",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/reminder",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-DELETEapi-v1-ws--ws_slug--tasks--task_slug--reminder"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--start-timer",
+      "title": "Запустить таймер задачи",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/start-timer",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--start-timer"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--stop-timer",
+      "title": "Остановить таймер задачи",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/stop-timer",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--stop-timer"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--duplicate",
+      "title": "Дублировать задачу",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/duplicate",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--duplicate"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--parent",
+      "title": "Установить родителя для задачи",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/parent",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--parent"
+    },
+    {
+      "id": "zadaci-DELETEapi-v1-ws--ws_slug--tasks--task_slug--destroy",
+      "title": "Удалить задачу",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-DELETEapi-v1-ws--ws_slug--tasks--task_slug--destroy"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--in-archive",
+      "title": "Переместить задачу в архив",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/in-archive",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--in-archive"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--check-change-status",
+      "title": "Проверить может ли пользователь менять статус задачи",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/check/change-status",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--check-change-status"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--comments-get",
+      "title": "Получить комментарии",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/comments/get",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--comments-get"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--comments-store",
+      "title": "Отправить комментарий",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/comments/store",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--comments-store"
+    },
+    {
+      "id": "zadaci-PATCHapi-v1-ws--ws_slug--tasks--task_slug--comments--comment_slug--update",
+      "title": "Обновить комментарий",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/comments/{comment_slug}/update",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        },
+        {
+          "name": "comment_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-PATCHapi-v1-ws--ws_slug--tasks--task_slug--comments--comment_slug--update"
+    },
+    {
+      "id": "zadaci-DELETEapi-v1-ws--ws_slug--tasks--task_slug--comments--comment_slug--destroy",
+      "title": "Удалить комментарий",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/comments/{comment_slug}/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        },
+        {
+          "name": "comment_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-DELETEapi-v1-ws--ws_slug--tasks--task_slug--comments--comment_slug--destroy"
+    },
+    {
+      "id": "zadaci-PUTapi-v1-ws--ws_slug--tasks--task_slug--files-get",
+      "title": "Получить файлы задачи",
+      "method": "PUT",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/files/get",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-PUTapi-v1-ws--ws_slug--tasks--task_slug--files-get"
+    },
+    {
+      "id": "zadaci-PUTapi-v1-ws--ws_slug--tasks--task_slug--files-upload",
+      "title": "Загрузить файл в задачу",
+      "method": "PUT",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/files/upload",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-PUTapi-v1-ws--ws_slug--tasks--task_slug--files-upload"
+    },
+    {
+      "id": "zadaci-DELETEapi-v1-ws--ws_slug--tasks--task_slug--files--file_slug-",
+      "title": "Удалить файл в задаче",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/files/{file_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        },
+        {
+          "name": "file_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-DELETEapi-v1-ws--ws_slug--tasks--task_slug--files--file_slug-"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--intervals-get",
+      "title": "Получить интервалы задачи",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/intervals/get",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--intervals-get"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--intervals",
+      "title": "Добавить интервал в задачу",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/intervals",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug--intervals"
+    },
+    {
+      "id": "zadaci-PATCHapi-v1-ws--ws_slug--tasks--task_slug--intervals--intervalId--update-comment",
+      "title": "Обновить комментарий интервала",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/intervals/{intervalId}/update-comment",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        },
+        {
+          "name": "intervalId",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-PATCHapi-v1-ws--ws_slug--tasks--task_slug--intervals--intervalId--update-comment"
+    },
+    {
+      "id": "zadaci-PUTapi-v1-ws--ws_slug--tasks--task_slug--intervals--intervalId-",
+      "title": "Обновить интервал задачи",
+      "method": "PUT",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/intervals/{intervalId}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        },
+        {
+          "name": "intervalId",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-PUTapi-v1-ws--ws_slug--tasks--task_slug--intervals--intervalId-"
+    },
+    {
+      "id": "zadaci-DELETEapi-v1-ws--ws_slug--tasks--task_slug--intervals--intervalId-",
+      "title": "Удалить интервал задачи",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/intervals/{intervalId}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        },
+        {
+          "name": "intervalId",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-DELETEapi-v1-ws--ws_slug--tasks--task_slug--intervals--intervalId-"
+    },
+    {
+      "id": "zadaci-GETapi-v1-ws--ws_slug--tasks--task_slug--media--mediaSlug--download",
+      "title": "Скачать файл задачи",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/tasks/{task_slug}/media/{mediaSlug}/download",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        },
+        {
+          "name": "mediaSlug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-GETapi-v1-ws--ws_slug--tasks--task_slug--media--mediaSlug--download"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tags-create",
+      "title": "Создать метку",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tags/create",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tags-create"
+    },
+    {
+      "id": "zadaci-PUTapi-v1-ws--ws_slug--tags--tag_id--update",
+      "title": "Обновить метку",
+      "method": "PUT",
+      "path": "/api/v1/ws/{ws_slug}/tags/{tag_id}/update",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "tag_id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-PUTapi-v1-ws--ws_slug--tags--tag_id--update"
+    },
+    {
+      "id": "zadaci-DELETEapi-v1-ws--ws_slug--tags--tag_id--destroy",
+      "title": "Удалить метку",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/tags/{tag_id}/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "tag_id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-DELETEapi-v1-ws--ws_slug--tags--tag_id--destroy"
+    },
+    {
+      "id": "zadaci-POSTapi-v1-ws--ws_slug--tags--tag_id--change-position",
+      "title": "Изменить позицию метки",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/tags/{tag_id}/change-position",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "tag_id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-POSTapi-v1-ws--ws_slug--tags--tag_id--change-position"
     }
   ]
 }

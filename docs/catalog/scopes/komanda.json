@@ -3,11 +3,215 @@
   "title": "Команда",
   "endpoints": [
     {
+      "id": "komanda-GETapi-v1-teams",
+      "title": "Получить пространства пользователя",
+      "method": "GET",
+      "path": "/api/v1/teams",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-GETapi-v1-teams"
+    },
+    {
+      "id": "komanda-GETapi-v1-teams-requests",
+      "title": "Получить приглашения в команду",
+      "method": "GET",
+      "path": "/api/v1/teams/requests",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-GETapi-v1-teams-requests"
+    },
+    {
+      "id": "komanda-POSTapi-v1-teams-requests--requestId--accept",
+      "title": "Принять приглашение в команду",
+      "method": "POST",
+      "path": "/api/v1/teams/requests/{requestId}/accept",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "requestId",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-POSTapi-v1-teams-requests--requestId--accept"
+    },
+    {
+      "id": "komanda-POSTapi-v1-teams-requests--requestId--cancel",
+      "title": "Отклонить приглашение в команду",
+      "method": "POST",
+      "path": "/api/v1/teams/requests/{requestId}/cancel",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "requestId",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-POSTapi-v1-teams-requests--requestId--cancel"
+    },
+    {
+      "id": "komanda-POSTapi-v1-ws-create",
+      "title": "Создать пространство",
+      "method": "POST",
+      "path": "/api/v1/ws/create",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-POSTapi-v1-ws-create"
+    },
+    {
+      "id": "komanda-POSTapi-v1-ws-change-position",
+      "title": "Изменить порядок пространств",
+      "method": "POST",
+      "path": "/api/v1/ws/change-position",
+      "authRequired": true,
+      "pathParams": [],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-POSTapi-v1-ws-change-position"
+    },
+    {
+      "id": "komanda-POSTapi-v1-ws--ws_slug-",
+      "title": "Получить доски проектов и статусы задач",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-POSTapi-v1-ws--ws_slug-"
+    },
+    {
+      "id": "komanda-GETapi-v1-ws--ws_slug--statistics",
+      "title": "Получить статистику пространства",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/statistics",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-GETapi-v1-ws--ws_slug--statistics"
+    },
+    {
+      "id": "komanda-GETapi-v1-ws--ws_slug--global-search",
+      "title": "Глобальный поиск",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/global-search",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-GETapi-v1-ws--ws_slug--global-search"
+    },
+    {
+      "id": "komanda-DELETEapi-v1-ws--ws_slug--destroy",
+      "title": "Удалить пространство",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-DELETEapi-v1-ws--ws_slug--destroy"
+    },
+    {
+      "id": "komanda-POSTapi-v1-ws--ws_slug--update",
+      "title": "Обновить пространство",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/update",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-POSTapi-v1-ws--ws_slug--update"
+    },
+    {
+      "id": "komanda-GETapi-v1-ws--ws_slug--panel-summary",
+      "title": "Получить данные сводки",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/panel/summary",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-GETapi-v1-ws--ws_slug--panel-summary"
+    },
+    {
+      "id": "komanda-GETapi-v1-ws--ws_slug--leave",
+      "title": "Покинуть пространство",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/leave",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-GETapi-v1-ws--ws_slug--leave"
+    },
+    {
+      "id": "komanda-GETapi-v1-ws--ws_slug--members",
+      "title": "Получить список участников пространства/приглашенных пользователей с пагинацией",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/members",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-GETapi-v1-ws--ws_slug--members"
+    },
+    {
       "id": "komanda-GETapi-v1-ws--ws_slug--members-list",
       "title": "Получить список всех активных участников пространства",
       "method": "GET",
       "path": "/api/v1/ws/{ws_slug}/members/list",
-      "authRequired": false,
+      "authRequired": true,
       "pathParams": [
         {
           "name": "ws_slug",
@@ -17,6 +221,246 @@
       "queryParams": [],
       "bodyParams": [],
       "docsAnchor": "#komanda-GETapi-v1-ws--ws_slug--members-list"
+    },
+    {
+      "id": "komanda-POSTapi-v1-ws--ws_slug--members-change-role",
+      "title": "Изменить роль участника",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/members/change-role",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-POSTapi-v1-ws--ws_slug--members-change-role"
+    },
+    {
+      "id": "komanda-POSTapi-v1-ws--ws_slug--members-invite",
+      "title": "Пригласить пользователей в пространство",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/members/invite",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-POSTapi-v1-ws--ws_slug--members-invite"
+    },
+    {
+      "id": "komanda-POSTapi-v1-ws--ws_slug--members-export",
+      "title": "Экспорт участников команды",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/members/export",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-POSTapi-v1-ws--ws_slug--members-export"
+    },
+    {
+      "id": "komanda-PUTapi-v1-ws--ws_slug--members--id--update",
+      "title": "Обновить информацию участника команды",
+      "method": "PUT",
+      "path": "/api/v1/ws/{ws_slug}/members/{id}/update",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-PUTapi-v1-ws--ws_slug--members--id--update"
+    },
+    {
+      "id": "komanda-DELETEapi-v1-ws--ws_slug--members--id--destroy",
+      "title": "Удалить пользователя из пространства",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/members/{id}/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-DELETEapi-v1-ws--ws_slug--members--id--destroy"
+    },
+    {
+      "id": "komanda-DELETEapi-v1-ws--ws_slug--members--id--cancel",
+      "title": "Отклонить ожидающего пользователя",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/members/{id}/cancel",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-DELETEapi-v1-ws--ws_slug--members--id--cancel"
+    },
+    {
+      "id": "komanda-POSTapi-v1-ws--ws_slug--members--id--accept",
+      "title": "Принять ожидающего пользователя",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/members/{id}/accept",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-POSTapi-v1-ws--ws_slug--members--id--accept"
+    },
+    {
+      "id": "komanda-DELETEapi-v1-ws--ws_slug--members--id--invite",
+      "title": "Отменить приглашение",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/members/{id}/invite",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-DELETEapi-v1-ws--ws_slug--members--id--invite"
+    },
+    {
+      "id": "komanda-GETapi-v1-ws--ws_slug--members--id--info",
+      "title": "Получить информацию об участнике команды",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/members/{id}/info",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "id",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-GETapi-v1-ws--ws_slug--members--id--info"
+    },
+    {
+      "id": "komanda-GETapi-v1-ws--ws_slug--roles",
+      "title": "Получить список ролей пространства",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/roles",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-GETapi-v1-ws--ws_slug--roles"
+    },
+    {
+      "id": "komanda-POSTapi-v1-ws--ws_slug--roles-create",
+      "title": "Создать роль",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/roles/create",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-POSTapi-v1-ws--ws_slug--roles-create"
+    },
+    {
+      "id": "komanda-PUTapi-v1-ws--ws_slug--roles--roleSlug--update",
+      "title": "Обновить роль",
+      "method": "PUT",
+      "path": "/api/v1/ws/{ws_slug}/roles/{roleSlug}/update",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "roleSlug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-PUTapi-v1-ws--ws_slug--roles--roleSlug--update"
+    },
+    {
+      "id": "komanda-DELETEapi-v1-ws--ws_slug--roles--roleSlug--destroy",
+      "title": "Удалить роль",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/roles/{roleSlug}/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "roleSlug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-DELETEapi-v1-ws--ws_slug--roles--roleSlug--destroy"
     }
   ]
 }

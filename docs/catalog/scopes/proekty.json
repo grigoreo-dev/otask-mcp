@@ -1,0 +1,1110 @@
+{
+  "id": "proekty",
+  "title": "Проекты",
+  "endpoints": [
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--panel-projects",
+      "title": "Получить проекты",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/panel/projects",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--panel-projects"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects-all",
+      "title": "Получить список всех проектов #1",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/all",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects-all"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects-list",
+      "title": "Получить список всех проектов #2",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/list",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects-list"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects-grouped-by-manager",
+      "title": "Получить проекты сгруппированные по колонкам",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/grouped-by-manager",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects-grouped-by-manager"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects-grouped-by-manager-load-more",
+      "title": "Получить проекты для колонки",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/grouped-by-manager/load-more",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects-grouped-by-manager-load-more"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects-create",
+      "title": "Создать проект",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/create",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects-create"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects-export",
+      "title": "Экспорт проектов",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/export",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects-export"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects-example-import",
+      "title": "Скачать пример файла для импорта проектов",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/example-import",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects-example-import"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects-import",
+      "title": "Импорт проектов",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/import",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects-import"
+    },
+    {
+      "id": "proekty-PATCHapi-v1-ws--ws_slug--projects--project_slug-",
+      "title": "Обновить проект",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-PATCHapi-v1-ws--ws_slug--projects--project_slug-"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug-",
+      "title": "Обновить проект",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug-"
+    },
+    {
+      "id": "proekty-PUTapi-v1-ws--ws_slug--projects--project_slug--change-position",
+      "title": "Изменить позицию проекта",
+      "method": "PUT",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/change-position",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-PUTapi-v1-ws--ws_slug--projects--project_slug--change-position"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--update-pinned",
+      "title": "Закрепить/открепить проект",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/update-pinned",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--update-pinned"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--update-description",
+      "title": "Изменить описание проекта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/update-description",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--update-description"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--update-tags",
+      "title": "Прикрепить/открепить метку проекта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/update-tags",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--update-tags"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--move-kanban",
+      "title": "Переместить проект в колонку",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/move-kanban",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--move-kanban"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--destroy",
+      "title": "Удалить проект",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--destroy"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--close",
+      "title": "Завершить/восстановить проект",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/close",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--close"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--summary",
+      "title": "Получить проект",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/summary",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--summary"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--files",
+      "title": "Получить файлы проекта для сводки",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/files",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--files"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--statistics",
+      "title": "Получить статистику по финансам проекта",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/statistics",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--statistics"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--boards",
+      "title": "Получить список досок проекта",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/boards",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--boards"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--boards",
+      "title": "Создать доску для проекта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/boards",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--boards"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--boards-change-position",
+      "title": "Изменить позицию досок",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/boards/change-position",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--boards-change-position"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--boards--board_slug-",
+      "title": "Получить задачи для доски",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/boards/{board_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "board_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--boards--board_slug-"
+    },
+    {
+      "id": "proekty-PATCHapi-v1-ws--ws_slug--projects--project_slug--boards--board_slug-",
+      "title": "Обновить название доски",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/boards/{board_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "board_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-PATCHapi-v1-ws--ws_slug--projects--project_slug--boards--board_slug-"
+    },
+    {
+      "id": "proekty-DELETEapi-v1-ws--ws_slug--projects--project_slug--boards--board_slug-",
+      "title": "Удалить доску проекта",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/boards/{board_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "board_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-DELETEapi-v1-ws--ws_slug--projects--project_slug--boards--board_slug-"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--media",
+      "title": "Получить файлы проекта",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/media",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--media"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--media-create-folder",
+      "title": "Создать папку в файлах проекта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/media/create-folder",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--media-create-folder"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--media-mediaDownloadGenerate",
+      "title": "Скачать файлы/папки из проекта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/media/mediaDownloadGenerate",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--media-mediaDownloadGenerate"
+    },
+    {
+      "id": "proekty-DELETEapi-v1-ws--ws_slug--projects--project_slug--media-destroy",
+      "title": "Удалить папки/файлы проекта",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/media/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-DELETEapi-v1-ws--ws_slug--projects--project_slug--media-destroy"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--media--media-",
+      "title": "Получить файла папки проекта",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/media/{media}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "media",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--media--media-"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--media--media--download",
+      "title": "Скачать файл проекта",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/media/{media}/download",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "media",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--media--media--download"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--media--media--editname",
+      "title": "Изменить имя файла/папки проекта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/media/{media}/editname",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "media",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--media--media--editname"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--media--media--upload",
+      "title": "Загрузить файл в папку",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/media/{media}/upload",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "media",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--media--media--upload"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--notes",
+      "title": "Получить блокноты проекта",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/notes",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--notes"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--notes-create",
+      "title": "Создать блокнот для проекта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/notes/create",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--notes-create"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--notes-update-list",
+      "title": "Изменить порядок блокнотов",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/notes/update-list",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--notes-update-list"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--notes--note_slug--update",
+      "title": "Изменить блокнот",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/notes/{note_slug}/update",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "note_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--notes--note_slug--update"
+    },
+    {
+      "id": "proekty-DELETEapi-v1-ws--ws_slug--projects--project_slug--notes--note_slug--destroy",
+      "title": "Удалить блокнот",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/notes/{note_slug}/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "note_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-DELETEapi-v1-ws--ws_slug--projects--project_slug--notes--note_slug--destroy"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--notes--note_slug--update-pinned",
+      "title": "Закрепить/открепить блокнот",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/notes/{note_slug}/update-pinned",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "note_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--notes--note_slug--update-pinned"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--notes--note_slug--pdf-download",
+      "title": "Экспорт блокнота в PDF",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/notes/{note_slug}/pdf/download",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "note_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--notes--note_slug--pdf-download"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--applications",
+      "title": "Получить приложения проекта",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/applications",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--applications"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--applications",
+      "title": "Создать приложение для проекта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/applications",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--applications"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--applications-change-position",
+      "title": "Изменить порядок приложений проекта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/applications/change-position",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--applications-change-position"
+    },
+    {
+      "id": "proekty-DELETEapi-v1-ws--ws_slug--projects--project_slug--applications--application_slug-",
+      "title": "Удалить приложение проекта",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/applications/{application_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "application_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-DELETEapi-v1-ws--ws_slug--projects--project_slug--applications--application_slug-"
+    },
+    {
+      "id": "proekty-PUTapi-v1-ws--ws_slug--projects--project_slug--applications--application_slug-",
+      "title": "Изменить приложение проекта",
+      "method": "PUT",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/applications/{application_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "application_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-PUTapi-v1-ws--ws_slug--projects--project_slug--applications--application_slug-"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--applications--application_slug--update-pinned",
+      "title": "Закрепить/открепить приложение проекта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/applications/{application_slug}/update-pinned",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "application_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--applications--application_slug--update-pinned"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--tasks",
+      "title": "Получить список задач проекта",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/tasks",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--tasks"
+    },
+    {
+      "id": "proekty-DELETEapi-v1-ws--ws_slug--projects--project_slug--tasks-destroy",
+      "title": "Удалить задачи проекта",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/tasks/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-DELETEapi-v1-ws--ws_slug--projects--project_slug--tasks-destroy"
+    },
+    {
+      "id": "proekty-GETapi-v1-ws--ws_slug--projects--project_slug--payments",
+      "title": "Получить список платежей проекта",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/payments",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-GETapi-v1-ws--ws_slug--projects--project_slug--payments"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--payments-create",
+      "title": "Создать платеж для проекта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/payments/create",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--payments-create"
+    },
+    {
+      "id": "proekty-DELETEapi-v1-ws--ws_slug--projects--project_slug--payments-destroy",
+      "title": "Создать платеж для проекта",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/payments/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-DELETEapi-v1-ws--ws_slug--projects--project_slug--payments-destroy"
+    },
+    {
+      "id": "proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--payments--payment_slug--update",
+      "title": "Изменить платеж проекта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/projects/{project_slug}/payments/{payment_slug}/update",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "project_slug",
+          "required": true
+        },
+        {
+          "name": "payment_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#proekty-POSTapi-v1-ws--ws_slug--projects--project_slug--payments--payment_slug--update"
+    }
+  ]
+}

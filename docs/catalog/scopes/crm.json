@@ -1,0 +1,702 @@
+{
+  "id": "crm",
+  "title": "CRM",
+  "endpoints": [
+    {
+      "id": "crm-GETapi-v1-ws--ws_slug--crm-contacts-all",
+      "title": "Получить все контакты",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/crm/contacts/all",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-GETapi-v1-ws--ws_slug--crm-contacts-all"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-contacts",
+      "title": "Получить контакты с пагинацией",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/contacts",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-contacts"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-contacts-create",
+      "title": "Создать контакт",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/contacts/create",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-contacts-create"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-contacts-duplicate",
+      "title": "Дублировать контакты",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/contacts/duplicate",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-contacts-duplicate"
+    },
+    {
+      "id": "crm-DELETEapi-v1-ws--ws_slug--crm-contacts",
+      "title": "Удалить контакты",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/crm/contacts",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-DELETEapi-v1-ws--ws_slug--crm-contacts"
+    },
+    {
+      "id": "crm-PATCHapi-v1-ws--ws_slug--crm-contacts--contact-",
+      "title": "Обновить поле контакта",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/crm/contacts/{contact}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "contact",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-PATCHapi-v1-ws--ws_slug--crm-contacts--contact-"
+    },
+    {
+      "id": "crm-GETapi-v1-ws--ws_slug--crm-companies-all",
+      "title": "Получить все компании",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/crm/companies/all",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-GETapi-v1-ws--ws_slug--crm-companies-all"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-companies",
+      "title": "Получить компании с пагинацией",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/companies",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-companies"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-companies-create",
+      "title": "Создать компанию",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/companies/create",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-companies-create"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-companies-duplicate",
+      "title": "Дублировать компании",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/companies/duplicate",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-companies-duplicate"
+    },
+    {
+      "id": "crm-DELETEapi-v1-ws--ws_slug--crm-companies",
+      "title": "Удалить компании",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/crm/companies",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-DELETEapi-v1-ws--ws_slug--crm-companies"
+    },
+    {
+      "id": "crm-PATCHapi-v1-ws--ws_slug--crm-companies--company-",
+      "title": "Обновить поле компании",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/crm/companies/{company}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "company",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-PATCHapi-v1-ws--ws_slug--crm-companies--company-"
+    },
+    {
+      "id": "crm-GETapi-v1-ws--ws_slug--crm-funnels",
+      "title": "Получить воронки",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/crm/funnels",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-GETapi-v1-ws--ws_slug--crm-funnels"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-funnels-statuses",
+      "title": "Получить этапы воронок",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/funnels/statuses",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-funnels-statuses"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-funnels",
+      "title": "Создать воронку",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/funnels",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-funnels"
+    },
+    {
+      "id": "crm-GETapi-v1-ws--ws_slug--crm-funnels--funnel-",
+      "title": "Получить воронку",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/crm/funnels/{funnel}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "funnel",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-GETapi-v1-ws--ws_slug--crm-funnels--funnel-"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-funnels--funnel--deals",
+      "title": "Получить сделки воронки (Столбцы)",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/funnels/{funnel}/deals",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "funnel",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-funnels--funnel--deals"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-funnels--funnel--deals-list",
+      "title": "Получить сделки воронки (Список)",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/funnels/{funnel}/deals/list",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "funnel",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-funnels--funnel--deals-list"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-funnels--funnel--duplicate",
+      "title": "Дублировать воронку",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/funnels/{funnel}/duplicate",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "funnel",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-funnels--funnel--duplicate"
+    },
+    {
+      "id": "crm-PATCHapi-v1-ws--ws_slug--crm-funnels--funnel-",
+      "title": "Обновить воронку",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/crm/funnels/{funnel}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "funnel",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-PATCHapi-v1-ws--ws_slug--crm-funnels--funnel-"
+    },
+    {
+      "id": "crm-DELETEapi-v1-ws--ws_slug--crm-funnels--funnel-",
+      "title": "Удалить воронку",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/crm/funnels/{funnel}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "funnel",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-DELETEapi-v1-ws--ws_slug--crm-funnels--funnel-"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-funnels--funnel--statuses",
+      "title": "Создать этап для воронки",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/funnels/{funnel}/statuses",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "funnel",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-funnels--funnel--statuses"
+    },
+    {
+      "id": "crm-PATCHapi-v1-ws--ws_slug--crm-funnels--funnel--statuses--status-",
+      "title": "Обновить этап воронки",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/crm/funnels/{funnel}/statuses/{status}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "funnel",
+          "required": true
+        },
+        {
+          "name": "status",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-PATCHapi-v1-ws--ws_slug--crm-funnels--funnel--statuses--status-"
+    },
+    {
+      "id": "crm-DELETEapi-v1-ws--ws_slug--crm-funnels--funnel--statuses--status-",
+      "title": "Удалить этап воронки",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/crm/funnels/{funnel}/statuses/{status}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "funnel",
+          "required": true
+        },
+        {
+          "name": "status",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-DELETEapi-v1-ws--ws_slug--crm-funnels--funnel--statuses--status-"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-deals",
+      "title": "Создать сделку",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/deals",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-deals"
+    },
+    {
+      "id": "crm-DELETEapi-v1-ws--ws_slug--crm-deals",
+      "title": "Удалить сделки",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/crm/deals",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-DELETEapi-v1-ws--ws_slug--crm-deals"
+    },
+    {
+      "id": "crm-GETapi-v1-ws--ws_slug--crm-deals--deal-",
+      "title": "Получить сделку",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/crm/deals/{deal}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "deal",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-GETapi-v1-ws--ws_slug--crm-deals--deal-"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-deals--deal--duplicate",
+      "title": "Дублировать сделку",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/deals/{deal}/duplicate",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "deal",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-deals--deal--duplicate"
+    },
+    {
+      "id": "crm-PATCHapi-v1-ws--ws_slug--crm-deals--deal-",
+      "title": "Обновить сделку",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/crm/deals/{deal}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "deal",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-PATCHapi-v1-ws--ws_slug--crm-deals--deal-"
+    },
+    {
+      "id": "crm-PATCHapi-v1-ws--ws_slug--crm-deals--deal--complete",
+      "title": "Завершить/Отменить завершение сделки",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/crm/deals/{deal}/complete",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "deal",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-PATCHapi-v1-ws--ws_slug--crm-deals--deal--complete"
+    },
+    {
+      "id": "crm-DELETEapi-v1-ws--ws_slug--crm-deals--deal-",
+      "title": "Удалить сделку",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/crm/deals/{deal}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "deal",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-DELETEapi-v1-ws--ws_slug--crm-deals--deal-"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-tasks",
+      "title": "Получить задачи (Столбцы)",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/tasks",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-tasks"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-tasks-list",
+      "title": "Получить задачи (Список)",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/tasks/list",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-tasks-list"
+    },
+    {
+      "id": "crm-DELETEapi-v1-ws--ws_slug--crm-tasks",
+      "title": "Удалить задачи",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/crm/tasks",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-DELETEapi-v1-ws--ws_slug--crm-tasks"
+    },
+    {
+      "id": "crm-GETapi-v1-ws--ws_slug--crm-tasks--task-",
+      "title": "Получить задачу",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/crm/tasks/{task}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-GETapi-v1-ws--ws_slug--crm-tasks--task-"
+    },
+    {
+      "id": "crm-PATCHapi-v1-ws--ws_slug--crm-tasks--task-",
+      "title": "Обновить задачу",
+      "method": "PATCH",
+      "path": "/api/v1/ws/{ws_slug}/crm/tasks/{task}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-PATCHapi-v1-ws--ws_slug--crm-tasks--task-"
+    },
+    {
+      "id": "crm-POSTapi-v1-ws--ws_slug--crm-tasks--task--duplicate",
+      "title": "Дублировать задачу",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/crm/tasks/{task}/duplicate",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-POSTapi-v1-ws--ws_slug--crm-tasks--task--duplicate"
+    },
+    {
+      "id": "crm-DELETEapi-v1-ws--ws_slug--crm-tasks--task-",
+      "title": "Удалить задачу",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/crm/tasks/{task}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#crm-DELETEapi-v1-ws--ws_slug--crm-tasks--task-"
+    }
+  ]
+}

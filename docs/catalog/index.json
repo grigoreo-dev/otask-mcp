@@ -1,17 +1,77 @@
 {
-  "generatedAt": "2026-07-09T17:19:54.938Z",
+  "generatedAt": "2026-07-09T17:58:02.282Z",
   "scopes": [
+    {
+      "id": "vvedenie",
+      "title": "Введение",
+      "endpointCount": 0,
+      "file": "scopes/vvedenie.json"
+    },
+    {
+      "id": "autentifikaciia-zaprosov",
+      "title": "Аутентификация запросов",
+      "endpointCount": 0,
+      "file": "scopes/autentifikaciia-zaprosov.json"
+    },
+    {
+      "id": "proekty",
+      "title": "Проекты",
+      "endpointCount": 54,
+      "file": "scopes/proekty.json"
+    },
     {
       "id": "zadaci",
       "title": "Задачи",
-      "endpointCount": 1,
+      "endpointCount": 63,
       "file": "scopes/zadaci.json"
+    },
+    {
+      "id": "finansy",
+      "title": "Финансы",
+      "endpointCount": 14,
+      "file": "scopes/finansy.json"
+    },
+    {
+      "id": "klienty",
+      "title": "Клиенты",
+      "endpointCount": 8,
+      "file": "scopes/klienty.json"
+    },
+    {
+      "id": "xranilishhe",
+      "title": "Хранилище",
+      "endpointCount": 9,
+      "file": "scopes/xranilishhe.json"
     },
     {
       "id": "komanda",
       "title": "Команда",
-      "endpointCount": 1,
+      "endpointCount": 28,
       "file": "scopes/komanda.json"
+    },
+    {
+      "id": "polzovatel",
+      "title": "Пользователь",
+      "endpointCount": 15,
+      "file": "scopes/polzovatel.json"
+    },
+    {
+      "id": "crm",
+      "title": "CRM",
+      "endpointCount": 38,
+      "file": "scopes/crm.json"
+    },
+    {
+      "id": "baza-znanii",
+      "title": "База знаний",
+      "endpointCount": 7,
+      "file": "scopes/baza-znanii.json"
+    },
+    {
+      "id": "otcety",
+      "title": "Отчеты",
+      "endpointCount": 4,
+      "file": "scopes/otcety.json"
     }
   ]
 }

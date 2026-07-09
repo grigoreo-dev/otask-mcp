@@ -1,0 +1,138 @@
+{
+  "id": "klienty",
+  "title": "Клиенты",
+  "endpoints": [
+    {
+      "id": "klienty-GETapi-v1-ws--ws_slug--clients",
+      "title": "Получить список клиентов",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/clients",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#klienty-GETapi-v1-ws--ws_slug--clients"
+    },
+    {
+      "id": "klienty-GETapi-v1-ws--ws_slug--clients-all",
+      "title": "Получить список всех клиентов",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/clients/all",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#klienty-GETapi-v1-ws--ws_slug--clients-all"
+    },
+    {
+      "id": "klienty-POSTapi-v1-ws--ws_slug--clients-create",
+      "title": "Создать клиента",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/clients/create",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#klienty-POSTapi-v1-ws--ws_slug--clients-create"
+    },
+    {
+      "id": "klienty-POSTapi-v1-ws--ws_slug--clients-export",
+      "title": "Экспорт клиентов",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/clients/export",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#klienty-POSTapi-v1-ws--ws_slug--clients-export"
+    },
+    {
+      "id": "klienty-POSTapi-v1-ws--ws_slug--clients-example-import",
+      "title": "Скачать пример файла для импорта",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/clients/example-import",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#klienty-POSTapi-v1-ws--ws_slug--clients-example-import"
+    },
+    {
+      "id": "klienty-POSTapi-v1-ws--ws_slug--clients-import",
+      "title": "Импорт клиентов",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/clients/import",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#klienty-POSTapi-v1-ws--ws_slug--clients-import"
+    },
+    {
+      "id": "klienty-POSTapi-v1-ws--ws_slug--clients--client_slug--update",
+      "title": "Обновить клиента",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/clients/{client_slug}/update",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "client_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#klienty-POSTapi-v1-ws--ws_slug--clients--client_slug--update"
+    },
+    {
+      "id": "klienty-DELETEapi-v1-ws--ws_slug--clients-destroy",
+      "title": "Удалить клиентов",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/clients/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#klienty-DELETEapi-v1-ws--ws_slug--clients-destroy"
+    }
+  ]
+}

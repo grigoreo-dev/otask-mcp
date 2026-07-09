@@ -1,0 +1,138 @@
+{
+  "id": "baza-znanii",
+  "title": "База знаний",
+  "endpoints": [
+    {
+      "id": "baza-znanii-GETapi-v1-ws--ws_slug--articles",
+      "title": "Получить документы",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/articles",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#baza-znanii-GETapi-v1-ws--ws_slug--articles"
+    },
+    {
+      "id": "baza-znanii-POSTapi-v1-ws--ws_slug--articles",
+      "title": "Создать документ",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/articles",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#baza-znanii-POSTapi-v1-ws--ws_slug--articles"
+    },
+    {
+      "id": "baza-znanii-GETapi-v1-ws--ws_slug--articles--article_slug-",
+      "title": "Получить документ",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/articles/{article_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "article_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#baza-znanii-GETapi-v1-ws--ws_slug--articles--article_slug-"
+    },
+    {
+      "id": "baza-znanii-GETapi-v1-ws--ws_slug--articles--article_slug--children",
+      "title": "Получить дочерние документы",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/articles/{article_slug}/children",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "article_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#baza-znanii-GETapi-v1-ws--ws_slug--articles--article_slug--children"
+    },
+    {
+      "id": "baza-znanii-POSTapi-v1-ws--ws_slug--articles--article_slug--duplicate",
+      "title": "Дублировать документ",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/articles/{article_slug}/duplicate",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "article_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#baza-znanii-POSTapi-v1-ws--ws_slug--articles--article_slug--duplicate"
+    },
+    {
+      "id": "baza-znanii-POSTapi-v1-ws--ws_slug--articles--article_slug--update",
+      "title": "Обновить документ",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/articles/{article_slug}/update",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "article_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#baza-znanii-POSTapi-v1-ws--ws_slug--articles--article_slug--update"
+    },
+    {
+      "id": "baza-znanii-DELETEapi-v1-ws--ws_slug--articles--article_slug--delete",
+      "title": "Удалить документ",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/articles/{article_slug}/delete",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "article_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#baza-znanii-DELETEapi-v1-ws--ws_slug--articles--article_slug--delete"
+    }
+  ]
+}

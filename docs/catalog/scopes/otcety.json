@@ -1,0 +1,74 @@
+{
+  "id": "otcety",
+  "title": "Отчеты",
+  "endpoints": [
+    {
+      "id": "otcety-POSTapi-v1-ws--ws_slug--reports-members",
+      "title": "Получить отчет по участникам",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/reports/members",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#otcety-POSTapi-v1-ws--ws_slug--reports-members"
+    },
+    {
+      "id": "otcety-POSTapi-v1-ws--ws_slug--reports-projects",
+      "title": "Получить отчет по проектам",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/reports/projects",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#otcety-POSTapi-v1-ws--ws_slug--reports-projects"
+    },
+    {
+      "id": "otcety-POSTapi-v1-ws--ws_slug--reports-tasks",
+      "title": "Получить отчет по задачам",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/reports/tasks",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#otcety-POSTapi-v1-ws--ws_slug--reports-tasks"
+    },
+    {
+      "id": "otcety-POSTapi-v1-ws--ws_slug--reports-tasks--task_slug-",
+      "title": "Получить подзадачи в отчетах",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/reports/tasks/{task_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "task_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#otcety-POSTapi-v1-ws--ws_slug--reports-tasks--task_slug-"
+    }
+  ]
+}

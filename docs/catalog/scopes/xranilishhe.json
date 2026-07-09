@@ -1,0 +1,166 @@
+{
+  "id": "xranilishhe",
+  "title": "Хранилище",
+  "endpoints": [
+    {
+      "id": "xranilishhe-GETapi-v1-ws--ws_slug--storages",
+      "title": "Получить хранилище",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/storages",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#xranilishhe-GETapi-v1-ws--ws_slug--storages"
+    },
+    {
+      "id": "xranilishhe-POSTapi-v1-ws--ws_slug--storages-media-create-folder",
+      "title": "Создать папку в хранилище",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/storages/media/create-folder",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#xranilishhe-POSTapi-v1-ws--ws_slug--storages-media-create-folder"
+    },
+    {
+      "id": "xranilishhe-POSTapi-v1-ws--ws_slug--storages-media-upload",
+      "title": "Загрузка файла в системную папку \"Без проекта\"",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/storages/media/upload",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#xranilishhe-POSTapi-v1-ws--ws_slug--storages-media-upload"
+    },
+    {
+      "id": "xranilishhe-POSTapi-v1-ws--ws_slug--storages-media-download-generate",
+      "title": "Скачать несколько файлов или папок",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/storages/media/download-generate",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#xranilishhe-POSTapi-v1-ws--ws_slug--storages-media-download-generate"
+    },
+    {
+      "id": "xranilishhe-DELETEapi-v1-ws--ws_slug--storages-media-destroy",
+      "title": "Удалить файлы/папки",
+      "method": "DELETE",
+      "path": "/api/v1/ws/{ws_slug}/storages/media/destroy",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#xranilishhe-DELETEapi-v1-ws--ws_slug--storages-media-destroy"
+    },
+    {
+      "id": "xranilishhe-GETapi-v1-ws--ws_slug--storages-media--mediaSlug--download",
+      "title": "Скачать файл",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/storages/media/{mediaSlug}/download",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "mediaSlug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#xranilishhe-GETapi-v1-ws--ws_slug--storages-media--mediaSlug--download"
+    },
+    {
+      "id": "xranilishhe-POSTapi-v1-ws--ws_slug--storages-media--mediaSlug--editname",
+      "title": "Изменить название файла/папки",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/storages/media/{mediaSlug}/editname",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "mediaSlug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#xranilishhe-POSTapi-v1-ws--ws_slug--storages-media--mediaSlug--editname"
+    },
+    {
+      "id": "xranilishhe-GETapi-v1-ws--ws_slug--storages--media_slug-",
+      "title": "Получить содержимое папки",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/storages/{media_slug}",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "media_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#xranilishhe-GETapi-v1-ws--ws_slug--storages--media_slug-"
+    },
+    {
+      "id": "xranilishhe-POSTapi-v1-ws--ws_slug--storages--media_slug--upload",
+      "title": "Загрузить файл в папку",
+      "method": "POST",
+      "path": "/api/v1/ws/{ws_slug}/storages/{media_slug}/upload",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        },
+        {
+          "name": "media_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#xranilishhe-POSTapi-v1-ws--ws_slug--storages--media_slug--upload"
+    }
+  ]
+}
