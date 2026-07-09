@@ -65,3 +65,33 @@ export interface UpdateTaskResult {
   is_recovery?: boolean;
   is_detach_parent?: boolean;
 }
+
+export interface CreateTaskBody {
+  name: string;
+  board_id: number;
+  board_column_id: number;
+  end_at: string;
+  project_id: number;
+  comment?: string;
+  description?: string;
+  priority_id?: number;
+  performers?: string[];
+  tags?: string[];
+}
+
+export interface OtaskProjectSummary {
+  id: number;
+  slug: string;
+  name: string;
+  status_id?: number;
+}
+
+export interface ListProjectTasksResult {
+  tasks: OtaskTask[];
+  meta?: unknown;
+}
+
+export interface ListBoardResult {
+  boards: unknown[];
+  columns: unknown[];
+}

@@ -1,6 +1,10 @@
 import type { OtaskAuthResolver } from "./auth.js";
 import type {
+  CreateTaskBody,
+  ListBoardResult,
+  ListProjectTasksResult,
   OtaskApiResponse,
+  OtaskProjectSummary,
   OtaskTask,
   UpdateTaskBody,
   UpdateTaskResult,
@@ -40,6 +44,57 @@ async function headersFor(auth: OtaskAuthResolver): Promise<Record<string, strin
   return auth();
 }
 
+function wsUrl(wsSlug: string, path: string): string {
+  return `${API_BASE_URL}/api/v1/ws/${encodeURIComponent(wsSlug)}${path}`;
+}
+
+function withQuery(
+  url: string,
+  query?: Record<string, string | number | undefined>,
+): string {
+  if (!query) return url;
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (value === undefined) continue;
+    params.set(key, String(value));
+  }
+  const qs = params.toString();
+  return qs ? `${url}?${qs}` : url;
+}
+
+function assertSuccess<T>(
+  result: OtaskApiResponse<T>,
+  status: number,
+  fallback: string,
+): T {
+  if (!result.success) {
+    throw new OtaskApiError(result.message ?? fallback, status, result);
+  }
+  return result.data;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  return null;
+}
+
+function pickArray(data: unknown, key: string): unknown[] {
+  if (Array.isArray(data)) return data;
+  const obj = asRecord(data);
+  if (obj && Array.isArray(obj[key])) return obj[key] as unknown[];
+  return [];
+}
+
+function pickTask(data: unknown): OtaskTask {
+  const obj = asRecord(data);
+  if (obj && obj.task && typeof obj.task === "object") {
+    return obj.task as OtaskTask;
+  }
+  return data as OtaskTask;
+}
+
 export async function getTask(
   wsSlug: string,
   taskSlug: string,
@@ -47,20 +102,12 @@ export async function getTask(
 ): Promise<OtaskTask> {
   const headers = await headersFor(auth);
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/ws/${encodeURIComponent(wsSlug)}/tasks/${encodeURIComponent(taskSlug)}`,
+    wsUrl(wsSlug, `/tasks/${encodeURIComponent(taskSlug)}`),
     { method: "GET", headers },
   );
 
   const result = await parseResponse<OtaskApiResponse<OtaskTask>>(response);
-  if (!result.success) {
-    throw new OtaskApiError(
-      result.message ?? "Failed to get task",
-      response.status,
-      result,
-    );
-  }
-
-  return result.data;
+  return assertSuccess(result, response.status, "Failed to get task");
 }
 
 export async function updateTask(
@@ -71,7 +118,7 @@ export async function updateTask(
 ): Promise<UpdateTaskResult> {
   const headers = await headersFor(auth);
   const response = await fetch(
-    `${API_BASE_URL}/api/v1/ws/${encodeURIComponent(wsSlug)}/tasks/${encodeURIComponent(taskSlug)}/update`,
+    wsUrl(wsSlug, `/tasks/${encodeURIComponent(taskSlug)}/update`),
     {
       method: "POST",
       headers,
@@ -87,21 +134,194 @@ export async function updateTask(
     }>
   >(response);
 
-  if (!result.success) {
-    throw new OtaskApiError(
-      result.message ?? "Failed to update task",
-      response.status,
-      result,
-    );
-  }
+  const data = assertSuccess(result, response.status, "Failed to update task");
 
   return {
     success: true,
     message: result.message,
-    task: result.data.task,
-    is_recovery: result.data.is_recovery,
-    is_detach_parent: result.data.is_detach_parent,
+    task: data.task,
+    is_recovery: data.is_recovery,
+    is_detach_parent: data.is_detach_parent,
   };
+}
+
+export async function listProjects(
+  wsSlug: string,
+  auth: OtaskAuthResolver,
+): Promise<OtaskProjectSummary[]> {
+  const headers = await headersFor(auth);
+  const response = await fetch(wsUrl(wsSlug, "/projects/list"), {
+    method: "GET",
+    headers,
+  });
+
+  const result = await parseResponse<OtaskApiResponse<unknown>>(response);
+  const data = assertSuccess(result, response.status, "Failed to list projects");
+  return pickArray(data, "projects") as OtaskProjectSummary[];
+}
+
+export async function listProjectTasks(
+  wsSlug: string,
+  projectSlug: string,
+  query: Record<string, string | number | undefined> | undefined,
+  auth: OtaskAuthResolver,
+): Promise<ListProjectTasksResult> {
+  const headers = await headersFor(auth);
+  const url = withQuery(
+    wsUrl(wsSlug, `/projects/${encodeURIComponent(projectSlug)}/tasks`),
+    query,
+  );
+  const response = await fetch(url, { method: "GET", headers });
+
+  const result = await parseResponse<OtaskApiResponse<unknown>>(response);
+  const data = assertSuccess(
+    result,
+    response.status,
+    "Failed to list project tasks",
+  );
+
+  if (Array.isArray(data)) {
+    return { tasks: data as OtaskTask[] };
+  }
+
+  const obj = asRecord(data) ?? {};
+  const tasks = Array.isArray(obj.tasks) ? (obj.tasks as OtaskTask[]) : [];
+  return { tasks, meta: obj.meta };
+}
+
+export async function listBoard(
+  wsSlug: string,
+  projectSlug: string,
+  query: { type?: string; board_slug?: string } | undefined,
+  auth: OtaskAuthResolver,
+): Promise<ListBoardResult> {
+  const headers = await headersFor(auth);
+  const url = withQuery(
+    wsUrl(wsSlug, `/projects/${encodeURIComponent(projectSlug)}/boards`),
+    query,
+  );
+  const response = await fetch(url, { method: "GET", headers });
+
+  const result = await parseResponse<OtaskApiResponse<unknown>>(response);
+  const data = assertSuccess(result, response.status, "Failed to list board");
+  const obj = asRecord(data) ?? {};
+
+  return {
+    boards: Array.isArray(obj.boards) ? obj.boards : [],
+    columns: Array.isArray(obj.columns) ? obj.columns : [],
+  };
+}
+
+export async function listMembers(
+  wsSlug: string,
+  auth: OtaskAuthResolver,
+): Promise<unknown[]> {
+  const headers = await headersFor(auth);
+  const response = await fetch(wsUrl(wsSlug, "/members/list"), {
+    method: "GET",
+    headers,
+  });
+
+  const result = await parseResponse<OtaskApiResponse<unknown>>(response);
+  const data = assertSuccess(result, response.status, "Failed to list members");
+  return pickArray(data, "members");
+}
+
+export async function listTags(
+  wsSlug: string,
+  auth: OtaskAuthResolver,
+): Promise<unknown[]> {
+  const headers = await headersFor(auth);
+  const response = await fetch(wsUrl(wsSlug, "/kanbans/tags"), {
+    method: "GET",
+    headers,
+  });
+
+  const result = await parseResponse<OtaskApiResponse<unknown>>(response);
+  const data = assertSuccess(result, response.status, "Failed to list tags");
+  return pickArray(data, "tags");
+}
+
+export async function listComments(
+  wsSlug: string,
+  taskSlug: string,
+  body: object | undefined,
+  auth: OtaskAuthResolver,
+): Promise<unknown> {
+  const headers = await headersFor(auth);
+  const response = await fetch(
+    wsUrl(wsSlug, `/tasks/${encodeURIComponent(taskSlug)}/comments/get`),
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body ?? {}),
+    },
+  );
+
+  const result = await parseResponse<OtaskApiResponse<unknown>>(response);
+  return assertSuccess(result, response.status, "Failed to list comments");
+}
+
+export async function addComment(
+  wsSlug: string,
+  taskSlug: string,
+  comment: string,
+  parentId: number | undefined,
+  auth: OtaskAuthResolver,
+): Promise<unknown> {
+  const headers = await headersFor(auth);
+  const payload: { comment: string; parent_id?: number } = { comment };
+  if (parentId !== undefined) {
+    payload.parent_id = parentId;
+  }
+
+  const response = await fetch(
+    wsUrl(wsSlug, `/tasks/${encodeURIComponent(taskSlug)}/comments/store`),
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    },
+  );
+
+  const result = await parseResponse<OtaskApiResponse<unknown>>(response);
+  return assertSuccess(result, response.status, "Failed to add comment");
+}
+
+export async function createTask(
+  wsSlug: string,
+  body: CreateTaskBody,
+  auth: OtaskAuthResolver,
+): Promise<OtaskTask> {
+  const headers = await headersFor(auth);
+  const response = await fetch(wsUrl(wsSlug, "/tasks/create"), {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
+
+  const result = await parseResponse<OtaskApiResponse<unknown>>(response);
+  const data = assertSuccess(result, response.status, "Failed to create task");
+  return pickTask(data);
+}
+
+export async function archiveTask(
+  wsSlug: string,
+  taskSlug: string,
+  auth: OtaskAuthResolver,
+): Promise<OtaskTask> {
+  const headers = await headersFor(auth);
+  const response = await fetch(
+    wsUrl(wsSlug, `/tasks/${encodeURIComponent(taskSlug)}/in-archive`),
+    {
+      method: "POST",
+      headers,
+    },
+  );
+
+  const result = await parseResponse<OtaskApiResponse<unknown>>(response);
+  const data = assertSuccess(result, response.status, "Failed to archive task");
+  return pickTask(data);
 }
 
 export function formatApiError(error: unknown): string {
