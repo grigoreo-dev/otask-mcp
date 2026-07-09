@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-07-09T17:19:54.938Z",
+  "scopes": [
+    {
+      "id": "zadaci",
+      "title": "Задачи",
+      "endpointCount": 1,
+      "file": "scopes/zadaci.json"
+    },
+    {
+      "id": "komanda",
+      "title": "Команда",
+      "endpointCount": 1,
+      "file": "scopes/komanda.json"
+    }
+  ]
+}

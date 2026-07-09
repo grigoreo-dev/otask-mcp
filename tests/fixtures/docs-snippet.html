@@ -1,0 +1,30 @@
+<aside class="sidebar">
+  <ul class="sidebar__menu">
+    <li class="sidebar__menu-item">
+      <a href="#zadaci" class="sidebar__menu-link"><span class="sidebar__menu-link-name">Задачи</span></a>
+      <ul class="sidebar__submenu">
+        <li class="sidebar__submenu-item">
+          <a href="#zadaci-GETapi-v1-ws--ws_slug--tasks" class="sidebar__submenu-link">Получить список задач</a>
+        </li>
+      </ul>
+    </li>
+    <li class="sidebar__menu-item">
+      <a href="#komanda" class="sidebar__menu-link"><span class="sidebar__menu-link-name">Команда</span></a>
+      <ul class="sidebar__submenu">
+        <li class="sidebar__submenu-item">
+          <a href="#komanda-GETapi-v1-ws--ws_slug--members-list" class="sidebar__submenu-link">Получить список всех активных участников пространства</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</aside>
+<main>
+  <h2 id="zadaci-GETapi-v1-ws--ws_slug--tasks">Получить список задач</h2>
+  <p><code>GET</code></p>
+  <p>https://api.otask.ru</p>
+  <p>/api/v1/ws/{ws_slug}/tasks</p>
+  <p>Требуется аутентификация</p>
+  <h2 id="komanda-GETapi-v1-ws--ws_slug--members-list">Получить список всех активных участников пространства</h2>
+  <p><code>GET</code></p>
+  <p>/api/v1/ws/{ws_slug}/members/list</p>
+</main>

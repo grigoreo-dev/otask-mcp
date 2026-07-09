@@ -1,0 +1,22 @@
+{
+  "id": "zadaci",
+  "title": "Задачи",
+  "endpoints": [
+    {
+      "id": "zadaci-GETapi-v1-ws--ws_slug--tasks",
+      "title": "Получить список задач",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/tasks",
+      "authRequired": true,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#zadaci-GETapi-v1-ws--ws_slug--tasks"
+    }
+  ]
+}

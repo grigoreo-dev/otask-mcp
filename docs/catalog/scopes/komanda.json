@@ -1,0 +1,22 @@
+{
+  "id": "komanda",
+  "title": "Команда",
+  "endpoints": [
+    {
+      "id": "komanda-GETapi-v1-ws--ws_slug--members-list",
+      "title": "Получить список всех активных участников пространства",
+      "method": "GET",
+      "path": "/api/v1/ws/{ws_slug}/members/list",
+      "authRequired": false,
+      "pathParams": [
+        {
+          "name": "ws_slug",
+          "required": true
+        }
+      ],
+      "queryParams": [],
+      "bodyParams": [],
+      "docsAnchor": "#komanda-GETapi-v1-ws--ws_slug--members-list"
+    }
+  ]
+}
