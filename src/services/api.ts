@@ -80,11 +80,15 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return null;
 }
 
-function pickArray(data: unknown, key: string): unknown[] {
+function pickArray(data: unknown, key: string, status = 200): unknown[] {
   if (Array.isArray(data)) return data;
   const obj = asRecord(data);
   if (obj && Array.isArray(obj[key])) return obj[key] as unknown[];
-  return [];
+  throw new OtaskApiError(
+    `Unexpected API response: missing array field "${key}"`,
+    status,
+    data,
+  );
 }
 
 function pickTask(data: unknown): OtaskTask {
@@ -157,7 +161,7 @@ export async function listProjects(
 
   const result = await parseResponse<OtaskApiResponse<unknown>>(response);
   const data = assertSuccess(result, response.status, "Failed to list projects");
-  return pickArray(data, "projects") as OtaskProjectSummary[];
+  return pickArray(data, "projects", response.status) as OtaskProjectSummary[];
 }
 
 export async function listProjectTasks(
@@ -184,9 +188,16 @@ export async function listProjectTasks(
     return { tasks: data as OtaskTask[] };
   }
 
-  const obj = asRecord(data) ?? {};
-  const tasks = Array.isArray(obj.tasks) ? (obj.tasks as OtaskTask[]) : [];
-  return { tasks, meta: obj.meta };
+  const obj = asRecord(data);
+  if (obj && Array.isArray(obj.tasks)) {
+    return { tasks: obj.tasks as OtaskTask[], meta: obj.meta };
+  }
+
+  throw new OtaskApiError(
+    'Unexpected API response: missing array field "tasks"',
+    response.status,
+    data,
+  );
 }
 
 export async function listBoard(
@@ -204,11 +215,21 @@ export async function listBoard(
 
   const result = await parseResponse<OtaskApiResponse<unknown>>(response);
   const data = assertSuccess(result, response.status, "Failed to list board");
-  const obj = asRecord(data) ?? {};
+  const obj = asRecord(data);
+  const hasBoards = obj !== null && Array.isArray(obj.boards);
+  const hasColumns = obj !== null && Array.isArray(obj.columns);
+
+  if (!hasBoards && !hasColumns) {
+    throw new OtaskApiError(
+      'Unexpected API response: missing board envelope (boards/columns)',
+      response.status,
+      data,
+    );
+  }
 
   return {
-    boards: Array.isArray(obj.boards) ? obj.boards : [],
-    columns: Array.isArray(obj.columns) ? obj.columns : [],
+    boards: hasBoards ? (obj!.boards as unknown[]) : [],
+    columns: hasColumns ? (obj!.columns as unknown[]) : [],
   };
 }
 
@@ -224,7 +245,7 @@ export async function listMembers(
 
   const result = await parseResponse<OtaskApiResponse<unknown>>(response);
   const data = assertSuccess(result, response.status, "Failed to list members");
-  return pickArray(data, "members");
+  return pickArray(data, "members", response.status);
 }
 
 export async function listTags(
@@ -239,7 +260,7 @@ export async function listTags(
 
   const result = await parseResponse<OtaskApiResponse<unknown>>(response);
   const data = assertSuccess(result, response.status, "Failed to list tags");
-  return pickArray(data, "tags");
+  return pickArray(data, "tags", response.status);
 }
 
 export async function listComments(

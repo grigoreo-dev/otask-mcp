@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
 import { createOtaskClient } from "../src/services/client.ts";
+import { OtaskApiError } from "../src/services/api.ts";
 import { API_BASE_URL } from "../src/constants.ts";
 
 const auth = async () => ({
@@ -21,6 +22,18 @@ function mockJsonFetch(handler: (url: string, init?: RequestInit) => unknown) {
     const payload = handler(url, init);
     return new Response(JSON.stringify(payload), {
       status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }) as typeof fetch;
+}
+
+function mockFetchWithStatus(
+  status: number,
+  payload: unknown,
+) {
+  globalThis.fetch = mock(async () => {
+    return new Response(JSON.stringify(payload), {
+      status,
       headers: { "Content-Type": "application/json" },
     });
   }) as typeof fetch;
@@ -289,5 +302,49 @@ describe("api paths and envelopes", () => {
     );
     expect(method).toBe("POST");
     expect(task.slug).toBe("t1");
+  });
+
+  test("listProjects throws OtaskApiError on success:false", async () => {
+    mockJsonFetch(() => ({
+      success: false,
+      message: "projects unavailable",
+      data: null,
+    }));
+
+    const client = createOtaskClient(auth);
+    try {
+      await client.listProjects("ws");
+      expect.unreachable("expected OtaskApiError");
+    } catch (err) {
+      expect(err).toBeInstanceOf(OtaskApiError);
+      expect((err as OtaskApiError).message).toBe("projects unavailable");
+    }
+  });
+
+  test("createTask throws OtaskApiError on non-2xx", async () => {
+    mockFetchWithStatus(422, {
+      message: "validation failed",
+    });
+
+    const client = createOtaskClient(auth);
+    await expect(
+      client.createTask("ws", {
+        name: "New",
+        board_id: 1,
+        board_column_id: 2,
+        end_at: "2026-01-01",
+        project_id: 10,
+      }),
+    ).rejects.toBeInstanceOf(OtaskApiError);
+  });
+
+  test("listProjects throws on unknown success envelope", async () => {
+    mockJsonFetch(() => ({
+      success: true,
+      data: { unexpected: true },
+    }));
+
+    const client = createOtaskClient(auth);
+    await expect(client.listProjects("ws")).rejects.toBeInstanceOf(OtaskApiError);
   });
 });
