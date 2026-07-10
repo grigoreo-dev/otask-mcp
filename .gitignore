@@ -6,6 +6,8 @@ dist/
 opencode.json
 opencode.jsonc
 .wrangler/
+.dev.vars
+**/.dev.vars
 
 .worktrees/
 .codegraph/

@@ -26,13 +26,13 @@ npm i -g @grigoreo-dev/otask-mcp
 |-----|-----|-----------|
 | **Пароль O!task** | только memory на POST `/authorize` | **нигде не пишется** (ни KV, ни env, ни git) |
 | **Токен O!task + scope** (`props`) | grant в **Cloudflare KV** (`OAUTH_KV`) | **end-to-end encrypted**: ключ шифрования — секрет access-токена MCP; из сырого KV **нельзя** прочитать props без валидного Bearer |
-| **userId** | KV, не зашифрован | **`sha256(email)`** — не email; связать с человеком по хранилищу нельзя |
+| **userId** | KV, не зашифрован | **`HMAC-SHA256(email, secret pepper)`** — не email; без секрета `USER_ID_PEPPER` перебором по словарю email **не** сматчить |
 | **metadata** | KV, не зашифрован | **пусто** (`{}`) — email в хранилище не пишется |
 | **Access token MCP** | у клиента (Claude и т.д.) | клиент + тот, кто перехватит Bearer |
 
 - Пароль **не** хранится после логина: email+password → `POST api.otask.ru/.../login` → API-токен → в `props`, пароль drop.
 - O!task Bearer **нужен** для запросов к API → лежит в encrypted `props`, не в открытом виде.
-- `userId = sha256(email)`: стабильный id (повторный логин заменяет старый grant), но **email в KV нет**.
+- `userId = HMAC-SHA256(email, USER_ID_PEPPER)`: стабильный id (повторный логин заменяет старый grant), но **email в KV нет** и хэш не перебрать без секрета.
 - Публичный Worker **без** `OTASK_*` / `MCP_AUTH_TOKEN` в env: multi-user, каждый — своя OAuth-сессия.
 - После expiry/401 — **повторный Connect** (re-login).
 - Код open source: self-deploy и аудит. Паттерн: [Remote MCP on Cloudflare](https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/).
@@ -194,6 +194,10 @@ HTTP gateway: задай OTASK_* + MCP_AUTH_TOKEN.
 bun install
 bunx wrangler login              # один раз (браузер, без API-токена)
 bun run worker:kv                # создаёт OAUTH_KV → id в wrangler.toml
+
+# секрет для HMAC userId (email не хранится в KV в переборно-открытом виде)
+bunx wrangler secret put USER_ID_PEPPER --config packages/worker/wrangler.toml
+
 bun run deploy:worker            # build monorepo + wrangler deploy
 ```
 

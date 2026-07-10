@@ -24,10 +24,18 @@ bun run worker:kv
 #   id = "<from create>"
 #   preview_id = "<same or preview namespace>"
 
+# required secret: HMAC pepper for userId (keeps email non-enumerable in KV)
+bunx wrangler secret put USER_ID_PEPPER --config packages/worker/wrangler.toml
+
 bun run deploy:worker
 ```
 
 URL: `https://otask-mcp.<account-subdomain>.workers.dev/mcp`
+
+**Required secret:** `USER_ID_PEPPER` — any long random string
+(e.g. `openssl rand -hex 32`). Without it, `/authorize` returns 500.
+It is the HMAC key for the stored `userId`; keep it stable, or existing
+grants stop matching on re-login.
 
 ### 2) GitHub Actions (current workflow)
 
@@ -41,6 +49,10 @@ Workflow: [`.github/workflows/deploy-worker.yml`](../../.github/workflows/deploy
 | `CLOUDFLARE_ACCOUNT_ID` | Dashboard right sidebar / Workers overview |
 
 Also: real KV `id` must already be in committed `wrangler.toml` (or Actions will fail on placeholder).
+
+Set the `USER_ID_PEPPER` **Worker secret once** (`wrangler secret put`, or dashboard →
+Worker → Settings → Variables → Secret). It persists across deploys — the workflow does
+not set it.
 
 Then: **Actions → Deploy Worker → Run workflow**.
 
@@ -83,7 +95,14 @@ bun install
 bun run build
 cd packages/worker
 bunx wrangler kv namespace create OAUTH_KV   # once; update wrangler.toml
-bun run dev
+bunx wrangler secret put USER_ID_PEPPER      # once; required for /authorize
+bun run dev                                  # local: put USER_ID_PEPPER in .dev.vars
+```
+
+For `wrangler dev`, put the pepper in `packages/worker/.dev.vars` (gitignored):
+
+```
+USER_ID_PEPPER=local-dev-pepper
 ```
 
 ## Rate limiting (dashboard, not code)
@@ -97,3 +116,5 @@ bun run dev
 
 - Public multi-user Worker: **no** `OTASK_*` / `MCP_AUTH_TOKEN` in `[vars]`.
 - Placeholder KV ids in git are intentional until first `worker:kv`.
+- **`USER_ID_PEPPER` is a required secret** (`wrangler secret put`), not a `[vars]`
+  value — never commit it. Rotating it invalidates existing grants (users re-login).
