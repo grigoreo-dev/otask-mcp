@@ -1,4 +1,4 @@
-import type { OtaskTask, OtaskSubtask, UpdateTaskBody } from "../types.js";
+import type { OtaskSubtask, OtaskTask, UpdateTaskBody } from "../types.js";
 
 export interface CompactTask {
   id: number;
@@ -15,6 +15,7 @@ export interface CompactTask {
   tags: Array<{ id: string; name?: string }>;
   comments_count?: number;
   subtasks_count?: number;
+  project?: { id: number; name: string };
 }
 
 export interface CompactProject {
@@ -77,9 +78,7 @@ function tagIds(task: OtaskTask): string[] {
   });
 }
 
-function compactRefs(
-  value: unknown,
-): Array<{ id: string; name?: string }> {
+function compactRefs(value: unknown): Array<{ id: string; name?: string }> {
   if (!Array.isArray(value)) {
     return [];
   }
@@ -111,7 +110,7 @@ function normalizeSubtasks(task: OtaskTask): OtaskSubtask[] {
 
 export function buildUpdateBodyFromTask(
   task: OtaskTask,
-  overrides: Partial<UpdateTaskBody> = {},
+  overrides: Partial<UpdateTaskBody> = {}
 ): UpdateTaskBody {
   const base: UpdateTaskBody = {
     name: task.name,
@@ -150,6 +149,18 @@ export function compactTask(task: OtaskTask): CompactTask {
 
   if (typeof task.comments_count === "number") {
     out.comments_count = task.comments_count;
+  }
+
+  const project = task.project;
+  if (
+    typeof project === "object" &&
+    project !== null &&
+    typeof (project as { name?: unknown }).name === "string"
+  ) {
+    out.project = {
+      id: task.project_id,
+      name: (project as { name: string }).name,
+    };
   }
 
   return out;

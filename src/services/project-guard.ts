@@ -16,9 +16,7 @@ export interface ProjectGuard {
   readonly list: ProjectAllowList;
 }
 
-export function parseProjectAllowList(
-  raw: string | undefined | null,
-): ProjectAllowList {
+export function parseProjectAllowList(raw: string | undefined | null): ProjectAllowList {
   const slugs = new Set<string>();
   const ids = new Set<number>();
   if (!raw?.trim()) {
@@ -62,7 +60,7 @@ export function createProjectGuard(list: ProjectAllowList): ProjectGuard {
 export async function assertProjectSlugAllowed(
   guard: ProjectGuard,
   listProjects: () => Promise<Array<{ id: number; slug: string }>>,
-  project_slug: string,
+  project_slug: string
 ): Promise<void> {
   const projects = await listProjects();
   const project = projects.find((p) => p.slug === project_slug);
@@ -78,7 +76,7 @@ export async function assertProjectIdAllowed(
   guard: ProjectGuard,
   listProjects: () => Promise<Array<{ id: number; slug: string }>>,
   project_id: number,
-  knownSlug?: string | null,
+  knownSlug?: string | null
 ): Promise<void> {
   if (knownSlug) {
     guard.assertAllowed({ id: project_id, slug: knownSlug });
@@ -93,9 +91,7 @@ export async function assertProjectIdAllowed(
   }
 }
 
-export function projectGuardFromEnv(
-  env: NodeJS.ProcessEnv = process.env,
-): ProjectGuard {
+export function projectGuardFromEnv(env: NodeJS.ProcessEnv = process.env): ProjectGuard {
   return createProjectGuard(parseProjectAllowList(env.OTASK_ALLOWED_PROJECTS));
 }
 
@@ -105,16 +101,14 @@ export function resolveHttpProjectGuard(opts: {
   headerRaw: string | undefined;
 }): ProjectGuard {
   if (opts.authMode === "gateway") {
-    return createProjectGuard(
-      parseProjectAllowList(opts.env.OTASK_ALLOWED_PROJECTS),
-    );
+    return createProjectGuard(parseProjectAllowList(opts.env.OTASK_ALLOWED_PROJECTS));
   }
   return createProjectGuard(parseProjectAllowList(opts.headerRaw));
 }
 
 export function projectGuardMode(
   authMode: "gateway" | "passthrough",
-  guard: ProjectGuard,
+  guard: ProjectGuard
 ): "env" | "header" | "off" {
   if (guard.list.isEmpty) return "off";
   return authMode === "gateway" ? "env" : "header";

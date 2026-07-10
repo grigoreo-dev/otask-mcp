@@ -1,15 +1,11 @@
-import { GetTaskInputSchema, type GetTaskInput } from "../schemas/task.js";
+import { type GetTaskInput, GetTaskInputSchema } from "../schemas/task.js";
 import { assertProjectIdAllowed } from "../services/project-guard.js";
 import { resolveWsSlug } from "../services/scope.js";
 import { compactTask } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
-export function createGetTaskTool({
-  api,
-  guard,
-  scope,
-}: ToolDeps): ToolDefinition<GetTaskInput> {
+export function createGetTaskTool({ api, guard, scope }: ToolDeps): ToolDefinition<GetTaskInput> {
   return {
     name: "otask_get_task",
     config: {
@@ -38,13 +34,12 @@ Docs: https://api.otask.ru/docs#zadaci-GETapi-v1-ws--ws_slug--tasks--task_slug`,
       try {
         const ws = resolveWsSlug(ws_slug, scope);
         const task = await api.getTask(ws, task_slug);
-        const projectSlug =
-          typeof task.project_slug === "string" ? task.project_slug : undefined;
+        const projectSlug = typeof task.project_slug === "string" ? task.project_slug : undefined;
         await assertProjectIdAllowed(
           guard,
           () => api.listProjects(ws),
           task.project_id,
-          projectSlug,
+          projectSlug
         );
         const summary = compactTask(task);
         return jsonToolResult(summary, { task: summary });

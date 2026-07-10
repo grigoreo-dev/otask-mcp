@@ -1,16 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import { extractProjectAllowListHeader } from "../src/services/auth.ts";
-import {
-  projectGuardMode,
-  resolveHttpProjectGuard,
-} from "../src/services/project-guard.ts";
+import { projectGuardMode, resolveHttpProjectGuard } from "../src/services/project-guard.ts";
 
 describe("extractProjectAllowListHeader", () => {
   test("reads x-otask-allowed-projects string", () => {
     expect(
       extractProjectAllowListHeader({
         "x-otask-allowed-projects": "p1,42",
-      }),
+      })
     ).toBe("p1,42");
   });
 
@@ -22,7 +19,7 @@ describe("extractProjectAllowListHeader", () => {
     expect(
       extractProjectAllowListHeader({
         "x-otask-allowed-projects": ["a", "b"],
-      }),
+      })
     ).toBe("a");
   });
 });

@@ -3,10 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseOtaskDocsHtml } from "../src/docs/parser.ts";
 
-const html = readFileSync(
-  join(import.meta.dir, "fixtures/docs-snippet.html"),
-  "utf8",
-);
+const html = readFileSync(join(import.meta.dir, "fixtures/docs-snippet.html"), "utf8");
 
 describe("parseOtaskDocsHtml", () => {
   test("splits scopes from sidebar and attaches endpoints", () => {
@@ -14,7 +11,9 @@ describe("parseOtaskDocsHtml", () => {
     const tasks = catalog.scopes.find((s) => s.id === "zadaci");
     const team = catalog.scopes.find((s) => s.id === "komanda");
     expect(tasks?.title).toBe("Задачи");
-    expect(tasks?.endpoints.some((e) => e.method === "GET" && e.path.includes("/tasks"))).toBe(true);
+    expect(tasks?.endpoints.some((e) => e.method === "GET" && e.path.includes("/tasks"))).toBe(
+      true
+    );
     expect(team?.endpoints.some((e) => e.path.includes("/members/list"))).toBe(true);
   });
 

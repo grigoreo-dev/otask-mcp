@@ -1,19 +1,10 @@
-import {
-  CreateTaskInputSchema,
-  type CreateTaskInput,
-} from "../schemas/task.js";
-import {
-  resolveProjectId,
-  resolveWsSlug,
-} from "../services/scope.js";
+import { type CreateTaskInput, CreateTaskInputSchema } from "../schemas/task.js";
+import { resolveProjectId, resolveWsSlug } from "../services/scope.js";
 import { compactTask } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
-export function createCreateTaskTool({
-  api,
-  scope,
-}: ToolDeps): ToolDefinition<CreateTaskInput> {
+export function createCreateTaskTool({ api, scope }: ToolDeps): ToolDefinition<CreateTaskInput> {
   return {
     name: "otask_create_task",
     config: {
@@ -42,11 +33,7 @@ Docs: https://api.otask.ru/docs`,
       try {
         const { ws_slug, project_id: projectIdArg, ...rest } = params;
         const ws = resolveWsSlug(ws_slug, scope);
-        const project_id = await resolveProjectId(
-          projectIdArg,
-          scope,
-          () => api.listProjects(ws),
-        );
+        const project_id = await resolveProjectId(projectIdArg, scope, () => api.listProjects(ws));
         const task = await api.createTask(ws, { ...rest, project_id });
         const summary = compactTask(task);
         return jsonToolResult(summary, { task: summary });

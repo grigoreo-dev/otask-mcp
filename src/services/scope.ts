@@ -2,8 +2,8 @@ import {
   assertProjectIdAllowed,
   assertProjectSlugAllowed,
   createProjectGuard,
-  parseProjectAllowList,
   type ProjectGuard,
+  parseProjectAllowList,
 } from "./project-guard.js";
 
 export interface WsAllowList {
@@ -24,9 +24,7 @@ export interface ScopeContext {
   projectGuard: ProjectGuard;
 }
 
-export function parseWsAllowList(
-  raw: string | undefined | null,
-): WsAllowList {
+export function parseWsAllowList(raw: string | undefined | null): WsAllowList {
   const slugs = new Set<string>();
   if (!raw?.trim()) {
     return { slugs, isEmpty: true };
@@ -55,7 +53,7 @@ export function createWsGuard(list: WsAllowList): WsGuard {
 
 function headerValue(
   headers: { [k: string]: string | string[] | undefined },
-  name: string,
+  name: string
 ): string | undefined {
   const raw = headers[name];
   if (typeof raw === "string") return raw;
@@ -68,15 +66,10 @@ function trimOrUndef(v: string | undefined | null): string | undefined {
   return t ? t : undefined;
 }
 
-export function resolveWsSlug(
-  ws_slug: string | undefined,
-  scope: ScopeContext,
-): string {
+export function resolveWsSlug(ws_slug: string | undefined, scope: ScopeContext): string {
   const ws = trimOrUndef(ws_slug) ?? scope.defaultWs;
   if (!ws) {
-    throw new Error(
-      "ws_slug is required (pass arg or set OTASK_DEFAULT_WS / X-Otask-Default-Ws)",
-    );
+    throw new Error("ws_slug is required (pass arg or set OTASK_DEFAULT_WS / X-Otask-Default-Ws)");
   }
   scope.wsGuard.assertAllowed(ws);
   return ws;
@@ -85,7 +78,7 @@ export function resolveWsSlug(
 export async function resolveProjectSlug(
   project_slug: string | undefined,
   scope: ScopeContext,
-  listProjects: () => Promise<Array<{ id: number; slug: string }>>,
+  listProjects: () => Promise<Array<{ id: number; slug: string }>>
 ): Promise<string> {
   const explicit = trimOrUndef(project_slug);
   if (explicit) {
@@ -96,7 +89,7 @@ export async function resolveProjectSlug(
   const def = scope.defaultProject;
   if (!def) {
     throw new Error(
-      "project_slug is required (pass arg or set OTASK_DEFAULT_PROJECT / X-Otask-Default-Project)",
+      "project_slug is required (pass arg or set OTASK_DEFAULT_PROJECT / X-Otask-Default-Project)"
     );
   }
 
@@ -121,7 +114,7 @@ export async function resolveProjectSlug(
 export async function resolveProjectId(
   project_id: number | undefined,
   scope: ScopeContext,
-  listProjects: () => Promise<Array<{ id: number; slug: string }>>,
+  listProjects: () => Promise<Array<{ id: number; slug: string }>>
 ): Promise<number> {
   if (project_id != null) {
     await assertProjectIdAllowed(scope.projectGuard, listProjects, project_id);
@@ -131,7 +124,7 @@ export async function resolveProjectId(
   const def = scope.defaultProject;
   if (!def) {
     throw new Error(
-      "project_id is required (pass arg or set OTASK_DEFAULT_PROJECT / X-Otask-Default-Project)",
+      "project_id is required (pass arg or set OTASK_DEFAULT_PROJECT / X-Otask-Default-Project)"
     );
   }
 
@@ -153,9 +146,7 @@ export async function resolveProjectId(
 export function assertDefaultsAllowed(scope: ScopeContext): void {
   if (scope.defaultWs && !scope.wsGuard.list.isEmpty) {
     if (!scope.wsGuard.allows(scope.defaultWs)) {
-      throw new Error(
-        `OTASK_DEFAULT_WS "${scope.defaultWs}" is not in OTASK_ALLOWED_WS`,
-      );
+      throw new Error(`OTASK_DEFAULT_WS "${scope.defaultWs}" is not in OTASK_ALLOWED_WS`);
     }
   }
   if (scope.defaultProject && !scope.projectGuard.list.isEmpty) {
@@ -165,23 +156,17 @@ export function assertDefaultsAllowed(scope: ScopeContext): void {
       scope.projectGuard.allows({ slug: def }) ||
       (asId != null && scope.projectGuard.allows({ id: asId }));
     if (!allowed) {
-      throw new Error(
-        `OTASK_DEFAULT_PROJECT "${def}" is not in OTASK_ALLOWED_PROJECTS`,
-      );
+      throw new Error(`OTASK_DEFAULT_PROJECT "${def}" is not in OTASK_ALLOWED_PROJECTS`);
     }
   }
 }
 
-export function scopeFromEnv(
-  env: NodeJS.ProcessEnv = process.env,
-): ScopeContext {
+export function scopeFromEnv(env: NodeJS.ProcessEnv = process.env): ScopeContext {
   return {
     defaultWs: trimOrUndef(env.OTASK_DEFAULT_WS),
     defaultProject: trimOrUndef(env.OTASK_DEFAULT_PROJECT),
     wsGuard: createWsGuard(parseWsAllowList(env.OTASK_ALLOWED_WS)),
-    projectGuard: createProjectGuard(
-      parseProjectAllowList(env.OTASK_ALLOWED_PROJECTS),
-    ),
+    projectGuard: createProjectGuard(parseProjectAllowList(env.OTASK_ALLOWED_PROJECTS)),
   };
 }
 
@@ -195,22 +180,14 @@ export function resolveHttpScope(opts: {
   }
 
   const headerWsAllow = headerValue(opts.headers, "x-otask-allowed-ws");
-  const headerProjectAllow = headerValue(
-    opts.headers,
-    "x-otask-allowed-projects",
-  );
+  const headerProjectAllow = headerValue(opts.headers, "x-otask-allowed-projects");
   const headerDefaultWs = headerValue(opts.headers, "x-otask-default-ws");
-  const headerDefaultProject = headerValue(
-    opts.headers,
-    "x-otask-default-project",
-  );
+  const headerDefaultProject = headerValue(opts.headers, "x-otask-default-project");
 
   return {
-    defaultWs:
-      trimOrUndef(headerDefaultWs) ?? trimOrUndef(opts.env.OTASK_DEFAULT_WS),
+    defaultWs: trimOrUndef(headerDefaultWs) ?? trimOrUndef(opts.env.OTASK_DEFAULT_WS),
     defaultProject:
-      trimOrUndef(headerDefaultProject) ??
-      trimOrUndef(opts.env.OTASK_DEFAULT_PROJECT),
+      trimOrUndef(headerDefaultProject) ?? trimOrUndef(opts.env.OTASK_DEFAULT_PROJECT),
     wsGuard: createWsGuard(parseWsAllowList(headerWsAllow)),
     projectGuard: createProjectGuard(parseProjectAllowList(headerProjectAllow)),
   };

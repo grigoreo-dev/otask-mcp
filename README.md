@@ -115,6 +115,8 @@ bun start
 
 | Инструмент | Назначение |
 |------------|------------|
+| `otask_me` | Текущий пользователь (id, имя, email, timezone) |
+| `otask_list_tasks` | Задачи воркспейса; по умолчанию `mine=true`; фильтры `performer_ids`, `project_ids`, `priority_ids`, `due`, `page` |
 | `otask_get_task` | Получить одну задачу по workspace + slug задачи (посмотреть поля перед обновлением) |
 | `otask_update_task` | Обновить существующую задачу (name, board, performers, tags, description, …) |
 | `otask_list_projects` | Список проектов воркспейса (с фильтром по allow-list, если задан) |
@@ -127,6 +129,16 @@ bun start
 | `otask_create_task` | Создать задачу (обязательно: `ws_slug`, `project_id`, `name`, `board_id`, `board_column_id`, `end_at`) |
 | `otask_move_task` | Переместить задачу в другую колонку доски (статус) |
 | `otask_archive_task` | Архивировать задачу |
+
+Inbox (после настройки `OTASK_DEFAULT_WS`):
+
+```text
+# утренний inbox
+otask_me
+otask_list_tasks  # mine=true
+otask_list_tasks due=today
+otask_list_tasks due=overdue
+```
 
 Если активен allow-list проектов, project-scoped инструменты проверяют членство (или фильтруют списки); пустой allow-list = доступны все проекты.
 
@@ -180,3 +192,7 @@ bun run dev:http       # HTTP hot reload
 4. `src/tools/registry.ts` — добавить factory в `toolFactories`  
 
 `server.ts` / `register.ts` править не нужно — регистрация централизована.
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup, PR checks, and the release tag flow.

@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://cubic.dev/schema/cubic-repository-config.schema.json
+version: 1
+
+reviews:
+  enabled: true
+  sensitivity: medium
+  incremental_commits: true
+  architecture_diagrams: false
+  resolve_threads_when_addressed: true
+  custom_instructions: |
+    This repository is a Bun TypeScript MCP server for the O!task API (stdio +
+    Streamable HTTP). O!task is a Russian product: Russian is allowed in
+    user-facing docs (README and similar). Prefer English for source code,
+    commits, PR titles, and CI/config. Do not flag Russian README content as a
+    defect. Do not suggest padloc, pnpm, Vite, or unrelated stack migrations as
+    incidental changes.
+  ignore:
+    files:
+      - bun.lockb
+      - package-lock.json
+      - dist/**
+      - docs/superpowers/**
+      - .superpowers/**
+    pr_labels:
+      - skip-ai-review
+
+pr_descriptions:
+  generate: true
+  instructions: |
+    Keep PR descriptions concise and in English. Include testing evidence and
+    call out deferred follow-up work explicitly.
