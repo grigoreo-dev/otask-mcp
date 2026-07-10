@@ -8,10 +8,12 @@ reviews:
   architecture_diagrams: false
   resolve_threads_when_addressed: true
   custom_instructions: |
-    Review all repository artifacts in English only. Flag any non-English text
-    in committed files. This repository is a Bun TypeScript MCP server for the
-    O!task API (stdio + Streamable HTTP). Do not suggest padloc, pnpm, Vite,
-    or unrelated stack migrations as incidental changes.
+    This repository is a Bun TypeScript MCP server for the O!task API (stdio +
+    Streamable HTTP). O!task is a Russian product: Russian is allowed in
+    user-facing docs (README and similar). Prefer English for source code,
+    commits, PR titles, and CI/config. Do not flag Russian README content as a
+    defect. Do not suggest padloc, pnpm, Vite, or unrelated stack migrations as
+    incidental changes.
   ignore:
     files:
       - bun.lockb

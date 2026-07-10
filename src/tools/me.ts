@@ -11,7 +11,7 @@ export function createMeTool({ api, meCache }: ToolDeps): ToolDefinition<Record<
     name: "otask_me",
     config: {
       title: "Current O!task User",
-      description: `Return the authenticated O!task user (id, name, email, timezone).
+      description: `Return the authenticated O!task user (id, full_name, email, timezone).
 
 Use before otask_list_tasks when you need the performer id explicitly.
 No args.

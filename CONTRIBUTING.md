@@ -4,8 +4,11 @@ Thank you for contributing to `@grigoreo-dev/otask-mcp`.
 
 ## Language policy
 
-Everything committed to this repository must be in English: code, comments,
-documentation, commit messages, pull requests, issues, and GitHub templates.
+O!task is a Russian product. User-facing docs (especially `README.md`) may be
+in Russian.
+
+Use English for: source code identifiers and comments, commit messages, pull
+request titles/bodies, issue templates, and CI/config files.
 
 ## Development prerequisites
 
@@ -46,6 +49,9 @@ Use conventional commits / PR titles:
 - `ci: ...`
 - `test: ...`
 - `refactor: ...`
+- `build: ...`
+- `perf: ...`
+- `revert: ...`
 
 ## Local validation
 
