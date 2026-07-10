@@ -7,6 +7,7 @@ Remote MCP endpoint (Streamable HTTP + OAuth) for O!task. Private package; not p
 ```bash
 # from repo root
 bun install
+bun run build
 bun install --cwd packages/worker
 
 # create OAUTH_KV and paste id into wrangler.toml
@@ -20,6 +21,7 @@ bun run dev
 ### Local
 
 ```bash
+# from repo root first: bun run build
 cd packages/worker
 bunx wrangler deploy
 ```

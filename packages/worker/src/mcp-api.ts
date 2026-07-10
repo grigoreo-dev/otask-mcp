@@ -17,7 +17,7 @@ type ExecutionContextWithProps = ExecutionContext & {
  */
 function serverFromProps(props: OtaskSessionProps | undefined) {
   if (!props?.otaskToken) {
-    throw new Error("Unauthorized: missing O!task session. Reconnect the MCP server.");
+    return null;
   }
   return createMcpServer(createSessionAuthResolver(props), scopeFromSession(props));
 }
@@ -26,6 +26,14 @@ export const apiHandler = {
   async fetch(request: Request, env: unknown, ctx: ExecutionContext): Promise<Response> {
     const props = (ctx as ExecutionContextWithProps).props;
     const server = serverFromProps(props);
+    if (!server) {
+      return Response.json(
+        {
+          error: "Unauthorized: missing O!task session. Reconnect the MCP server.",
+        },
+        { status: 401 },
+      );
+    }
     return createMcpHandler(server)(request, env, ctx);
   },
 };

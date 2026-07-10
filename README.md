@@ -45,7 +45,7 @@ https://otask-mcp.<account>.workers.dev/mcp
 2. Запустите **Connect / OAuth** flow клиента.
 3. На странице логина Worker введите **email + password** O!task.
 4. После успешного authorize клиент получает access token сессии MCP; вызовы `/mcp` идут с этим токеном.
-5. При необходимости задайте default workspace/project через инструменты (`otask_list_projects` / env на self-host).
+5. Default workspace/project — на форме логина (или явные `ws_slug` / project args в tools). Self-host stdio/HTTP: env `OTASK_DEFAULT_*`.
 
 На публичном Worker **нет** `OTASK_*` в env: multi-user, credentials только в сессии пользователя.
 
@@ -125,7 +125,7 @@ Env сервера: **без** `OTASK_AUTH_KEY` / `OTASK_EMAIL` / `OTASK_PASSWOR
 Подключи remote MCP сервер O!task:
 - URL: https://otask-mcp.<account>.workers.dev/mcp
 - Используй OAuth / Connect flow клиента
-- После логина email+password O!task задай default workspace/project если нужно
+- Default workspace/project задаются на форме логина Worker (или явными args tools)
 Не сохраняй мой пароль в файлы репозитория.
 ```
 
@@ -144,9 +144,10 @@ auth: oauth
 
 ```
 Задеплой otask-mcp Worker из репозитория grigoreo-dev/otask-mcp:
-1) packages/worker, wrangler kv namespace create OAUTH_KV
-2) wrangler deploy
-3) Дай мне URL /mcp и пропиши в MCP клиент с OAuth
+1) bun install; bun run build (из корня)
+2) packages/worker: wrangler kv namespace create OAUTH_KV
+3) wrangler deploy
+4) Дай мне URL /mcp и пропиши в MCP клиент с OAuth
 ```
 
 ### Docker passthrough
@@ -178,6 +179,7 @@ HTTP gateway: задай OTASK_* + MCP_AUTH_TOKEN.
 ```bash
 # из корня репозитория
 bun install
+bun run build
 bun install --cwd packages/worker
 
 cd packages/worker
