@@ -10,7 +10,14 @@ Remote MCP endpoint (Streamable HTTP + OAuth) for O!task. Private package; not p
 | **GitHub Actions** | **Yes** — repo secrets | Button deploy from CI |
 | **Cloudflare Workers Builds (Git)** | No — CF GitHub App in dashboard | Auto-deploy on push to `main` |
 
-KV namespace `OAUTH_KV` is **not** committed to git. `wrangler.toml` declares only the binding; Wrangler [automatic provisioning](https://developers.cloudflare.com/workers/wrangler/configuration/#automatic-provisioning) creates the namespace on first deploy. Resource IDs live in the Cloudflare dashboard only.
+KV namespace `OAUTH_KV` is **not** committed to git. `wrangler.toml` declares only the
+binding; Wrangler [automatic provisioning](https://developers.cloudflare.com/workers/wrangler/configuration/#automatic-provisioning) (Beta)
+creates the namespace on first deploy.
+
+- **Local `wrangler deploy`:** Wrangler writes the generated `id` back into your local
+  `wrangler.toml`. **Do not commit** that change — keep the id local (or in dashboard).
+- **GitHub Actions / Workers Builds (from git):** the id is **not** written back to the
+  repo; it lives in the Cloudflare dashboard only.
 
 ### 1) Local (simplest first time)
 
@@ -77,7 +84,8 @@ deploy:
 npx wrangler deploy
 ```
 
-Enable deploy on every push to `main`. First build creates `OAUTH_KV`; check **Workers & Pages → KV** in the dashboard if needed.
+Enable deploy on every push to `main`. The first `wrangler deploy` provisions `OAUTH_KV`
+(the build step only compiles); check **Workers & Pages → KV** in the dashboard if needed.
 
 ## Local development
 
