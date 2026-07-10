@@ -1,0 +1,12 @@
+name = "otask-mcp"
+main = "src/index.ts"
+compatibility_date = "2025-03-10"
+compatibility_flags = ["nodejs_compat"]
+
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "REPLACE_AFTER_wrangler_kv_namespace_create"
+preview_id = "REPLACE_PREVIEW"
+
+[vars]
+# no OTASK_* for multi-user public deploy
