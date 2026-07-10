@@ -3,10 +3,11 @@ main = "src/index.ts"
 compatibility_date = "2026-07-10"
 compatibility_flags = ["nodejs_compat"]
 
+# KV id omitted — Wrangler automatic provisioning creates OAUTH_KV on deploy.
+# IDs stay in the Cloudflare dashboard, not in git.
+# https://developers.cloudflare.com/workers/wrangler/configuration/#automatic-provisioning
 [[kv_namespaces]]
 binding = "OAUTH_KV"
-id = "REPLACE_AFTER_wrangler_kv_namespace_create"
-preview_id = "REPLACE_PREVIEW"
 
 [vars]
 # no OTASK_* for multi-user public deploy

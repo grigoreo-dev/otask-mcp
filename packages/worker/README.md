@@ -10,6 +10,15 @@ Remote MCP endpoint (Streamable HTTP + OAuth) for O!task. Private package; not p
 | **GitHub Actions** | **Yes** — repo secrets | Button deploy from CI |
 | **Cloudflare Workers Builds (Git)** | No — CF GitHub App in dashboard | Auto-deploy on push to `main` |
 
+KV namespace `OAUTH_KV` is **not** committed to git. `wrangler.toml` declares only the
+binding; Wrangler [automatic provisioning](https://developers.cloudflare.com/workers/wrangler/configuration/#automatic-provisioning) (Beta)
+creates the namespace on first deploy.
+
+- **Local `wrangler deploy`:** Wrangler writes the generated `id` back into your local
+  `wrangler.toml`. **Do not commit** that change — keep the id local (or in dashboard).
+- **GitHub Actions / Workers Builds (from git):** the id is **not** written back to the
+  repo; it lives in the Cloudflare dashboard only.
+
 ### 1) Local (simplest first time)
 
 ```bash
@@ -17,17 +26,10 @@ Remote MCP endpoint (Streamable HTTP + OAuth) for O!task. Private package; not p
 bun install
 bunx wrangler login          # once per machine
 
-# create OAuth KV, paste printed id into packages/worker/wrangler.toml
-bun run worker:kv
-
-# edit packages/worker/wrangler.toml:
-#   id = "<from create>"
-#   preview_id = "<same or preview namespace>"
-
 # required secret: HMAC pepper for userId (keeps email non-enumerable in KV)
 bunx wrangler secret put USER_ID_PEPPER --config packages/worker/wrangler.toml
 
-bun run deploy:worker
+bun run deploy:worker        # build + wrangler deploy (KV OAUTH_KV auto-created)
 ```
 
 URL: `https://otask-mcp.<account-subdomain>.workers.dev/mcp`
@@ -48,13 +50,11 @@ Workflow: [`.github/workflows/deploy-worker.yml`](../../.github/workflows/deploy
 | `CLOUDFLARE_API_TOKEN` | [Create Token](https://dash.cloudflare.com/profile/api-tokens) → template **Edit Cloudflare Workers** (or custom: Account Workers Scripts Edit + Account Workers KV Storage Edit) |
 | `CLOUDFLARE_ACCOUNT_ID` | Dashboard right sidebar / Workers overview |
 
-Also: real KV `id` must already be in committed `wrangler.toml` (or Actions will fail on placeholder).
-
 Set the `USER_ID_PEPPER` **Worker secret once** (`wrangler secret put`, or dashboard →
 Worker → Settings → Variables → Secret). It persists across deploys — the workflow does
 not set it.
 
-Then: **Actions → Deploy Worker → Run workflow**.
+Then: **Actions → Deploy Worker → Run workflow**. KV is provisioned automatically on deploy.
 
 `publish.yml` (npm OIDC) is unrelated — no CF token there.
 
@@ -84,9 +84,8 @@ deploy:
 npx wrangler deploy
 ```
 
-Still need a real `OAUTH_KV` id in `wrangler.toml` before first successful build.
-
-Optional: enable deploy on every push to `main`.
+Enable deploy on every push to `main`. The first `wrangler deploy` provisions `OAUTH_KV`
+(the build step only compiles); check **Workers & Pages → KV** in the dashboard if needed.
 
 ## Local development
 
@@ -94,8 +93,7 @@ Optional: enable deploy on every push to `main`.
 bun install
 bun run build
 cd packages/worker
-bunx wrangler kv namespace create OAUTH_KV   # once; update wrangler.toml
-bun run dev
+bun run dev                    # local KV auto-provisioned for wrangler dev
 ```
 
 For `wrangler dev`, `USER_ID_PEPPER` comes from `packages/worker/.dev.vars`
@@ -115,6 +113,7 @@ USER_ID_PEPPER=local-dev-pepper
 ## Notes
 
 - Public multi-user Worker: **no** `OTASK_*` / `MCP_AUTH_TOKEN` in `[vars]`.
-- Placeholder KV ids in git are intentional until first `worker:kv`.
+- KV `OAUTH_KV` is auto-provisioned on first deploy — no ids in git. To reuse an existing
+  namespace, add `id = "..."` locally or bind via dashboard (not required for default flow).
 - **`USER_ID_PEPPER` is a required secret** (`wrangler secret put`), not a `[vars]`
   value — never commit it. Rotating it invalidates existing grants (users re-login).
