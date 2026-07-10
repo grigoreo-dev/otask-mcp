@@ -18,6 +18,7 @@ import { createListMembersTool } from "../src/tools/list-members.ts";
 import { createListTagsTool } from "../src/tools/list-tags.ts";
 import { createGetTaskTool } from "../src/tools/get-task.ts";
 import { createMeTool } from "../src/tools/me.ts";
+import { createListTasksTool } from "../src/tools/list-tasks.ts";
 import { createMeCache } from "../src/services/me-cache.ts";
 import { toolFactories } from "../src/tools/registry.ts";
 
@@ -484,6 +485,126 @@ describe("otask_me", () => {
   });
 });
 
+describe("otask_list_tasks", () => {
+  test("defaults mine=true and passes performer_ids from me", async () => {
+    const listWorkspaceTasks = mock(async () => ({
+      tasks: [sampleTask({ project_id: 5, end_at: "2026-07-09T12:00:00Z" })],
+      meta: { current_page: 1, last_page: 1, per_page: 20, total: 1 },
+    }));
+    const getMe = mock(async () => ({
+      id: 11458,
+      full_name: "U",
+      timezone: "UTC",
+    }));
+    const d = deps({ listWorkspaceTasks, getMe });
+    d.meCache = createMeCache(() => d.api.getMe());
+    const tool = createListTasksTool(d);
+    const result = await tool.handler({ ws_slug: "ws-1" });
+    expect(result.isError).toBeUndefined();
+    expect(listWorkspaceTasks).toHaveBeenCalledWith("ws-1", {
+      page: 1,
+      performer_ids: [11458],
+    });
+  });
+
+  test("mine=false omits performer_ids", async () => {
+    const listWorkspaceTasks = mock(async () => ({
+      tasks: [],
+      meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 },
+    }));
+    const d = deps({
+      listWorkspaceTasks,
+      getMe: mock(async () => ({ id: 1, full_name: "U", timezone: "UTC" })),
+    });
+    d.meCache = createMeCache(() => d.api.getMe());
+    await createListTasksTool(d).handler({ ws_slug: "ws-1", mine: false });
+    expect(listWorkspaceTasks).toHaveBeenCalledWith("ws-1", { page: 1 });
+  });
+
+  test("explicit performer_ids overrides mine", async () => {
+    const listWorkspaceTasks = mock(async () => ({
+      tasks: [],
+      meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 },
+    }));
+    const d = deps({
+      listWorkspaceTasks,
+      getMe: mock(async () => ({ id: 1, full_name: "U", timezone: "UTC" })),
+    });
+    d.meCache = createMeCache(() => d.api.getMe());
+    await createListTasksTool(d).handler({
+      ws_slug: "ws-1",
+      performer_ids: [99],
+    });
+    expect(listWorkspaceTasks).toHaveBeenCalledWith("ws-1", {
+      page: 1,
+      performer_ids: [99],
+    });
+  });
+
+  test("allow-list drops tasks from other projects", async () => {
+    const listWorkspaceTasks = mock(async () => ({
+      tasks: [
+        sampleTask({ id: 1, project_id: 5 }),
+        sampleTask({ id: 2, project_id: 99 }),
+      ],
+      meta: { current_page: 1, last_page: 1, per_page: 20, total: 2 },
+    }));
+    const d = deps(
+      {
+        listWorkspaceTasks,
+        getMe: mock(async () => ({ id: 1, full_name: "U", timezone: "UTC" })),
+      },
+      "5",
+    );
+    d.meCache = createMeCache(() => d.api.getMe());
+    const result = await createListTasksTool(d).handler({
+      ws_slug: "ws-1",
+      mine: false,
+    });
+    const body = parseContent(result) as { items: Array<{ id: number }> };
+    expect(body.items.map((i) => i.id)).toEqual([1]);
+  });
+
+  test("due=overdue scans pages with cap metadata", async () => {
+    const listWorkspaceTasks = mock(async (_ws: string, q?: { page?: number }) => {
+      const page = q?.page ?? 1;
+      return {
+        tasks: [
+          sampleTask({
+            id: page,
+            end_at: page === 1 ? "2020-01-01T00:00:00Z" : "2030-01-01T00:00:00Z",
+          }),
+        ],
+        meta: {
+          current_page: page,
+          last_page: 10,
+          per_page: 20,
+          total: 200,
+        },
+      };
+    });
+    const d = deps({
+      listWorkspaceTasks,
+      getMe: mock(async () => ({ id: 1, full_name: "U", timezone: "UTC" })),
+    });
+    d.meCache = createMeCache(() => d.api.getMe());
+    const result = await createListTasksTool(d).handler({
+      ws_slug: "ws-1",
+      mine: false,
+      due: "overdue",
+      page: 1,
+    });
+    const body = parseContent(result) as {
+      items: Array<{ id: number }>;
+      next: { scanned_pages: number; scan_capped: boolean; filtered_count: number };
+    };
+    expect(body.items.map((i) => i.id)).toEqual([1]);
+    expect(body.next.scanned_pages).toBe(5);
+    expect(body.next.scan_capped).toBe(true);
+    expect(listWorkspaceTasks).toHaveBeenCalledTimes(5);
+  });
+});
+
 describe("registry", () => {
   test("registers all read tools", () => {
     const names = toolFactories.map((f) => f(deps()).name);
@@ -494,5 +615,6 @@ describe("registry", () => {
     expect(names).toContain("otask_list_members");
     expect(names).toContain("otask_list_tags");
     expect(names).toContain("otask_get_task");
+    expect(names).toContain("otask_list_tasks");
   });
 });

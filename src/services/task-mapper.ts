@@ -15,6 +15,7 @@ export interface CompactTask {
   tags: Array<{ id: string; name?: string }>;
   comments_count?: number;
   subtasks_count?: number;
+  project?: { id: number; name: string };
 }
 
 export interface CompactProject {
@@ -150,6 +151,18 @@ export function compactTask(task: OtaskTask): CompactTask {
 
   if (typeof task.comments_count === "number") {
     out.comments_count = task.comments_count;
+  }
+
+  const project = task.project;
+  if (
+    typeof project === "object" &&
+    project !== null &&
+    typeof (project as { name?: unknown }).name === "string"
+  ) {
+    out.project = {
+      id: task.project_id,
+      name: (project as { name: string }).name,
+    };
   }
 
   return out;
