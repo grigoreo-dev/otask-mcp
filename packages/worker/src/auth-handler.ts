@@ -34,7 +34,15 @@ export const AuthHandler = {
       return new Response("Method not allowed", { status: 405 });
     }
 
-    const form = await request.formData();
+    let form: FormData;
+    try {
+      form = await request.formData();
+    } catch {
+      return renderLoginPage({
+        query,
+        error: "Некорректные данные формы. Попробуйте войти снова.",
+      });
+    }
     const email = String(form.get("email") || "").trim();
     const defaultWs = String(form.get("default_ws") || "").trim() || undefined;
     const defaultProject = String(form.get("default_project") || "").trim() || undefined;
