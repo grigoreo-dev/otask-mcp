@@ -20,12 +20,22 @@ npm i -g @grigoreo-dev/otask-mcp
 
 ## 🔒 Приватность и доверие
 
-- **Пароль O!task не хранится** на Worker после логина: email+password используются только на шаге OAuth authorize, чтобы получить API-токен.
-- **Токен O!task** живёт в **сессии OAuth** (KV / props), а не в репозитории и не в статичном env публичного Worker.
-- После истечения/отзыва сессии — **повторный логин** через Connect flow клиента.
-- Код открыт: можно self-deploy и аудировать.
-- Паттерн remote MCP на Cloudflare: [Remote Model Context Protocol servers (MCP)](https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/).
-- Официальный публичный URL: **TBD after first deploy** (после деплоя: `https://otask-mcp.<account>.workers.dev/mcp`).
+Касается **Cloudflare Worker** (remote MCP) и библиотеки [`@cloudflare/workers-oauth-provider`](https://github.com/cloudflare/workers-oauth-provider):
+
+| Что | Где | Кто видит |
+|-----|-----|-----------|
+| **Пароль O!task** | только memory на POST `/authorize` | **нигде не пишется** (ни KV, ни env, ни git) |
+| **Токен O!task + scope** (`props`) | grant в **Cloudflare KV** (`OAUTH_KV`) | **end-to-end encrypted**: ключ шифрования — секрет access-токена MCP; из сырого KV **нельзя** прочитать props без валидного Bearer |
+| **userId / metadata** (у нас email) | KV рядом с grant, **не** в encrypted props | оператор Worker (dashboard/API) **может** видеть email для audit/revoke |
+| **Access token MCP** | у клиента (Claude и т.д.) | клиент + тот, кто перехватит Bearer |
+
+- Пароль **не** хранится после логина: email+password → `POST api.otask.ru/.../login` → API-токен → в `props`, пароль drop.
+- Публичный Worker **без** `OTASK_*` / `MCP_AUTH_TOKEN` в env: multi-user, каждый — своя OAuth-сессия.
+- После expiry/401 — **повторный Connect** (re-login).
+- Код open source: self-deploy и аудит. Паттерн: [Remote MCP on Cloudflare](https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/).
+- Официальный URL: **TBD after first deploy** (`https://otask-mcp.<account>.workers.dev/mcp`).
+
+**Доверие к оператору Worker:** владелец Cloudflare-аккаунта (или кто деплоит) **не** читает O!task-токены из KV «как plaintext», но **может** сменить код Worker (логировать `ctx.props`, токены) или видеть **email** в metadata. Self-deploy — если не хотите доверять чужому demo.
 
 **Не кладите** `OTASK_PASSWORD`, `OTASK_AUTH_KEY` и токены в git, скриншоты и issue.
 
