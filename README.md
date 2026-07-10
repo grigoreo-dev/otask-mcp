@@ -158,8 +158,8 @@ auth: oauth
 ```
 Задеплой otask-mcp Worker из репозитория grigoreo-dev/otask-mcp:
 1) bun install; bun run build (из корня)
-2) packages/worker: wrangler kv namespace create OAUTH_KV
-3) wrangler deploy
+2) wrangler login (один раз)
+3) bun run deploy:worker   # KV OAUTH_KV создаётся автоматически
 4) Дай мне URL /mcp и пропиши в MCP клиент с OAuth
 ```
 
@@ -193,12 +193,10 @@ HTTP gateway: задай OTASK_* + MCP_AUTH_TOKEN.
 # из корня репозитория
 bun install
 bunx wrangler login              # один раз (браузер, без API-токена)
-bun run worker:kv                # создаёт OAUTH_KV → id в wrangler.toml
-
 # секрет для HMAC userId (email не хранится в KV в переборно-открытом виде)
 bunx wrangler secret put USER_ID_PEPPER --config packages/worker/wrangler.toml
 
-bun run deploy:worker            # build monorepo + wrangler deploy
+bun run deploy:worker            # build + deploy; KV OAUTH_KV создаётся автоматически
 ```
 
 Подробнее (GH Actions, Workers Builds из git, secrets): [`packages/worker/README.md`](packages/worker/README.md).
