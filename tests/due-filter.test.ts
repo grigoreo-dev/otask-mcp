@@ -4,7 +4,7 @@ import {
   filterTasksByDue,
   matchesDue,
   startOfDayUtcMs,
-} from "../src/services/due-filter.ts";
+} from "../packages/core/src/services/due-filter.ts";
 
 describe("due-filter", () => {
   test("DUE_SCAN_MAX_PAGES is 5", () => {

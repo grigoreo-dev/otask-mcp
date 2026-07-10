@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import { API_BASE_URL } from "../src/constants.ts";
-import { OtaskApiError } from "../src/services/api.ts";
-import { createOtaskClient } from "../src/services/client.ts";
+import { API_BASE_URL } from "../packages/core/src/constants.ts";
+import { OtaskApiError } from "../packages/core/src/services/api.ts";
+import { createOtaskClient } from "../packages/core/src/services/client.ts";
 
 const auth = async () => ({
   Authorization: "Bearer test-token",

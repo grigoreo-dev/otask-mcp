@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import {
   createSessionAuthResolver,
-  scopeFromSession,
   type OtaskSessionProps,
-} from "../src/services/session-scope.ts";
+  scopeFromSession,
+} from "../packages/core/src/services/session-scope.ts";
 
 describe("scopeFromSession", () => {
   test("empty allow-lists mean guards off and optional defaults", () => {

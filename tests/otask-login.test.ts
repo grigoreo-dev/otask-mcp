@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { loginOtaskWithPassword } from "../src/services/auth.ts";
+import { loginOtaskWithPassword } from "../packages/core/src/services/auth.ts";
 
 describe("loginOtaskWithPassword", () => {
   test("returns token from O!task login JSON", async () => {

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseOtaskDocsHtml } from "../src/docs/parser.ts";
+import { parseOtaskDocsHtml } from "../packages/core/src/docs/parser.ts";
 
 const html = readFileSync(join(import.meta.dir, "fixtures/docs-snippet.html"), "utf8");
 

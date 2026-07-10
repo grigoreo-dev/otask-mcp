@@ -1,19 +1,26 @@
 import { describe, expect, mock, test } from "bun:test";
-import type { OtaskClient } from "../src/services/client.ts";
-import { createMeCache } from "../src/services/me-cache.ts";
-import { createProjectGuard, parseProjectAllowList } from "../src/services/project-guard.ts";
-import { createWsGuard, parseWsAllowList, type ScopeContext } from "../src/services/scope.ts";
-import { createGetTaskTool } from "../src/tools/get-task.ts";
-import { createListBoardTool } from "../src/tools/list-board.ts";
-import { createListMembersTool } from "../src/tools/list-members.ts";
-import { createListProjectTasksTool } from "../src/tools/list-project-tasks.ts";
-import { createListProjectsTool } from "../src/tools/list-projects.ts";
-import { createListTagsTool } from "../src/tools/list-tags.ts";
-import { createListTasksTool } from "../src/tools/list-tasks.ts";
-import { createMeTool } from "../src/tools/me.ts";
-import { toolFactories } from "../src/tools/registry.ts";
-import type { ToolDeps } from "../src/tools/types.ts";
-import type { OtaskTask } from "../src/types.ts";
+import type { OtaskClient } from "../packages/core/src/services/client.ts";
+import { createMeCache } from "../packages/core/src/services/me-cache.ts";
+import {
+  createProjectGuard,
+  parseProjectAllowList,
+} from "../packages/core/src/services/project-guard.ts";
+import {
+  createWsGuard,
+  parseWsAllowList,
+  type ScopeContext,
+} from "../packages/core/src/services/scope.ts";
+import { createGetTaskTool } from "../packages/core/src/tools/get-task.ts";
+import { createListBoardTool } from "../packages/core/src/tools/list-board.ts";
+import { createListMembersTool } from "../packages/core/src/tools/list-members.ts";
+import { createListProjectTasksTool } from "../packages/core/src/tools/list-project-tasks.ts";
+import { createListProjectsTool } from "../packages/core/src/tools/list-projects.ts";
+import { createListTagsTool } from "../packages/core/src/tools/list-tags.ts";
+import { createListTasksTool } from "../packages/core/src/tools/list-tasks.ts";
+import { createMeTool } from "../packages/core/src/tools/me.ts";
+import { toolFactories } from "../packages/core/src/tools/registry.ts";
+import type { ToolDeps } from "../packages/core/src/tools/types.ts";
+import type { OtaskTask } from "../packages/core/src/types.ts";
 
 function sampleTask(overrides: Partial<OtaskTask> = {}): OtaskTask {
   return {

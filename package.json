@@ -3,13 +3,15 @@
   "version": "1.4.0",
   "description": "MCP server for O!task API — stdio locally, Streamable HTTP for n8n",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "packages/stdio/dist/index.js",
   "bin": {
-    "otask-mcp": "dist/index.js",
-    "otask-mcp-http": "dist/mcp-http.js"
+    "otask-mcp": "packages/stdio/dist/index.js",
+    "otask-mcp-http": "packages/http-node/dist/mcp-http.js"
   },
   "files": [
-    "dist",
+    "packages/core/dist",
+    "packages/stdio/dist",
+    "packages/http-node/dist",
     "README.md"
   ],
   "publishConfig": {
@@ -20,13 +22,16 @@
     "url": "https://github.com/grigoreo-dev/otask-mcp.git"
   },
   "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "start": "bun run dist/index.js",
-    "start:http": "bun run dist/mcp-http.js",
-    "dev": "bun --watch src/index.ts",
-    "dev:http": "bun --watch src/mcp-http.ts",
-    "build": "tsc",
-    "clean": "rm -rf dist",
+    "start": "bun run packages/stdio/dist/index.js",
+    "start:http": "bun run packages/http-node/dist/mcp-http.js",
+    "dev": "bun --watch packages/stdio/src/index.ts",
+    "dev:http": "bun --watch packages/http-node/src/mcp-http.ts",
+    "build": "bun run --filter @grigoreo-dev/otask-mcp-core build && bun run --filter @grigoreo-dev/otask-mcp-stdio build && bun run --filter @grigoreo-dev/otask-mcp-http build",
+    "clean": "rm -rf packages/core/dist packages/stdio/dist packages/http-node/dist",
     "test": "bun test",
     "docs:parse": "bun run scripts/parse-docs.ts",
     "lint": "biome check .",

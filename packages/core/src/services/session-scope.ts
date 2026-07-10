@@ -1,14 +1,7 @@
 import type { OtaskAuthResolver } from "./auth.js";
 import { createPassthroughAuthResolver } from "./auth.js";
-import {
-  createProjectGuard,
-  parseProjectAllowList,
-} from "./project-guard.js";
-import {
-  createWsGuard,
-  parseWsAllowList,
-  type ScopeContext,
-} from "./scope.js";
+import { createProjectGuard, parseProjectAllowList } from "./project-guard.js";
+import { createWsGuard, parseWsAllowList, type ScopeContext } from "./scope.js";
 
 export interface OtaskSessionProps {
   otaskToken: string;

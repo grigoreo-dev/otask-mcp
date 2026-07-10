@@ -1,6 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { extractProjectAllowListHeader } from "../src/services/auth.ts";
-import { projectGuardMode, resolveHttpProjectGuard } from "../src/services/project-guard.ts";
+import { extractProjectAllowListHeader } from "../packages/core/src/services/auth.ts";
+import {
+  projectGuardMode,
+  resolveHttpProjectGuard,
+} from "../packages/core/src/services/project-guard.ts";
 
 describe("extractProjectAllowListHeader", () => {
   test("reads x-otask-allowed-projects string", () => {

@@ -1,5 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createProjectGuard, parseProjectAllowList } from "../src/services/project-guard.ts";
+import {
+  createProjectGuard,
+  parseProjectAllowList,
+} from "../packages/core/src/services/project-guard.ts";
 import {
   assertDefaultsAllowed,
   createWsGuard,
@@ -10,7 +13,7 @@ import {
   resolveWsSlug,
   type ScopeContext,
   scopeFromEnv,
-} from "../src/services/scope.ts";
+} from "../packages/core/src/services/scope.ts";
 
 function scope(partial: Partial<ScopeContext> & { projectAllow?: string } = {}): ScopeContext {
   return {

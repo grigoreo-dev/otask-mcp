@@ -3,7 +3,7 @@ import {
   assertProjectIdAllowed,
   createProjectGuard,
   parseProjectAllowList,
-} from "../src/services/project-guard.ts";
+} from "../packages/core/src/services/project-guard.ts";
 
 describe("parseProjectAllowList", () => {
   test("empty when unset", () => {

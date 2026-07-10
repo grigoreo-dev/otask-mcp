@@ -1,5 +1,5 @@
 import { describe, expect, mock, test } from "bun:test";
-import { compactMe, createMeCache } from "../src/services/me-cache.ts";
+import { compactMe, createMeCache } from "../packages/core/src/services/me-cache.ts";
 
 describe("compactMe", () => {
   test("maps essential fields and defaults timezone", () => {
