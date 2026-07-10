@@ -192,3 +192,7 @@ bun run dev:http       # HTTP hot reload
 4. `src/tools/registry.ts` — добавить factory в `toolFactories`  
 
 `server.ts` / `register.ts` править не нужно — регистрация централизована.
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup, PR checks, and the release tag flow.
