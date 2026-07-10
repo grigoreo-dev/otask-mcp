@@ -2,6 +2,7 @@ import type { OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 import { loginOtaskWithPassword } from "@grigoreo-dev/otask-mcp-core/services/auth.js";
 import { renderLoginPage } from "./login-page.js";
 import type { OtaskSessionProps } from "./session-props.js";
+import { hashUserId } from "./user-id.js";
 
 export interface WorkerEnv {
   OAUTH_PROVIDER: OAuthHelpers;
@@ -77,11 +78,14 @@ export const AuthHandler = {
       allowedProjects,
     };
 
+    // userId is stored unencrypted in KV; use a hash so email is not PII-in-storage.
+    // metadata is empty on purpose — we have no audit UI, and props (encrypted)
+    // already carry the O!task Bearer token needed to call the API.
     // Single full MCP access for this connector; grant requested scopes as-is (usually empty/MCP defaults).
     const { redirectTo } = await provider.completeAuthorization({
       request: oauthReq,
-      userId: email.toLowerCase(),
-      metadata: { email: email.toLowerCase() },
+      userId: await hashUserId(email),
+      metadata: {},
       scope: oauthReq.scope ?? [],
       props,
     });

@@ -26,16 +26,19 @@ npm i -g @grigoreo-dev/otask-mcp
 |-----|-----|-----------|
 | **Пароль O!task** | только memory на POST `/authorize` | **нигде не пишется** (ни KV, ни env, ни git) |
 | **Токен O!task + scope** (`props`) | grant в **Cloudflare KV** (`OAUTH_KV`) | **end-to-end encrypted**: ключ шифрования — секрет access-токена MCP; из сырого KV **нельзя** прочитать props без валидного Bearer |
-| **userId / metadata** (у нас email) | KV рядом с grant, **не** в encrypted props | оператор Worker (dashboard/API) **может** видеть email для audit/revoke |
+| **userId** | KV, не зашифрован | **`sha256(email)`** — не email; связать с человеком по хранилищу нельзя |
+| **metadata** | KV, не зашифрован | **пусто** (`{}`) — email в хранилище не пишется |
 | **Access token MCP** | у клиента (Claude и т.д.) | клиент + тот, кто перехватит Bearer |
 
 - Пароль **не** хранится после логина: email+password → `POST api.otask.ru/.../login` → API-токен → в `props`, пароль drop.
+- O!task Bearer **нужен** для запросов к API → лежит в encrypted `props`, не в открытом виде.
+- `userId = sha256(email)`: стабильный id (повторный логин заменяет старый grant), но **email в KV нет**.
 - Публичный Worker **без** `OTASK_*` / `MCP_AUTH_TOKEN` в env: multi-user, каждый — своя OAuth-сессия.
 - После expiry/401 — **повторный Connect** (re-login).
 - Код open source: self-deploy и аудит. Паттерн: [Remote MCP on Cloudflare](https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/).
 - Официальный URL: **TBD after first deploy** (`https://otask-mcp.<account>.workers.dev/mcp`).
 
-**Доверие к оператору Worker:** владелец Cloudflare-аккаунта (или кто деплоит) **не** читает O!task-токены из KV «как plaintext», но **может** сменить код Worker (логировать `ctx.props`, токены) или видеть **email** в metadata. Self-deploy — если не хотите доверять чужому demo.
+**Доверие к оператору Worker:** в хранилище нет ни пароля, ни email plaintext, а O!task-токен — только encrypted `props`. Но владелец Cloudflare-аккаунта **может сменить код** Worker (залогировать `ctx.props` / токен на своём деплое). Гарантия — открытый код: не доверяете чужому demo → self-deploy.
 
 **Не кладите** `OTASK_PASSWORD`, `OTASK_AUTH_KEY` и токены в git, скриншоты и issue.
 
