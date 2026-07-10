@@ -24,7 +24,8 @@ function serverFromProps(props: OtaskSessionProps | undefined) {
 
 function unauthorizedResponse(request: Request): Response {
   const url = new URL(request.url);
-  const resourceMetadata = `${url.origin}/.well-known/oauth-protected-resource`;
+  // Canonical MCP resource is /mcp; path-suffixed metadata matches RFC 9728 discovery.
+  const resourceMetadata = `${url.origin}/.well-known/oauth-protected-resource/mcp`;
   return Response.json(
     {
       error: "Unauthorized: missing O!task session. Reconnect the MCP server.",
