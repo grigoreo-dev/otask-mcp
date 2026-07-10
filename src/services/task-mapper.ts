@@ -1,4 +1,4 @@
-import type { OtaskTask, OtaskSubtask, UpdateTaskBody } from "../types.js";
+import type { OtaskSubtask, OtaskTask, UpdateTaskBody } from "../types.js";
 
 export interface CompactTask {
   id: number;
@@ -78,9 +78,7 @@ function tagIds(task: OtaskTask): string[] {
   });
 }
 
-function compactRefs(
-  value: unknown,
-): Array<{ id: string; name?: string }> {
+function compactRefs(value: unknown): Array<{ id: string; name?: string }> {
   if (!Array.isArray(value)) {
     return [];
   }
@@ -112,7 +110,7 @@ function normalizeSubtasks(task: OtaskTask): OtaskSubtask[] {
 
 export function buildUpdateBodyFromTask(
   task: OtaskTask,
-  overrides: Partial<UpdateTaskBody> = {},
+  overrides: Partial<UpdateTaskBody> = {}
 ): UpdateTaskBody {
   const base: UpdateTaskBody = {
     name: task.name,

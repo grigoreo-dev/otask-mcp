@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import { createOtaskClient } from "../src/services/client.ts";
-import { OtaskApiError } from "../src/services/api.ts";
 import { API_BASE_URL } from "../src/constants.ts";
+import { OtaskApiError } from "../src/services/api.ts";
+import { createOtaskClient } from "../src/services/client.ts";
 
 const auth = async () => ({
   Authorization: "Bearer test-token",
@@ -27,10 +27,7 @@ function mockJsonFetch(handler: (url: string, init?: RequestInit) => unknown) {
   }) as typeof fetch;
 }
 
-function mockFetchWithStatus(
-  status: number,
-  payload: unknown,
-) {
+function mockFetchWithStatus(status: number, payload: unknown) {
   globalThis.fetch = mock(async () => {
     return new Response(JSON.stringify(payload), {
       status,
@@ -137,9 +134,7 @@ describe("api paths and envelopes", () => {
       empty: undefined,
     });
 
-    expect(calledUrl).toContain(
-      `${API_BASE_URL}/api/v1/ws/ws/projects/proj/tasks?`,
-    );
+    expect(calledUrl).toContain(`${API_BASE_URL}/api/v1/ws/ws/projects/proj/tasks?`);
     expect(calledUrl).toContain("page=2");
     expect(calledUrl).toContain("search=foo");
     expect(calledUrl).not.toContain("empty");
@@ -163,9 +158,7 @@ describe("api paths and envelopes", () => {
       board_slug: "main",
     });
 
-    expect(calledUrl).toContain(
-      `${API_BASE_URL}/api/v1/ws/ws/projects/proj/boards?`,
-    );
+    expect(calledUrl).toContain(`${API_BASE_URL}/api/v1/ws/ws/projects/proj/boards?`);
     expect(calledUrl).toContain("type=kanban");
     expect(calledUrl).toContain("board_slug=main");
     expect(board.boards).toEqual([{ id: 1 }]);
@@ -206,9 +199,7 @@ describe("api paths and envelopes", () => {
     const client = createOtaskClient(auth);
     const result = await client.listComments("ws", "t1", { page: 1 });
 
-    expect(calledUrl).toBe(
-      `${API_BASE_URL}/api/v1/ws/ws/tasks/t1/comments/get`,
-    );
+    expect(calledUrl).toBe(`${API_BASE_URL}/api/v1/ws/ws/tasks/t1/comments/get`);
     expect(method).toBe("POST");
     expect(body).toEqual({ page: 1 });
     expect(result).toEqual({ comments: [] });
@@ -226,9 +217,7 @@ describe("api paths and envelopes", () => {
     const client = createOtaskClient(auth);
     const result = await client.addComment("ws", "t1", "hello", 5);
 
-    expect(calledUrl).toBe(
-      `${API_BASE_URL}/api/v1/ws/ws/tasks/t1/comments/store`,
-    );
+    expect(calledUrl).toBe(`${API_BASE_URL}/api/v1/ws/ws/tasks/t1/comments/store`);
     expect(body).toEqual({ comment: "hello", parent_id: 5 });
     expect(result).toEqual({ id: 99 });
   });
@@ -297,9 +286,7 @@ describe("api paths and envelopes", () => {
     const client = createOtaskClient(auth);
     const task = await client.archiveTask("ws", "t1");
 
-    expect(calledUrl).toBe(
-      `${API_BASE_URL}/api/v1/ws/ws/tasks/t1/in-archive`,
-    );
+    expect(calledUrl).toBe(`${API_BASE_URL}/api/v1/ws/ws/tasks/t1/in-archive`);
     expect(method).toBe("POST");
     expect(task.slug).toBe("t1");
   });
@@ -334,7 +321,7 @@ describe("api paths and envelopes", () => {
         board_column_id: 2,
         end_at: "2026-01-01",
         project_id: 10,
-      }),
+      })
     ).rejects.toBeInstanceOf(OtaskApiError);
   });
 

@@ -12,7 +12,7 @@ describe("compactMe", () => {
         avatar: "https://x",
         isonline: true,
         params: { hide: true },
-      }),
+      })
     ).toEqual({
       id: 11458,
       full_name: "Григорий Лисовский",

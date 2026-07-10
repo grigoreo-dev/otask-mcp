@@ -1,7 +1,4 @@
-import {
-  ListTasksInputSchema,
-  type ListTasksInput,
-} from "../schemas/workspace.js";
+import { type ListTasksInput, ListTasksInputSchema } from "../schemas/workspace.js";
 import {
   collectTasksWithDueScan,
   DUE_SCAN_MAX_PAGES,
@@ -94,9 +91,7 @@ Docs: https://api.otask.ru/docs`,
 
         if (due === "none") {
           const result = await api.listWorkspaceTasks(ws, baseQuery);
-          const items = result.tasks
-            .filter((t) => allow(t.project_id))
-            .map((t) => compactTask(t));
+          const items = result.tasks.filter((t) => allow(t.project_id)).map((t) => compactTask(t));
           const mineLabel =
             input.performer_ids?.length != null && input.performer_ids.length > 0
               ? "performer_ids"
@@ -104,12 +99,9 @@ Docs: https://api.otask.ru/docs`,
           const payload = agentListResult(
             `${items.length} task(s) (${mineLabel})`,
             items,
-            result.meta,
+            result.meta
           );
-          return jsonToolResult(
-            payload,
-            payload as unknown as Record<string, unknown>,
-          );
+          return jsonToolResult(payload, payload as unknown as Record<string, unknown>);
         }
 
         const scanned = await collectTasksWithDueScan({
@@ -135,12 +127,9 @@ Docs: https://api.otask.ru/docs`,
         const payload = agentListResult(
           `${items.length} task(s) (due=${due}, scanned_pages=${scanned.meta.scanned_pages})`,
           items,
-          scanned.meta,
+          scanned.meta
         );
-        return jsonToolResult(
-          payload,
-          payload as unknown as Record<string, unknown>,
-        );
+        return jsonToolResult(payload, payload as unknown as Record<string, unknown>);
       } catch (error) {
         return toolError(error);
       }

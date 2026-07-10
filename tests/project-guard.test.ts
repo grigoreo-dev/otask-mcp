@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import {
-  parseProjectAllowList,
-  createProjectGuard,
   assertProjectIdAllowed,
+  createProjectGuard,
+  parseProjectAllowList,
 } from "../src/services/project-guard.ts";
 
 describe("parseProjectAllowList", () => {
@@ -66,28 +66,20 @@ describe("assertProjectIdAllowed", () => {
         return [];
       },
       42,
-      "allowed-proj",
+      "allowed-proj"
     );
     expect(listed).toBe(false);
   });
 
   test("resolves slug via listProjects for slug-only allow-list", async () => {
     const g = createProjectGuard(parseProjectAllowList("allowed-proj"));
-    await assertProjectIdAllowed(
-      g,
-      async () => [{ id: 42, slug: "allowed-proj" }],
-      42,
-    );
+    await assertProjectIdAllowed(g, async () => [{ id: 42, slug: "allowed-proj" }], 42);
   });
 
   test("denies when resolved slug not on allow-list", async () => {
     const g = createProjectGuard(parseProjectAllowList("allowed-proj"));
     await expect(
-      assertProjectIdAllowed(
-        g,
-        async () => [{ id: 99, slug: "other" }],
-        99,
-      ),
+      assertProjectIdAllowed(g, async () => [{ id: 99, slug: "other" }], 99)
     ).rejects.toThrow(/Project not allowed/);
   });
 });

@@ -1,19 +1,16 @@
 import { describe, expect, test } from "bun:test";
+import { createProjectGuard, parseProjectAllowList } from "../src/services/project-guard.ts";
 import {
-  parseWsAllowList,
-  createWsGuard,
-  resolveWsSlug,
-  resolveProjectSlug,
-  resolveProjectId,
-  scopeFromEnv,
-  resolveHttpScope,
   assertDefaultsAllowed,
+  createWsGuard,
+  parseWsAllowList,
+  resolveHttpScope,
+  resolveProjectId,
+  resolveProjectSlug,
+  resolveWsSlug,
   type ScopeContext,
+  scopeFromEnv,
 } from "../src/services/scope.ts";
-import {
-  createProjectGuard,
-  parseProjectAllowList,
-} from "../src/services/project-guard.ts";
 
 function scope(partial: Partial<ScopeContext> & { projectAllow?: string } = {}): ScopeContext {
   return {
@@ -21,8 +18,7 @@ function scope(partial: Partial<ScopeContext> & { projectAllow?: string } = {}):
     defaultProject: partial.defaultProject,
     wsGuard: partial.wsGuard ?? createWsGuard(parseWsAllowList(undefined)),
     projectGuard:
-      partial.projectGuard ??
-      createProjectGuard(parseProjectAllowList(partial.projectAllow ?? "")),
+      partial.projectGuard ?? createProjectGuard(parseProjectAllowList(partial.projectAllow ?? "")),
   };
 }
 
@@ -83,10 +79,10 @@ describe("resolveProjectSlug", () => {
   test("uses arg then asserts allow-list", async () => {
     const s = scope({ projectAllow: "good" });
     await expect(
-      resolveProjectSlug("good", s, async () => [{ id: 1, slug: "good" }]),
+      resolveProjectSlug("good", s, async () => [{ id: 1, slug: "good" }])
     ).resolves.toBe("good");
     await expect(
-      resolveProjectSlug("bad", s, async () => [{ id: 2, slug: "bad" }]),
+      resolveProjectSlug("bad", s, async () => [{ id: 2, slug: "bad" }])
     ).rejects.toThrow(/Project not allowed/);
   });
 
@@ -96,9 +92,7 @@ describe("resolveProjectSlug", () => {
       projectAllow: "def-slug",
     });
     await expect(
-      resolveProjectSlug(undefined, s, async () => [
-        { id: 9, slug: "def-slug" },
-      ]),
+      resolveProjectSlug(undefined, s, async () => [{ id: 9, slug: "def-slug" }])
     ).resolves.toBe("def-slug");
   });
 
@@ -108,32 +102,28 @@ describe("resolveProjectSlug", () => {
       projectAllow: "42",
     });
     await expect(
-      resolveProjectSlug(undefined, s, async () => [
-        { id: 42, slug: "from-id" },
-      ]),
+      resolveProjectSlug(undefined, s, async () => [{ id: 42, slug: "from-id" }])
     ).resolves.toBe("from-id");
   });
 
   test("throws when no project", async () => {
-    await expect(
-      resolveProjectSlug(undefined, scope(), async () => []),
-    ).rejects.toThrow(/project_slug is required/);
+    await expect(resolveProjectSlug(undefined, scope(), async () => [])).rejects.toThrow(
+      /project_slug is required/
+    );
   });
 });
 
 describe("resolveProjectId", () => {
   test("uses explicit id", async () => {
     const s = scope({ projectAllow: "7" });
-    await expect(
-      resolveProjectId(7, s, async () => [{ id: 7, slug: "p" }]),
-    ).resolves.toBe(7);
+    await expect(resolveProjectId(7, s, async () => [{ id: 7, slug: "p" }])).resolves.toBe(7);
   });
 
   test("falls back to default id", async () => {
     const s = scope({ defaultProject: "99", projectAllow: "99" });
-    await expect(
-      resolveProjectId(undefined, s, async () => [{ id: 99, slug: "x" }]),
-    ).resolves.toBe(99);
+    await expect(resolveProjectId(undefined, s, async () => [{ id: 99, slug: "x" }])).resolves.toBe(
+      99
+    );
   });
 
   test("falls back to default slug resolved via listProjects", async () => {
@@ -142,9 +132,7 @@ describe("resolveProjectId", () => {
       projectAllow: "my-proj",
     });
     await expect(
-      resolveProjectId(undefined, s, async () => [
-        { id: 55, slug: "my-proj" },
-      ]),
+      resolveProjectId(undefined, s, async () => [{ id: 55, slug: "my-proj" }])
     ).resolves.toBe(55);
   });
 });
@@ -217,8 +205,8 @@ describe("assertDefaultsAllowed", () => {
           defaultProject: "p1",
           wsGuard: createWsGuard(parseWsAllowList("ws1")),
           projectGuard: createProjectGuard(parseProjectAllowList("p1")),
-        }),
-      ),
+        })
+      )
     ).not.toThrow();
   });
 
@@ -228,8 +216,8 @@ describe("assertDefaultsAllowed", () => {
         scope({
           defaultWs: "bad",
           wsGuard: createWsGuard(parseWsAllowList("good")),
-        }),
-      ),
+        })
+      )
     ).toThrow(/OTASK_DEFAULT_WS/);
   });
 
@@ -239,8 +227,8 @@ describe("assertDefaultsAllowed", () => {
         scope({
           defaultProject: "bad",
           projectGuard: createProjectGuard(parseProjectAllowList("good")),
-        }),
-      ),
+        })
+      )
     ).toThrow(/OTASK_DEFAULT_PROJECT/);
   });
 });

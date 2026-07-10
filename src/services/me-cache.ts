@@ -37,7 +37,7 @@ export function compactMe(raw: unknown): CompactMe {
 
 export function createMeCache(
   fetchMe: () => Promise<unknown>,
-  ttlMs = 5 * 60 * 1000,
+  ttlMs = 5 * 60 * 1000
 ): { get(): Promise<CompactMe>; clear(): void } {
   let cached: CompactMe | null = null;
   let expiresAt = 0;

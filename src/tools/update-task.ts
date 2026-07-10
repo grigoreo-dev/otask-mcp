@@ -1,13 +1,7 @@
-import {
-  UpdateTaskInputSchema,
-  type UpdateTaskInput,
-} from "../schemas/task.js";
+import { type UpdateTaskInput, UpdateTaskInputSchema } from "../schemas/task.js";
 import { assertProjectIdAllowed } from "../services/project-guard.js";
 import { resolveWsSlug } from "../services/scope.js";
-import {
-  buildUpdateBodyFromTask,
-  summarizeTask,
-} from "../services/task-mapper.js";
+import { buildUpdateBodyFromTask, summarizeTask } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
@@ -53,52 +47,32 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
         const ws = resolveWsSlug(ws_slug, scope);
         const current = await api.getTask(ws, task_slug);
         const projectSlug =
-          typeof current.project_slug === "string"
-            ? current.project_slug
-            : undefined;
+          typeof current.project_slug === "string" ? current.project_slug : undefined;
         await assertProjectIdAllowed(
           guard,
           () => api.listProjects(ws),
           current.project_id,
-          projectSlug,
+          projectSlug
         );
         const body = buildUpdateBodyFromTask(current, {
           ...(changes.name !== undefined ? { name: changes.name } : {}),
-          ...(changes.board_id !== undefined
-            ? { board_id: changes.board_id }
-            : {}),
+          ...(changes.board_id !== undefined ? { board_id: changes.board_id } : {}),
           ...(changes.board_column_id !== undefined
             ? { board_column_id: changes.board_column_id }
             : {}),
-          ...(changes.comment !== undefined
-            ? { comment: changes.comment }
-            : {}),
-          ...(changes.description !== undefined
-            ? { description: changes.description }
-            : {}),
+          ...(changes.comment !== undefined ? { comment: changes.comment } : {}),
+          ...(changes.description !== undefined ? { description: changes.description } : {}),
           ...(changes.end_at !== undefined ? { end_at: changes.end_at } : {}),
           ...(changes.files !== undefined ? { files: changes.files } : {}),
-          ...(changes.performers !== undefined
-            ? { performers: changes.performers }
-            : {}),
-          ...(changes.priority_id !== undefined
-            ? { priority_id: changes.priority_id }
-            : {}),
-          ...(changes.project_id !== undefined
-            ? { project_id: changes.project_id }
-            : {}),
-          ...(changes.subtasks !== undefined
-            ? { subtasks: changes.subtasks }
-            : {}),
+          ...(changes.performers !== undefined ? { performers: changes.performers } : {}),
+          ...(changes.priority_id !== undefined ? { priority_id: changes.priority_id } : {}),
+          ...(changes.project_id !== undefined ? { project_id: changes.project_id } : {}),
+          ...(changes.subtasks !== undefined ? { subtasks: changes.subtasks } : {}),
           ...(changes.tags !== undefined ? { tags: changes.tags } : {}),
         });
 
         if (changes.project_id !== undefined) {
-          await assertProjectIdAllowed(
-            guard,
-            () => api.listProjects(ws),
-            changes.project_id,
-          );
+          await assertProjectIdAllowed(guard, () => api.listProjects(ws), changes.project_id);
         }
 
         const result = await api.updateTask(ws, task_slug, body);
@@ -116,7 +90,7 @@ Docs: https://api.otask.ru/docs#zadaci-POSTapi-v1-ws--ws_slug--tasks--task_slug-
             success: result.success,
             message: result.message,
             task: summary,
-          },
+          }
         );
       } catch (error) {
         return toolError(error);

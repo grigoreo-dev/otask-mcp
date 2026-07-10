@@ -1,17 +1,11 @@
-import {
-  WsSlugSchema,
-  type WsSlugInput,
-} from "../schemas/workspace.js";
+import { type WsSlugInput, WsSlugSchema } from "../schemas/workspace.js";
 import { agentListResult } from "../services/format.js";
 import { resolveWsSlug } from "../services/scope.js";
 import { compactTag } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
-export function createListTagsTool({
-  api,
-  scope,
-}: ToolDeps): ToolDefinition<WsSlugInput> {
+export function createListTagsTool({ api, scope }: ToolDeps): ToolDefinition<WsSlugInput> {
   return {
     name: "otask_list_tags",
     config: {
@@ -37,7 +31,7 @@ Docs: https://api.otask.ru/docs`,
         const ws = resolveWsSlug(ws_slug, scope);
         const tags = await api.listTags(ws);
         const items = tags.map((t) =>
-          compactTag(t as { id: number; name: string; slug?: string; color?: string }),
+          compactTag(t as { id: number; name: string; slug?: string; color?: string })
         );
         const payload = agentListResult(`${items.length} tag(s)`, items);
         return jsonToolResult(payload, payload as unknown as Record<string, unknown>);

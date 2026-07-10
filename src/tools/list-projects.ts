@@ -1,7 +1,4 @@
-import {
-  WsSlugSchema,
-  type WsSlugInput,
-} from "../schemas/workspace.js";
+import { type WsSlugInput, WsSlugSchema } from "../schemas/workspace.js";
 import { agentListResult } from "../services/format.js";
 import { resolveWsSlug } from "../services/scope.js";
 import { compactProject } from "../services/task-mapper.js";
@@ -39,10 +36,7 @@ Docs: https://api.otask.ru/docs`,
         const projects = await api.listProjects(ws);
         const allowed = guard.filterProjects(projects);
         const items = allowed.map((p) => compactProject(p));
-        const payload = agentListResult(
-          `${items.length} project(s)`,
-          items,
-        );
+        const payload = agentListResult(`${items.length} project(s)`, items);
         return jsonToolResult(payload, payload as unknown as Record<string, unknown>);
       } catch (error) {
         return toolError(error);

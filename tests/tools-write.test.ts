@@ -1,22 +1,16 @@
 import { describe, expect, mock, test } from "bun:test";
-import {
-  createProjectGuard,
-  parseProjectAllowList,
-} from "../src/services/project-guard.ts";
-import {
-  createWsGuard,
-  parseWsAllowList,
-} from "../src/services/scope.ts";
 import type { OtaskClient } from "../src/services/client.ts";
-import type { OtaskTask } from "../src/types.ts";
-import type { ToolDeps } from "../src/tools/types.ts";
-import { createCreateTaskTool } from "../src/tools/create-task.ts";
-import { createMoveTaskTool } from "../src/tools/move-task.ts";
-import { createArchiveTaskTool } from "../src/tools/archive-task.ts";
-import { createListCommentsTool } from "../src/tools/list-comments.ts";
+import { createProjectGuard, parseProjectAllowList } from "../src/services/project-guard.ts";
+import { createWsGuard, parseWsAllowList } from "../src/services/scope.ts";
 import { createAddCommentTool } from "../src/tools/add-comment.ts";
-import { createUpdateTaskTool } from "../src/tools/update-task.ts";
+import { createArchiveTaskTool } from "../src/tools/archive-task.ts";
+import { createCreateTaskTool } from "../src/tools/create-task.ts";
+import { createListCommentsTool } from "../src/tools/list-comments.ts";
+import { createMoveTaskTool } from "../src/tools/move-task.ts";
 import { toolFactories } from "../src/tools/registry.ts";
+import type { ToolDeps } from "../src/tools/types.ts";
+import { createUpdateTaskTool } from "../src/tools/update-task.ts";
+import type { OtaskTask } from "../src/types.ts";
 
 function sampleTask(overrides: Partial<OtaskTask> = {}): OtaskTask {
   return {
@@ -68,10 +62,7 @@ function mockApi(partial: Partial<OtaskClient> = {}): OtaskClient {
   };
 }
 
-function deps(
-  apiPartial: Partial<OtaskClient> = {},
-  allowList = "",
-): ToolDeps {
+function deps(apiPartial: Partial<OtaskClient> = {}, allowList = ""): ToolDeps {
   const projectGuard = createProjectGuard(parseProjectAllowList(allowList));
   return {
     api: mockApi(apiPartial),
@@ -83,9 +74,7 @@ function deps(
   };
 }
 
-function parseContent(result: {
-  content: Array<{ type: string; text: string }>;
-}): unknown {
+function parseContent(result: { content: Array<{ type: string; text: string }> }): unknown {
   return JSON.parse(result.content[0]!.text);
 }
 
@@ -112,7 +101,7 @@ describe("otask_create_task", () => {
       {
         createTask: mock(async () => created),
       },
-      "5",
+      "5"
     );
     const tool = createCreateTaskTool(d);
     const result = await tool.handler({
@@ -141,12 +130,10 @@ describe("otask_create_task", () => {
     const created = sampleTask({ id: 99, name: "New", project_id: 42 });
     const d = deps(
       {
-        listProjects: mock(async () => [
-          { id: 42, slug: "allowed-proj", name: "Allowed" },
-        ]),
+        listProjects: mock(async () => [{ id: 42, slug: "allowed-proj", name: "Allowed" }]),
         createTask: mock(async () => created),
       },
-      "allowed-proj",
+      "allowed-proj"
     );
     const tool = createCreateTaskTool(d);
     const result = await tool.handler({
@@ -167,15 +154,13 @@ describe("otask_move_task", () => {
   test("calls update with board_column_id after get+guard", async () => {
     const d = deps(
       {
-        getTask: mock(async () =>
-          sampleTask({ project_id: 5, board_id: 1, board_column_id: 3 }),
-        ),
+        getTask: mock(async () => sampleTask({ project_id: 5, board_id: 1, board_column_id: 3 })),
         updateTask: mock(async (_ws, _slug, body) => ({
           success: true,
           task: sampleTask({ board_column_id: body.board_column_id }),
         })),
       },
-      "5",
+      "5"
     );
     const tool = createMoveTaskTool(d);
     const result = await tool.handler({
@@ -186,8 +171,7 @@ describe("otask_move_task", () => {
     expect(result.isError).toBeUndefined();
     expect(d.api.getTask).toHaveBeenCalledWith("ws", "task-10");
     expect(d.api.updateTask).toHaveBeenCalled();
-    const updateCall = (d.api.updateTask as ReturnType<typeof mock>).mock
-      .calls[0]!;
+    const updateCall = (d.api.updateTask as ReturnType<typeof mock>).mock.calls[0]!;
     expect(updateCall[0]).toBe("ws");
     expect(updateCall[1]).toBe("task-10");
     expect(updateCall[2]).toMatchObject({
@@ -202,7 +186,7 @@ describe("otask_move_task", () => {
       {
         getTask: mock(async () => sampleTask({ project_id: 99 })),
       },
-      "5",
+      "5"
     );
     const tool = createMoveTaskTool(d);
     const result = await tool.handler({
@@ -219,15 +203,13 @@ describe("otask_move_task", () => {
     const d = deps(
       {
         getTask: mock(async () => sampleTask({ project_id: 42 })),
-        listProjects: mock(async () => [
-          { id: 42, slug: "allowed-proj", name: "Allowed" },
-        ]),
+        listProjects: mock(async () => [{ id: 42, slug: "allowed-proj", name: "Allowed" }]),
         updateTask: mock(async () => ({
           success: true,
           task: sampleTask({ project_id: 42, board_column_id: 8 }),
         })),
       },
-      "allowed-proj",
+      "allowed-proj"
     );
     const tool = createMoveTaskTool(d);
     const result = await tool.handler({
@@ -244,11 +226,9 @@ describe("otask_move_task", () => {
     const d = deps(
       {
         getTask: mock(async () => sampleTask({ project_id: 99 })),
-        listProjects: mock(async () => [
-          { id: 99, slug: "other", name: "Other" },
-        ]),
+        listProjects: mock(async () => [{ id: 99, slug: "other", name: "Other" }]),
       },
-      "allowed-proj",
+      "allowed-proj"
     );
     const tool = createMoveTaskTool(d);
     const result = await tool.handler({
@@ -269,7 +249,7 @@ describe("otask_move_task", () => {
           task: sampleTask({ board_id: 2, board_column_id: 9 }),
         })),
       },
-      "5",
+      "5"
     );
     const tool = createMoveTaskTool(d);
     await tool.handler({
@@ -290,7 +270,7 @@ describe("otask_archive_task", () => {
         getTask: mock(async () => sampleTask({ project_id: 5 })),
         archiveTask: mock(async () => sampleTask({ id: 10, name: "Archived" })),
       },
-      "5",
+      "5"
     );
     const tool = createArchiveTaskTool(d);
     const result = await tool.handler({
@@ -307,7 +287,7 @@ describe("otask_archive_task", () => {
       {
         getTask: mock(async () => sampleTask({ project_id: 99 })),
       },
-      "5",
+      "5"
     );
     const tool = createArchiveTaskTool(d);
     const result = await tool.handler({
@@ -328,7 +308,7 @@ describe("otask_list_comments", () => {
           comments: [{ id: 1, comment: "hi" }],
         })),
       },
-      "5",
+      "5"
     );
     const tool = createListCommentsTool(d);
     const result = await tool.handler({
@@ -347,7 +327,7 @@ describe("otask_list_comments", () => {
       {
         getTask: mock(async () => sampleTask({ project_id: 99 })),
       },
-      "5",
+      "5"
     );
     const tool = createListCommentsTool(d);
     const result = await tool.handler({
@@ -366,7 +346,7 @@ describe("otask_add_comment", () => {
         getTask: mock(async () => sampleTask({ project_id: 5 })),
         addComment: mock(async () => ({ id: 7, comment: "note" })),
       },
-      "5",
+      "5"
     );
     const tool = createAddCommentTool(d);
     const result = await tool.handler({
@@ -384,7 +364,7 @@ describe("otask_add_comment", () => {
       {
         getTask: mock(async () => sampleTask({ project_id: 99 })),
       },
-      "5",
+      "5"
     );
     const tool = createAddCommentTool(d);
     const result = await tool.handler({
@@ -403,7 +383,7 @@ describe("otask_update_task guard", () => {
       {
         getTask: mock(async () => sampleTask({ project_id: 99 })),
       },
-      "5",
+      "5"
     );
     const tool = createUpdateTaskTool(d);
     const result = await tool.handler({
@@ -425,7 +405,7 @@ describe("otask_update_task guard", () => {
           task: sampleTask({ name: "Renamed" }),
         })),
       },
-      "5",
+      "5"
     );
     const tool = createUpdateTaskTool(d);
     const result = await tool.handler({
@@ -442,7 +422,7 @@ describe("otask_update_task guard", () => {
       {
         getTask: mock(async () => sampleTask({ project_id: 5 })),
       },
-      "5",
+      "5"
     );
     const tool = createUpdateTaskTool(d);
     const result = await tool.handler({
@@ -459,15 +439,13 @@ describe("otask_update_task guard", () => {
     const d = deps(
       {
         getTask: mock(async () => sampleTask({ project_id: 42 })),
-        listProjects: mock(async () => [
-          { id: 42, slug: "allowed-proj", name: "Allowed" },
-        ]),
+        listProjects: mock(async () => [{ id: 42, slug: "allowed-proj", name: "Allowed" }]),
         updateTask: mock(async () => ({
           success: true,
           task: sampleTask({ project_id: 42, name: "Renamed" }),
         })),
       },
-      "allowed-proj",
+      "allowed-proj"
     );
     const tool = createUpdateTaskTool(d);
     const result = await tool.handler({

@@ -1,9 +1,4 @@
-import type {
-  DocsCatalog,
-  EndpointRecord,
-  HttpMethod,
-  ScopeCatalog,
-} from "./types.ts";
+import type { DocsCatalog, EndpointRecord, HttpMethod, ScopeCatalog } from "./types.ts";
 
 const METHODS = new Set<HttpMethod>(["GET", "POST", "PUT", "PATCH", "DELETE"]);
 
@@ -31,15 +26,13 @@ function stripTags(html: string): string {
 
 function parseSidebar(html: string): SidebarScope[] {
   const scopes: SidebarScope[] = [];
-  const parts = html.split(
-    /(?=<li[^>]*class="[^"]*sidebar__menu-item[^"]*")/i,
-  );
+  const parts = html.split(/(?=<li[^>]*class="[^"]*sidebar__menu-item[^"]*")/i);
 
   for (const part of parts) {
     if (!/sidebar__menu-item/i.test(part)) continue;
 
     const scopeMatch = part.match(
-      /href=["']#([^"']+)["'][^>]*class=["'][^"']*sidebar__menu-link[^"']*["'][^>]*>[\s\S]*?<span[^>]*class=["'][^"']*sidebar__menu-link-name[^"']*["'][^>]*>([\s\S]*?)<\/span>/i,
+      /href=["']#([^"']+)["'][^>]*class=["'][^"']*sidebar__menu-link[^"']*["'][^>]*>[\s\S]*?<span[^>]*class=["'][^"']*sidebar__menu-link-name[^"']*["'][^>]*>([\s\S]*?)<\/span>/i
     );
     if (!scopeMatch) continue;
 
@@ -50,12 +43,16 @@ function parseSidebar(html: string): SidebarScope[] {
 
     const subRe =
       /href=["']#([^"']+)["'][^>]*class=["'][^"']*sidebar__submenu-link[^"']*["'][^>]*>([\s\S]*?)<\/a>/gi;
-    let sm: RegExpExecArray | null;
-    while ((sm = subRe.exec(part)) !== null) {
+    let sm: RegExpExecArray | null = subRe.exec(part);
+    while (sm !== null) {
       const epId = sm[1]!;
-      if (epId === id) continue;
+      if (epId === id) {
+        sm = subRe.exec(part);
+        continue;
+      }
       endpointIds.push(epId);
       endpointTitles.set(epId, stripTags(sm[2]!));
+      sm = subRe.exec(part);
     }
 
     scopes.push({ id, title, endpointIds, endpointTitles });
@@ -74,11 +71,7 @@ function findIdIndex(html: string, id: string): number {
   return best;
 }
 
-function sliceForEndpoint(
-  html: string,
-  endpointId: string,
-  allEndpointIds: string[],
-): string {
+function sliceForEndpoint(html: string, endpointId: string, allEndpointIds: string[]): string {
   const start = findIdIndex(html, endpointId);
   if (start === -1) return "";
 
@@ -94,7 +87,7 @@ function sliceForEndpoint(
 function parseEndpointSlice(
   slice: string,
   id: string,
-  sidebarTitle?: string,
+  sidebarTitle?: string
 ): EndpointRecord | null {
   if (!slice) return null;
 
@@ -107,14 +100,13 @@ function parseEndpointSlice(
   const path = pathMatch?.[0]?.replace(/[.,;)]+$/, "") ?? "";
 
   const authRequired =
-    /Требуется аутентификация/i.test(text) ||
-    /required authentication/i.test(text);
+    /Требуется аутентификация/i.test(text) || /required authentication/i.test(text);
 
   let title = sidebarTitle ?? "";
   if (!title) {
     const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const hMatch = slice.match(
-      new RegExp(`id=["']${escaped}["'][^>]*>([\\s\\S]*?)<\\/h[1-6]>`, "i"),
+      new RegExp(`id=["']${escaped}["'][^>]*>([\\s\\S]*?)<\\/h[1-6]>`, "i")
     );
     if (hMatch) title = stripTags(hMatch[1]!);
   }
@@ -145,11 +137,7 @@ export function parseOtaskDocsHtml(html: string): DocsCatalog {
     const endpoints: EndpointRecord[] = [];
     for (const epId of s.endpointIds) {
       const slice = sliceForEndpoint(html, epId, allEndpointIds);
-      const record = parseEndpointSlice(
-        slice,
-        epId,
-        s.endpointTitles.get(epId),
-      );
+      const record = parseEndpointSlice(slice, epId, s.endpointTitles.get(epId));
       if (record) endpoints.push(record);
     }
     return {

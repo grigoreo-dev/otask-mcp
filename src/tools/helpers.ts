@@ -3,7 +3,7 @@ import { formatApiError } from "../services/api.js";
 
 export function jsonToolResult(
   data: unknown,
-  structuredContent?: Record<string, unknown>,
+  structuredContent?: Record<string, unknown>
 ): {
   content: Array<{ type: "text"; text: string }>;
   structuredContent?: Record<string, unknown>;

@@ -1,21 +1,11 @@
-import {
-  MoveTaskInputSchema,
-  type MoveTaskInput,
-} from "../schemas/task.js";
+import { type MoveTaskInput, MoveTaskInputSchema } from "../schemas/task.js";
 import { assertProjectIdAllowed } from "../services/project-guard.js";
 import { resolveWsSlug } from "../services/scope.js";
-import {
-  buildUpdateBodyFromTask,
-  compactTask,
-} from "../services/task-mapper.js";
+import { buildUpdateBodyFromTask, compactTask } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
-export function createMoveTaskTool({
-  api,
-  guard,
-  scope,
-}: ToolDeps): ToolDefinition<MoveTaskInput> {
+export function createMoveTaskTool({ api, guard, scope }: ToolDeps): ToolDefinition<MoveTaskInput> {
   return {
     name: "otask_move_task",
     config: {
@@ -46,14 +36,12 @@ Docs: https://api.otask.ru/docs`,
         const ws = resolveWsSlug(ws_slug, scope);
         const current = await api.getTask(ws, task_slug);
         const projectSlug =
-          typeof current.project_slug === "string"
-            ? current.project_slug
-            : undefined;
+          typeof current.project_slug === "string" ? current.project_slug : undefined;
         await assertProjectIdAllowed(
           guard,
           () => api.listProjects(ws),
           current.project_id,
-          projectSlug,
+          projectSlug
         );
         const body = buildUpdateBodyFromTask(current, {
           board_column_id,
@@ -71,7 +59,7 @@ Docs: https://api.otask.ru/docs`,
             success: result.success,
             message: result.message,
             task: summary,
-          },
+          }
         );
       } catch (error) {
         return toolError(error);

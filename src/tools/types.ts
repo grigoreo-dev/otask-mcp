@@ -1,7 +1,7 @@
 import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 import type { z } from "zod";
-import type { CompactMe } from "../services/me-cache.js";
 import type { OtaskClient } from "../services/client.js";
+import type { CompactMe } from "../services/me-cache.js";
 import type { ProjectGuard } from "../services/project-guard.js";
 import type { ScopeContext } from "../services/scope.js";
 

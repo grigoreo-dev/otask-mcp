@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import http from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import http from "node:http";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createMcpServer } from "./server.js";
 import {
@@ -11,11 +11,7 @@ import {
   getHttpAuthMode,
   validateHttpAuthConfig,
 } from "./services/auth.js";
-import {
-  assertDefaultsAllowed,
-  resolveHttpScope,
-  scopeFromEnv,
-} from "./services/scope.js";
+import { assertDefaultsAllowed, resolveHttpScope, scopeFromEnv } from "./services/scope.js";
 
 function getPort(): number {
   const raw = process.env.PORT?.trim() || "3847";
@@ -33,14 +29,10 @@ function sendJson(res: ServerResponse, status: number, body: unknown): void {
 
 function scopeModes(
   authMode: "gateway" | "passthrough",
-  scope: ReturnType<typeof resolveHttpScope>,
+  scope: ReturnType<typeof resolveHttpScope>
 ) {
   return {
-    wsGuard: scope.wsGuard.list.isEmpty
-      ? "off"
-      : authMode === "gateway"
-        ? "env"
-        : "header",
+    wsGuard: scope.wsGuard.list.isEmpty ? "off" : authMode === "gateway" ? "env" : "header",
     projectGuard: scope.projectGuard.list.isEmpty
       ? "off"
       : authMode === "gateway"
@@ -144,9 +136,7 @@ function main(): void {
       });
     })
     .listen(port, host, () => {
-      console.error(
-        `O!task MCP HTTP http://${host}:${port}/mcp [${getHttpAuthMode()}]`,
-      );
+      console.error(`O!task MCP HTTP http://${host}:${port}/mcp [${getHttpAuthMode()}]`);
     });
 }
 

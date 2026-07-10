@@ -1,7 +1,4 @@
-import {
-  ListCommentsInputSchema,
-  type ListCommentsInput,
-} from "../schemas/task.js";
+import { type ListCommentsInput, ListCommentsInputSchema } from "../schemas/task.js";
 import { assertProjectIdAllowed } from "../services/project-guard.js";
 import { resolveWsSlug } from "../services/scope.js";
 import { jsonToolResult, toolError } from "./helpers.js";
@@ -38,14 +35,12 @@ Docs: https://api.otask.ru/docs`,
         const ws = resolveWsSlug(ws_slug, scope);
         const current = await api.getTask(ws, task_slug);
         const projectSlug =
-          typeof current.project_slug === "string"
-            ? current.project_slug
-            : undefined;
+          typeof current.project_slug === "string" ? current.project_slug : undefined;
         await assertProjectIdAllowed(
           guard,
           () => api.listProjects(ws),
           current.project_id,
-          projectSlug,
+          projectSlug
         );
         const data = await api.listComments(ws, task_slug);
         return jsonToolResult(data, data as Record<string, unknown>);

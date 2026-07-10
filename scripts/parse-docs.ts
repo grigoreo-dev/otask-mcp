@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseOtaskDocsHtml } from "../src/docs/parser.ts";
 
@@ -30,15 +30,12 @@ writeFileSync(
       })),
     },
     null,
-    2,
-  ),
+    2
+  )
 );
 for (const scope of catalog.scopes) {
-  writeFileSync(
-    join(outDir, "scopes", `${scope.id}.json`),
-    JSON.stringify(scope, null, 2),
-  );
+  writeFileSync(join(outDir, "scopes", `${scope.id}.json`), JSON.stringify(scope, null, 2));
 }
 console.error(
-  `Wrote ${catalog.scopes.length} scopes, ${catalog.scopes.reduce((n, s) => n + s.endpoints.length, 0)} endpoints → docs/catalog`,
+  `Wrote ${catalog.scopes.length} scopes, ${catalog.scopes.reduce((n, s) => n + s.endpoints.length, 0)} endpoints → docs/catalog`
 );

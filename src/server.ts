@@ -2,15 +2,12 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { OtaskAuthResolver } from "./services/auth.js";
 import { createOtaskClient } from "./services/client.js";
 import { createMeCache } from "./services/me-cache.js";
-import {
-  scopeFromEnv,
-  type ScopeContext,
-} from "./services/scope.js";
+import { type ScopeContext, scopeFromEnv } from "./services/scope.js";
 import { registerAllTools } from "./tools/register.js";
 
 export function createMcpServer(
   auth: OtaskAuthResolver,
-  scope: ScopeContext = scopeFromEnv({}),
+  scope: ScopeContext = scopeFromEnv({})
 ): McpServer {
   const server = new McpServer({
     name: "otask-mcp-server",

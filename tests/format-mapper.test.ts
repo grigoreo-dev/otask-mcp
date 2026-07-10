@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { agentListResult } from "../src/services/format.ts";
 import {
-  compactTask,
-  compactProject,
-  compactMember,
-  summarizeTask,
   buildUpdateBodyFromTask,
+  compactMember,
+  compactProject,
+  compactTask,
+  summarizeTask,
 } from "../src/services/task-mapper.ts";
 import type { OtaskTask } from "../src/types.ts";
 
@@ -84,7 +84,7 @@ describe("compactTask", () => {
       sampleTask({
         performers: [42, "99"],
         tags: ["tag-a", 3],
-      }),
+      })
     );
     expect(out.performers).toEqual([{ id: "42" }, { id: "99" }]);
     expect(out.tags).toEqual([{ id: "tag-a" }, { id: "3" }]);
@@ -101,7 +101,7 @@ describe("compactTask", () => {
         performers: undefined,
         tags: undefined,
         subtasks: undefined,
-      }),
+      })
     );
     expect(out.performers).toEqual([]);
     expect(out.tags).toEqual([]);

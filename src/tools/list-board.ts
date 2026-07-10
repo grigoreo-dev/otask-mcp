@@ -1,19 +1,10 @@
-import {
-  ListBoardInputSchema,
-  type ListBoardInput,
-} from "../schemas/workspace.js";
-import {
-  resolveProjectSlug,
-  resolveWsSlug,
-} from "../services/scope.js";
+import { type ListBoardInput, ListBoardInputSchema } from "../schemas/workspace.js";
+import { resolveProjectSlug, resolveWsSlug } from "../services/scope.js";
 import { compactBoard, compactColumn } from "../services/task-mapper.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
-export function createListBoardTool({
-  api,
-  scope,
-}: ToolDeps): ToolDefinition<ListBoardInput> {
+export function createListBoardTool({ api, scope }: ToolDeps): ToolDefinition<ListBoardInput> {
   return {
     name: "otask_list_board",
     config: {
@@ -42,18 +33,14 @@ Docs: https://api.otask.ru/docs`,
     handler: async ({ ws_slug, project_slug, type, board_slug }) => {
       try {
         const ws = resolveWsSlug(ws_slug, scope);
-        const project = await resolveProjectSlug(
-          project_slug,
-          scope,
-          () => api.listProjects(ws),
-        );
+        const project = await resolveProjectSlug(project_slug, scope, () => api.listProjects(ws));
         const query = {
           type: type ?? "status",
           ...(board_slug !== undefined ? { board_slug } : {}),
         };
         const result = await api.listBoard(ws, project, query);
         const boards = result.boards.map((b) =>
-          compactBoard(b as { id: number; name: string; slug?: string; color?: string }),
+          compactBoard(b as { id: number; name: string; slug?: string; color?: string })
         );
         const columns = result.columns.map((c) =>
           compactColumn(
@@ -63,8 +50,8 @@ Docs: https://api.otask.ru/docs`,
               slug?: string;
               color?: string;
               board_id?: number;
-            },
-          ),
+            }
+          )
         );
         const payload = {
           summary: `${boards.length} board(s), ${columns.length} column(s)`,

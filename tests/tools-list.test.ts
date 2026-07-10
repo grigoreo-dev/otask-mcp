@@ -1,26 +1,19 @@
 import { describe, expect, mock, test } from "bun:test";
-import {
-  createProjectGuard,
-  parseProjectAllowList,
-} from "../src/services/project-guard.ts";
-import {
-  createWsGuard,
-  parseWsAllowList,
-  type ScopeContext,
-} from "../src/services/scope.ts";
 import type { OtaskClient } from "../src/services/client.ts";
-import type { OtaskTask } from "../src/types.ts";
-import type { ToolDeps } from "../src/tools/types.ts";
-import { createListProjectsTool } from "../src/tools/list-projects.ts";
-import { createListProjectTasksTool } from "../src/tools/list-project-tasks.ts";
+import { createMeCache } from "../src/services/me-cache.ts";
+import { createProjectGuard, parseProjectAllowList } from "../src/services/project-guard.ts";
+import { createWsGuard, parseWsAllowList, type ScopeContext } from "../src/services/scope.ts";
+import { createGetTaskTool } from "../src/tools/get-task.ts";
 import { createListBoardTool } from "../src/tools/list-board.ts";
 import { createListMembersTool } from "../src/tools/list-members.ts";
+import { createListProjectTasksTool } from "../src/tools/list-project-tasks.ts";
+import { createListProjectsTool } from "../src/tools/list-projects.ts";
 import { createListTagsTool } from "../src/tools/list-tags.ts";
-import { createGetTaskTool } from "../src/tools/get-task.ts";
-import { createMeTool } from "../src/tools/me.ts";
 import { createListTasksTool } from "../src/tools/list-tasks.ts";
-import { createMeCache } from "../src/services/me-cache.ts";
+import { createMeTool } from "../src/tools/me.ts";
 import { toolFactories } from "../src/tools/registry.ts";
+import type { ToolDeps } from "../src/tools/types.ts";
+import type { OtaskTask } from "../src/types.ts";
 
 function sampleTask(overrides: Partial<OtaskTask> = {}): OtaskTask {
   return {
@@ -79,10 +72,7 @@ function emptyScope(projectAllow = ""): ScopeContext {
   };
 }
 
-function deps(
-  apiPartial: Partial<OtaskClient> = {},
-  allowList = "",
-): ToolDeps {
+function deps(apiPartial: Partial<OtaskClient> = {}, allowList = ""): ToolDeps {
   const scope = emptyScope(allowList);
   return {
     api: mockApi(apiPartial),
@@ -91,9 +81,7 @@ function deps(
   };
 }
 
-function parseContent(result: {
-  content: Array<{ type: string; text: string }>;
-}): unknown {
+function parseContent(result: { content: Array<{ type: string; text: string }> }): unknown {
   return JSON.parse(result.content[0]!.text);
 }
 
@@ -107,7 +95,7 @@ describe("otask_list_projects", () => {
           { id: 3, slug: "c", name: "Gamma" },
         ]),
       },
-      "a,2",
+      "a,2"
     );
     const tool = createListProjectsTool(d);
     const result = await tool.handler({ ws_slug: "ws-1" });
@@ -135,9 +123,7 @@ describe("otask_list_projects", () => {
       ]),
     });
     const tool = createListProjectsTool(d);
-    const body = parseContent(
-      await tool.handler({ ws_slug: "ws" }),
-    ) as { items: unknown[] };
+    const body = parseContent(await tool.handler({ ws_slug: "ws" })) as { items: unknown[] };
     expect(body.items).toHaveLength(2);
   });
 });
@@ -154,7 +140,7 @@ describe("otask_list_project_tasks", () => {
           meta: { page: 1 },
         })),
       },
-      "proj-a",
+      "proj-a"
     );
     const tool = createListProjectTasksTool(d);
     const result = await tool.handler({
@@ -171,22 +157,16 @@ describe("otask_list_project_tasks", () => {
     expect(body.items[0]).toMatchObject({ id: 1, slug: "t1", name: "One" });
     expect(body.items[0]).not.toHaveProperty("files");
     expect(body.next).toEqual({ page: 1 });
-    expect(d.api.listProjectTasks).toHaveBeenCalledWith(
-      "ws-1",
-      "proj-a",
-      undefined,
-    );
+    expect(d.api.listProjectTasks).toHaveBeenCalledWith("ws-1", "proj-a", undefined);
   });
 
   test("blocks disallowed project_slug", async () => {
     const d = deps(
       {
-        listProjects: mock(async () => [
-          { id: 1, slug: "forbidden", name: "Forbidden" },
-        ]),
+        listProjects: mock(async () => [{ id: 1, slug: "forbidden", name: "Forbidden" }]),
         listProjectTasks: mock(async () => ({ tasks: [] })),
       },
-      "allowed-only",
+      "allowed-only"
     );
     const tool = createListProjectTasksTool(d);
     const result = await tool.handler({
@@ -201,14 +181,12 @@ describe("otask_list_project_tasks", () => {
   test("allow-list numeric id only resolves project and succeeds", async () => {
     const d = deps(
       {
-        listProjects: mock(async () => [
-          { id: 42, slug: "proj-by-id", name: "By Id" },
-        ]),
+        listProjects: mock(async () => [{ id: 42, slug: "proj-by-id", name: "By Id" }]),
         listProjectTasks: mock(async () => ({
           tasks: [sampleTask({ id: 1, slug: "t1", project_id: 42 })],
         })),
       },
-      "42",
+      "42"
     );
     const tool = createListProjectTasksTool(d);
     const result = await tool.handler({
@@ -219,22 +197,16 @@ describe("otask_list_project_tasks", () => {
     const body = parseContent(result) as { items: unknown[] };
     expect(body.items).toHaveLength(1);
     expect(d.api.listProjects).toHaveBeenCalledWith("ws-1");
-    expect(d.api.listProjectTasks).toHaveBeenCalledWith(
-      "ws-1",
-      "proj-by-id",
-      undefined,
-    );
+    expect(d.api.listProjectTasks).toHaveBeenCalledWith("ws-1", "proj-by-id", undefined);
   });
 
   test("forwards optional page and status_id query to api", async () => {
     const d = deps(
       {
-        listProjects: mock(async () => [
-          { id: 5, slug: "proj-a", name: "A" },
-        ]),
+        listProjects: mock(async () => [{ id: 5, slug: "proj-a", name: "A" }]),
         listProjectTasks: mock(async () => ({ tasks: [] })),
       },
-      "proj-a",
+      "proj-a"
     );
     const tool = createListProjectTasksTool(d);
     await tool.handler({
@@ -254,9 +226,7 @@ describe("otask_list_board", () => {
   test("asserts project and returns compact boards/columns", async () => {
     const d = deps(
       {
-        listProjects: mock(async () => [
-          { id: 1, slug: "p1", name: "P1" },
-        ]),
+        listProjects: mock(async () => [{ id: 1, slug: "p1", name: "P1" }]),
         listBoard: mock(async () => ({
           boards: [
             {
@@ -280,7 +250,7 @@ describe("otask_list_board", () => {
           ],
         })),
       },
-      "p1",
+      "p1"
     );
     const tool = createListBoardTool(d);
     const result = await tool.handler({
@@ -294,12 +264,8 @@ describe("otask_list_board", () => {
       columns: Array<Record<string, unknown>>;
       next: null;
     };
-    expect(body.boards).toEqual([
-      { id: 1, name: "Main", slug: "main", color: "#fff" },
-    ]);
-    expect(body.columns).toEqual([
-      { id: 10, name: "Todo", slug: "todo", board_id: 1 },
-    ]);
+    expect(body.boards).toEqual([{ id: 1, name: "Main", slug: "main", color: "#fff" }]);
+    expect(body.columns).toEqual([{ id: 10, name: "Todo", slug: "todo", board_id: 1 }]);
     expect(body.boards[0]).not.toHaveProperty("pivot");
     expect(body.boards[0]).not.toHaveProperty("localtz");
     expect(body.columns[0]).not.toHaveProperty("pivot");
@@ -310,11 +276,9 @@ describe("otask_list_board", () => {
   test("blocks disallowed project", async () => {
     const d = deps(
       {
-        listProjects: mock(async () => [
-          { id: 9, slug: "nope", name: "Nope" },
-        ]),
+        listProjects: mock(async () => [{ id: 9, slug: "nope", name: "Nope" }]),
       },
-      "only-this",
+      "only-this"
     );
     const tool = createListBoardTool(d);
     const result = await tool.handler({
@@ -340,9 +304,10 @@ describe("otask_list_members", () => {
       ]),
     });
     const tool = createListMembersTool(d);
-    const body = parseContent(
-      await tool.handler({ ws_slug: "ws" }),
-    ) as { items: Array<Record<string, unknown>>; next: null };
+    const body = parseContent(await tool.handler({ ws_slug: "ws" })) as {
+      items: Array<Record<string, unknown>>;
+      next: null;
+    };
     expect(body.items).toEqual([
       {
         id: 55,
@@ -365,9 +330,11 @@ describe("otask_list_tags", () => {
       ]),
     });
     const tool = createListTagsTool(d);
-    const body = parseContent(
-      await tool.handler({ ws_slug: "ws" }),
-    ) as { summary: string; items: Array<Record<string, unknown>>; next: null };
+    const body = parseContent(await tool.handler({ ws_slug: "ws" })) as {
+      summary: string;
+      items: Array<Record<string, unknown>>;
+      next: null;
+    };
     expect(body.items).toEqual([
       { id: 1, name: "bug", slug: "bug", color: "#f00" },
       { id: 2, name: "feature" },
@@ -383,11 +350,9 @@ describe("otask_get_task guard", () => {
   test("returns compact task when project allowed", async () => {
     const d = deps(
       {
-        getTask: mock(async () =>
-          sampleTask({ project_id: 5, name: "Allowed" }),
-        ),
+        getTask: mock(async () => sampleTask({ project_id: 5, name: "Allowed" })),
       },
-      "5",
+      "5"
     );
     const tool = createGetTaskTool(d);
     const result = await tool.handler({
@@ -405,7 +370,7 @@ describe("otask_get_task guard", () => {
       {
         getTask: mock(async () => sampleTask({ project_id: 99 })),
       },
-      "5",
+      "5"
     );
     const tool = createGetTaskTool(d);
     const result = await tool.handler({
@@ -420,11 +385,9 @@ describe("otask_get_task guard", () => {
     const d = deps(
       {
         getTask: mock(async () => sampleTask({ project_id: 42 })),
-        listProjects: mock(async () => [
-          { id: 42, slug: "allowed-proj", name: "Allowed" },
-        ]),
+        listProjects: mock(async () => [{ id: 42, slug: "allowed-proj", name: "Allowed" }]),
       },
-      "allowed-proj",
+      "allowed-proj"
     );
     const tool = createGetTaskTool(d);
     const result = await tool.handler({
@@ -444,7 +407,7 @@ describe("otask_get_task guard", () => {
           { id: 99, slug: "other", name: "Other" },
         ]),
       },
-      "allowed-proj",
+      "allowed-proj"
     );
     const tool = createGetTaskTool(d);
     const result = await tool.handler({
@@ -543,10 +506,7 @@ describe("otask_list_tasks", () => {
 
   test("allow-list drops tasks from other projects", async () => {
     const listWorkspaceTasks = mock(async () => ({
-      tasks: [
-        sampleTask({ id: 1, project_id: 5 }),
-        sampleTask({ id: 2, project_id: 99 }),
-      ],
+      tasks: [sampleTask({ id: 1, project_id: 5 }), sampleTask({ id: 2, project_id: 99 })],
       meta: { current_page: 1, last_page: 1, per_page: 20, total: 2 },
     }));
     const d = deps(
@@ -554,7 +514,7 @@ describe("otask_list_tasks", () => {
         listWorkspaceTasks,
         getMe: mock(async () => ({ id: 1, full_name: "U", timezone: "UTC" })),
       },
-      "5",
+      "5"
     );
     d.meCache = createMeCache(() => d.api.getMe());
     const result = await createListTasksTool(d).handler({
@@ -567,22 +527,17 @@ describe("otask_list_tasks", () => {
 
   test("slug-only allow-list keeps tasks after resolving project id via listProjects", async () => {
     const listWorkspaceTasks = mock(async () => ({
-      tasks: [
-        sampleTask({ id: 1, project_id: 5 }),
-        sampleTask({ id: 2, project_id: 99 }),
-      ],
+      tasks: [sampleTask({ id: 1, project_id: 5 }), sampleTask({ id: 2, project_id: 99 })],
       meta: { current_page: 1, last_page: 1, per_page: 20, total: 2 },
     }));
-    const listProjects = mock(async () => [
-      { id: 5, slug: "proj-slug", name: "P" },
-    ]);
+    const listProjects = mock(async () => [{ id: 5, slug: "proj-slug", name: "P" }]);
     const d = deps(
       {
         listWorkspaceTasks,
         listProjects,
         getMe: mock(async () => ({ id: 1, full_name: "U", timezone: "UTC" })),
       },
-      "proj-slug",
+      "proj-slug"
     );
     d.meCache = createMeCache(() => d.api.getMe());
     const result = await createListTasksTool(d).handler({

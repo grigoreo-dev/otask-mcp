@@ -1,14 +1,11 @@
 import { z } from "zod";
-import { createMeCache, type CompactMe } from "../services/me-cache.js";
+import { type CompactMe, createMeCache } from "../services/me-cache.js";
 import { jsonToolResult, toolError } from "./helpers.js";
 import type { ToolDefinition, ToolDeps } from "./types.js";
 
 const EmptySchema = z.object({}).strict();
 
-export function createMeTool({
-  api,
-  meCache,
-}: ToolDeps): ToolDefinition<Record<string, never>> {
+export function createMeTool({ api, meCache }: ToolDeps): ToolDefinition<Record<string, never>> {
   const cache = meCache ?? createMeCache(() => api.getMe());
   return {
     name: "otask_me",

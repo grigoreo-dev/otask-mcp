@@ -36,23 +36,17 @@ export function getHttpAuthMode(): HttpAuthMode {
 
 export function validateStdioAuthConfig(): void {
   if (!hasServerOtaskCredentials()) {
-    throw new Error(
-      "Set OTASK_AUTH_KEY or OTASK_EMAIL + OTASK_PASSWORD for stdio MCP",
-    );
+    throw new Error("Set OTASK_AUTH_KEY or OTASK_EMAIL + OTASK_PASSWORD for stdio MCP");
   }
 }
 
 export function validateHttpAuthConfig(): void {
   if (hasServerOtaskCredentials() && !process.env.MCP_AUTH_TOKEN?.trim()) {
-    throw new Error(
-      "MCP_AUTH_TOKEN is required when OTASK_* credentials are set in env",
-    );
+    throw new Error("MCP_AUTH_TOKEN is required when OTASK_* credentials are set in env");
   }
 }
 
-export function extractBearerToken(
-  authorizationHeader: string | undefined,
-): string | undefined {
+export function extractBearerToken(authorizationHeader: string | undefined): string | undefined {
   if (!authorizationHeader?.startsWith("Bearer ")) {
     return undefined;
   }
@@ -60,24 +54,26 @@ export function extractBearerToken(
   return token || undefined;
 }
 
-export function extractProjectAllowListHeader(
-  headers: { [k: string]: string | string[] | undefined },
-): string | undefined {
+export function extractProjectAllowListHeader(headers: {
+  [k: string]: string | string[] | undefined;
+}): string | undefined {
   const raw = headers["x-otask-allowed-projects"];
   if (typeof raw === "string") return raw;
   if (Array.isArray(raw) && typeof raw[0] === "string") return raw[0];
   return undefined;
 }
 
-export function authorizeHttpMcpRequest(clientBearer: string | undefined): {
-  ok: true;
-  otaskBearer?: string;
-} | {
-  ok: false;
-  status: number;
-  error: string;
-  hint: string;
-} {
+export function authorizeHttpMcpRequest(clientBearer: string | undefined):
+  | {
+      ok: true;
+      otaskBearer?: string;
+    }
+  | {
+      ok: false;
+      status: number;
+      error: string;
+      hint: string;
+    } {
   if (hasServerOtaskCredentials()) {
     const mcpToken = process.env.MCP_AUTH_TOKEN?.trim();
     if (!clientBearer || clientBearer !== mcpToken) {
@@ -103,9 +99,7 @@ export function authorizeHttpMcpRequest(clientBearer: string | undefined): {
   return { ok: true, otaskBearer: clientBearer };
 }
 
-export function createPassthroughAuthResolver(
-  otaskBearer: string,
-): OtaskAuthResolver {
+export function createPassthroughAuthResolver(otaskBearer: string): OtaskAuthResolver {
   return async () => ({
     Authorization: `Bearer ${otaskBearer}`,
     "Content-Type": "application/json",
@@ -129,9 +123,7 @@ async function loginWithPassword(email: string, password: string): Promise<strin
 
   if (!response.ok || !body.token) {
     const detail =
-      typeof body.message === "string"
-        ? body.message
-        : JSON.stringify(body).slice(0, 500);
+      typeof body.message === "string" ? body.message : JSON.stringify(body).slice(0, 500);
     throw new Error(`O!task login failed (${response.status}): ${detail}`);
   }
 
