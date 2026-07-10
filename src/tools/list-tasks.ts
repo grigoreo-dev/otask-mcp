@@ -17,6 +17,7 @@ import type { ToolDefinition, ToolDeps } from "./types.js";
 
 export function createListTasksTool({
   api,
+  guard,
   scope,
   meCache,
 }: ToolDeps): ToolDefinition<ListTasksInput> {
@@ -79,8 +80,17 @@ Docs: https://api.otask.ru/docs`,
           baseQuery.priority_ids = input.priority_ids;
         }
 
+        let idToSlug: Map<number, string> | undefined;
+        if (!guard.list.isEmpty) {
+          const projects = await api.listProjects(ws);
+          idToSlug = new Map(projects.map((p) => [p.id, p.slug]));
+        }
+
         const allow = (projectId: number) =>
-          scope.projectGuard.allows({ id: projectId });
+          guard.allows({
+            id: projectId,
+            slug: idToSlug?.get(projectId),
+          });
 
         if (due === "none") {
           const result = await api.listWorkspaceTasks(ws, baseQuery);

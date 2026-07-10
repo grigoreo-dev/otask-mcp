@@ -565,6 +565,35 @@ describe("otask_list_tasks", () => {
     expect(body.items.map((i) => i.id)).toEqual([1]);
   });
 
+  test("slug-only allow-list keeps tasks after resolving project id via listProjects", async () => {
+    const listWorkspaceTasks = mock(async () => ({
+      tasks: [
+        sampleTask({ id: 1, project_id: 5 }),
+        sampleTask({ id: 2, project_id: 99 }),
+      ],
+      meta: { current_page: 1, last_page: 1, per_page: 20, total: 2 },
+    }));
+    const listProjects = mock(async () => [
+      { id: 5, slug: "proj-slug", name: "P" },
+    ]);
+    const d = deps(
+      {
+        listWorkspaceTasks,
+        listProjects,
+        getMe: mock(async () => ({ id: 1, full_name: "U", timezone: "UTC" })),
+      },
+      "proj-slug",
+    );
+    d.meCache = createMeCache(() => d.api.getMe());
+    const result = await createListTasksTool(d).handler({
+      ws_slug: "ws-1",
+      mine: false,
+    });
+    const body = parseContent(result) as { items: Array<{ id: number }> };
+    expect(body.items.map((i) => i.id)).toEqual([1]);
+    expect(listProjects).toHaveBeenCalledWith("ws-1");
+  });
+
   test("due=overdue scans pages with cap metadata", async () => {
     const listWorkspaceTasks = mock(async (_ws: string, q?: { page?: number }) => {
       const page = q?.page ?? 1;
