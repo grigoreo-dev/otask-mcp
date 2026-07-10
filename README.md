@@ -179,19 +179,18 @@ HTTP gateway: задай OTASK_* + MCP_AUTH_TOKEN.
 ```bash
 # из корня репозитория
 bun install
-bun run build
-bun install --cwd packages/worker
-
-cd packages/worker
-bunx wrangler kv namespace create OAUTH_KV
-# вставьте id в wrangler.toml (binding OAUTH_KV)
-bunx wrangler deploy
+bunx wrangler login              # один раз (браузер, без API-токена)
+bun run worker:kv                # создаёт OAUTH_KV → id в wrangler.toml
+bun run deploy:worker            # build monorepo + wrangler deploy
 ```
+
+Подробнее (GH Actions, Workers Builds из git, secrets): [`packages/worker/README.md`](packages/worker/README.md).
 
 - Endpoint MCP: `https://otask-mcp.<ваш-subdomain>.workers.dev/mcp`
 - OAuth: `/authorize`, `/oauth/token`, `/oauth/register`
 - **Не** задавайте `OTASK_*` в `[vars]` для multi-user публичного деплоя
-- CI (опционально): `.github/workflows/deploy-worker.yml` (`workflow_dispatch`); secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
+- **GitHub Actions** (кнопка Deploy): нужны secrets `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`
+- **Cloudflare Workers Builds** (git в dashboard): токен в GitHub **не** нужен — CF GitHub App; build из monorepo
 
 Rate limiting — в dashboard Cloudflare (см. worker README), не в коде v1.
 

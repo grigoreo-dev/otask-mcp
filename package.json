@@ -35,7 +35,9 @@
     "test": "bun test",
     "docs:parse": "bun run scripts/parse-docs.ts",
     "lint": "biome check .",
-    "format": "biome check --write ."
+    "format": "biome check --write .",
+    "worker:kv": "bunx wrangler kv namespace create OAUTH_KV --config packages/worker/wrangler.toml",
+    "deploy:worker": "bun run build && bunx wrangler deploy --config packages/worker/wrangler.toml"
   },
   "engines": {
     "bun": ">=1.1.0"
