@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { agentListResult } from "../src/services/format.ts";
+import { agentListResult } from "../packages/core/src/services/format.ts";
 import {
   buildUpdateBodyFromTask,
   compactMember,
   compactProject,
   compactTask,
   summarizeTask,
-} from "../src/services/task-mapper.ts";
-import type { OtaskTask } from "../src/types.ts";
+} from "../packages/core/src/services/task-mapper.ts";
+import type { OtaskTask } from "../packages/core/src/types.ts";
 
 function sampleTask(overrides: Partial<OtaskTask> = {}): OtaskTask {
   return {

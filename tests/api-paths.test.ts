@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import { API_BASE_URL } from "../src/constants.ts";
-import { OtaskApiError } from "../src/services/api.ts";
-import { createOtaskClient } from "../src/services/client.ts";
+import { API_BASE_URL } from "../packages/core/src/constants.ts";
+import { OtaskApiError } from "../packages/core/src/services/api.ts";
+import { createOtaskClient } from "../packages/core/src/services/client.ts";
 
 const auth = async () => ({
   Authorization: "Bearer test-token",
@@ -323,6 +323,22 @@ describe("api paths and envelopes", () => {
         project_id: 10,
       })
     ).rejects.toBeInstanceOf(OtaskApiError);
+  });
+
+  test("401 maps to reconnect message", async () => {
+    mockFetchWithStatus(401, { message: "Unauthorized" });
+
+    const client = createOtaskClient(auth);
+    try {
+      await client.getMe();
+      expect.unreachable("expected OtaskApiError");
+    } catch (err) {
+      expect(err).toBeInstanceOf(OtaskApiError);
+      expect((err as OtaskApiError).status).toBe(401);
+      expect((err as OtaskApiError).message).toBe(
+        "O!task authorization expired or rejected (401). Check OTASK_* credentials, the request Bearer token, or reconnect the remote MCP OAuth session."
+      );
+    }
   });
 
   test("listProjects throws on unknown success envelope", async () => {

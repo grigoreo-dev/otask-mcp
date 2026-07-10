@@ -1,16 +1,19 @@
 import { describe, expect, mock, test } from "bun:test";
-import type { OtaskClient } from "../src/services/client.ts";
-import { createProjectGuard, parseProjectAllowList } from "../src/services/project-guard.ts";
-import { createWsGuard, parseWsAllowList } from "../src/services/scope.ts";
-import { createAddCommentTool } from "../src/tools/add-comment.ts";
-import { createArchiveTaskTool } from "../src/tools/archive-task.ts";
-import { createCreateTaskTool } from "../src/tools/create-task.ts";
-import { createListCommentsTool } from "../src/tools/list-comments.ts";
-import { createMoveTaskTool } from "../src/tools/move-task.ts";
-import { toolFactories } from "../src/tools/registry.ts";
-import type { ToolDeps } from "../src/tools/types.ts";
-import { createUpdateTaskTool } from "../src/tools/update-task.ts";
-import type { OtaskTask } from "../src/types.ts";
+import type { OtaskClient } from "../packages/core/src/services/client.ts";
+import {
+  createProjectGuard,
+  parseProjectAllowList,
+} from "../packages/core/src/services/project-guard.ts";
+import { createWsGuard, parseWsAllowList } from "../packages/core/src/services/scope.ts";
+import { createAddCommentTool } from "../packages/core/src/tools/add-comment.ts";
+import { createArchiveTaskTool } from "../packages/core/src/tools/archive-task.ts";
+import { createCreateTaskTool } from "../packages/core/src/tools/create-task.ts";
+import { createListCommentsTool } from "../packages/core/src/tools/list-comments.ts";
+import { createMoveTaskTool } from "../packages/core/src/tools/move-task.ts";
+import { toolFactories } from "../packages/core/src/tools/registry.ts";
+import type { ToolDeps } from "../packages/core/src/tools/types.ts";
+import { createUpdateTaskTool } from "../packages/core/src/tools/update-task.ts";
+import type { OtaskTask } from "../packages/core/src/types.ts";
 
 function sampleTask(overrides: Partial<OtaskTask> = {}): OtaskTask {
   return {

@@ -11,7 +11,7 @@ export function createMcpServer(
 ): McpServer {
   const server = new McpServer({
     name: "otask-mcp-server",
-    version: "1.4.0",
+    version: "1.5.0",
   });
 
   const api = createOtaskClient(auth);

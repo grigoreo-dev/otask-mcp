@@ -1,8 +1,14 @@
 # otask-mcp-server
 
-[MCP-сервер](https://modelcontextprotocol.io) для [O!task API](https://api.otask.ru/docs). Отдаёт операции O!task (воркспейс/задачи) как MCP-инструменты для агентов (Cursor, OpenCode, n8n MCP Client Tool).
+[MCP-сервер](https://modelcontextprotocol.io) для [O!task API](https://api.otask.ru/docs). Отдаёт операции O!task (воркспейс/задачи) как MCP-инструменты для агентов (Claude, Cursor, OpenCode, n8n MCP Client Tool).
 
-## Установка
+## 🚀 Возможности
+
+- **stdio** — локальный MCP для Claude Desktop / Cursor / OpenCode
+- **HTTP gateway / passthrough** — Streamable HTTP для n8n и self-host
+- **Remote MCP (Cloudflare Worker)** — OAuth-логин O!task, без пароля в конфиге клиента
+- Allow-list workspace/project, defaults, inbox-сценарии (`otask_list_tasks`)
+- Open source: [grigoreo-dev/otask-mcp](https://github.com/grigoreo-dev/otask-mcp)
 
 ```bash
 npm i -g @grigoreo-dev/otask-mcp
@@ -12,17 +18,182 @@ npm i -g @grigoreo-dev/otask-mcp
 
 Публикация на npm: push tag `vX.Y.Z` (версия в tag = `package.json`). CI: `.github/workflows/publish.yml` (OIDC Trusted Publisher, без `NPM_TOKEN`).
 
-## Режимы
+## 🔒 Приватность и доверие
 
-| Режим | Команда | Как выбирается | Авторизация клиента |
-|-------|---------|----------------|---------------------|
-| **stdio** | `bun start` | Локальный процесс; всегда берёт credentials из env сервера | Без HTTP; задайте `OTASK_*` в env |
-| **HTTP gateway** | `bun run start:http` | Есть `OTASK_AUTH_KEY` **или** `OTASK_EMAIL`+`OTASK_PASSWORD` | `Authorization: Bearer <MCP_AUTH_TOKEN>` |
-| **HTTP passthrough** | `bun run start:http` | Нет credentials `OTASK_*` в env | `Authorization: Bearer <токен O!task>` (проксируется в API) |
+- **Пароль O!task не хранится** на Worker после логина: email+password используются только на шаге OAuth authorize, чтобы получить API-токен.
+- **Токен O!task** живёт в **сессии OAuth** (KV / props), а не в репозитории и не в статичном env публичного Worker.
+- После истечения/отзыва сессии — **повторный логин** через Connect flow клиента.
+- Код открыт: можно self-deploy и аудировать.
+- Паттерн remote MCP на Cloudflare: [Remote Model Context Protocol servers (MCP)](https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/).
+- Официальный публичный URL: **TBD after first deploy** (после деплоя: `https://otask-mcp.<account>.workers.dev/mcp`).
 
-Определение: `hasServerOtaskCredentials()` — gateway, если задан статический ключ или email+password; иначе passthrough. Проверка: `GET /health` → `authMode: "gateway" | "passthrough"`.
+**Не кладите** `OTASK_PASSWORD`, `OTASK_AUTH_KEY` и токены в git, скриншоты и issue.
 
-stdio требует `OTASK_*` (без них падает при старте). HTTP gateway требует `MCP_AUTH_TOKEN`, если заданы `OTASK_*` (иначе падает при старте).
+## ☁️ Remote MCP (Cloudflare)
+
+Официальный endpoint (после первого деплоя):
+
+```text
+https://otask-mcp.<account>.workers.dev/mcp
+```
+
+Пока публичный demo не выкатан — URL **TBD after first deploy**. Self-host: см. [🔧 Self-deploy Worker](#-self-deploy-worker).
+
+### Подключение (OAuth)
+
+1. В MCP-клиенте добавьте remote server с URL `…/mcp`.
+2. Запустите **Connect / OAuth** flow клиента.
+3. На странице логина Worker введите **email + password** O!task.
+4. После успешного authorize клиент получает access token сессии MCP; вызовы `/mcp` идут с этим токеном.
+5. Default workspace/project — на форме логина (или явные `ws_slug` / project args в tools). Self-host stdio/HTTP: env `OTASK_DEFAULT_*`.
+
+На публичном Worker **нет** `OTASK_*` в env: multi-user, credentials только в сессии пользователя.
+
+## 💻 stdio (локально)
+
+Локальный процесс; credentials только из env сервера.
+
+```env
+OTASK_AUTH_KEY=...
+# или OTASK_EMAIL + OTASK_PASSWORD
+OTASK_DEFAULT_WS=...
+OTASK_DEFAULT_PROJECT=my-project
+OTASK_ALLOWED_WS=...
+OTASK_ALLOWED_PROJECTS=my-project
+```
+
+```bash
+bun start
+# или: npx @grigoreo-dev/otask-mcp
+```
+
+stdio **требует** `OTASK_*` (без них падает при старте).
+
+## 🐳 Docker / HTTP
+
+```bash
+bun run start:http
+# Docker: образ из Dockerfile, PORT=3847
+```
+
+| | |
+|---|---|
+| MCP | `POST`/`GET` `/mcp` (Streamable HTTP) |
+| Health | `GET /health` → `{ ok, mode, authMode, projectGuard, wsGuard, defaults }` (`"env" \| "header" \| "off"`) |
+
+Пример self-host: `https://otask-mcp.example/mcp` (порт `3847` в Docker).
+
+### Gateway (credentials O!task на сервере)
+
+```env
+OTASK_AUTH_KEY=...
+MCP_AUTH_TOKEN=...
+OTASK_DEFAULT_WS=...
+OTASK_DEFAULT_PROJECT=...
+OTASK_ALLOWED_WS=...
+OTASK_ALLOWED_PROJECTS=...
+```
+
+Клиент: `Authorization: Bearer <MCP_AUTH_TOKEN>` (не токен O!task). **Не** шлите `X-Otask-*` allow/default (берутся из env).
+
+### Passthrough (токен O!task у клиента)
+
+Env сервера: **без** `OTASK_AUTH_KEY` / `OTASK_EMAIL` / `OTASK_PASSWORD`.
+
+Клиент: `Authorization: Bearer <токен api.otask.ru>`. Опционально: `X-Otask-Allowed-Projects`, `X-Otask-Allowed-Ws`, `X-Otask-Default-Ws`, `X-Otask-Default-Project`.
+
+Проверка: `GET /health` → `authMode: "gateway" | "passthrough"`.
+
+## 🔀 Режимы auth
+
+| Режим | Где | Команда / URL | Авторизация клиента |
+|-------|-----|---------------|---------------------|
+| **stdio** | локально | `bun start` / `otask-mcp` | Нет HTTP; `OTASK_*` в env процесса |
+| **HTTP gateway** | Node/Docker | `bun run start:http` | `Authorization: Bearer <MCP_AUTH_TOKEN>`; на сервере есть `OTASK_*` |
+| **HTTP passthrough** | Node/Docker | `bun run start:http` | `Authorization: Bearer <токен O!task>`; **нет** `OTASK_*` в env |
+| **remote Worker** | Cloudflare | `https://…/mcp` + OAuth | OAuth Connect → логин email+password на Worker; API-токен в сессии, не в env Worker |
+
+Определение HTTP (Node): `hasServerOtaskCredentials()` — gateway, если задан статический ключ или email+password; иначе passthrough. HTTP gateway **требует** `MCP_AUTH_TOKEN`, если заданы `OTASK_*` (иначе падает при старте).
+
+## 🤖 Промпты для агентов
+
+Скопируйте блок в чат агента.
+
+### Claude web → официальный URL
+
+```
+Подключи remote MCP сервер O!task:
+- URL: https://otask-mcp.<account>.workers.dev/mcp
+- Используй OAuth / Connect flow клиента
+- Default workspace/project задаются на форме логина Worker (или явными args tools)
+Не сохраняй мой пароль в файлы репозитория.
+```
+
+(Пока demo не выкатан — URL **TBD after first deploy**.)
+
+### Cursor → официальный URL
+
+```
+Добавь в MCP config Cursor remote server O!task:
+url: https://otask-mcp.<account>.workers.dev/mcp
+auth: oauth
+После connect проверь otask_me.
+```
+
+### Self-deploy Worker
+
+```
+Задеплой otask-mcp Worker из репозитория grigoreo-dev/otask-mcp:
+1) bun install; bun run build (из корня)
+2) packages/worker: wrangler kv namespace create OAUTH_KV
+3) wrangler deploy
+4) Дай мне URL /mcp и пропиши в MCP клиент с OAuth
+```
+
+### Docker passthrough
+
+```
+Подними otask-mcp HTTP passthrough в Docker без OTASK_* в env.
+Клиент шлёт Authorization: Bearer <O!task token>.
+PORT 3847. Проверь GET /health.
+```
+
+### stdio local
+
+```
+Установи @grigoreo-dev/otask-mcp, настрой stdio MCP с OTASK_EMAIL+OTASK_PASSWORD
+или OTASK_AUTH_KEY. Добавь в Claude Desktop / Cursor mcp servers.
+```
+
+### Gateway self-host
+
+```
+HTTP gateway: задай OTASK_* + MCP_AUTH_TOKEN.
+Клиент шлёт Bearer MCP_AUTH_TOKEN, не токен O!task.
+```
+
+## 🔧 Self-deploy Worker
+
+Пакет: `packages/worker` (не публикуется на npm). Подробнее: [`packages/worker/README.md`](./packages/worker/README.md).
+
+```bash
+# из корня репозитория
+bun install
+bun run build
+bun install --cwd packages/worker
+
+cd packages/worker
+bunx wrangler kv namespace create OAUTH_KV
+# вставьте id в wrangler.toml (binding OAUTH_KV)
+bunx wrangler deploy
+```
+
+- Endpoint MCP: `https://otask-mcp.<ваш-subdomain>.workers.dev/mcp`
+- OAuth: `/authorize`, `/oauth/token`, `/oauth/register`
+- **Не** задавайте `OTASK_*` в `[vars]` для multi-user публичного деплоя
+- CI (опционально): `.github/workflows/deploy-worker.yml` (`workflow_dispatch`); secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
+
+Rate limiting — в dashboard Cloudflare (см. worker README), не в коде v1.
 
 ## Переменные окружения
 
@@ -41,106 +212,65 @@ stdio требует `OTASK_*` (без них падает при старте).
 
 Default должен входить в allow-list, если list непустой (иначе сервер падает при старте).
 
+Remote Worker: user credentials **не** через эти env (OAuth-сессия).
+
 ## HTTP-заголовки
 
 | Заголовок | Режим | Назначение |
 |-----------|-------|------------|
 | `Authorization: Bearer …` | gateway | Должен совпадать с `MCP_AUTH_TOKEN` |
 | `Authorization: Bearer …` | passthrough | Токен O!task API; проксируется на каждый запрос к API |
+| `Authorization: Bearer …` | remote Worker | Access token OAuth-сессии MCP (после Connect) |
 | `X-Otask-Allowed-Projects` | **только passthrough** | Allow-list projects; в gateway — env |
 | `X-Otask-Allowed-Ws` | **только passthrough** | Allow-list workspaces |
 | `X-Otask-Default-Ws` | **passthrough** (override env) | Default workspace slug |
 | `X-Otask-Default-Project` | **passthrough** (override env) | Default project slug/id |
 
-## Эндпоинты (HTTP)
-
-| | |
-|---|---|
-| MCP | `POST`/`GET` `/mcp` (Streamable HTTP) |
-| Health | `GET /health` → `{ ok, mode, authMode, projectGuard, wsGuard, defaults }` (`"env" \| "header" \| "off"`) |
-
-Пример деплоя: `https://otask-mcp.grigoreo.dev/mcp` (порт `3847` в Docker).
-
 ## Примеры для n8n
 
-### Gateway (credentials O!task хранит сервер)
-
-Env сервера:
-
-```env
-OTASK_AUTH_KEY=...
-MCP_AUTH_TOKEN=super-secret-mcp-token
-OTASK_DEFAULT_WS=246cd090-27a2-4f00-b4d6-2018d4d7ffe1
-OTASK_DEFAULT_PROJECT=3156e838-b2b8-4537-8379-97131c22f60b
-OTASK_ALLOWED_WS=246cd090-27a2-4f00-b4d6-2018d4d7ffe1
-OTASK_ALLOWED_PROJECTS=3156e838-b2b8-4537-8379-97131c22f60b,35747
-```
-
-n8n **MCP Client Tool**:
+### Gateway
 
 - URL: `https://otask-mcp.example/mcp`
 - Transport: **HTTP Streamable**
-- Credential / header: `Authorization: Bearer super-secret-mcp-token`
-- **Не** отправляйте `X-Otask-*` allow/default headers (берутся из env сервера)
+- Credential / header: `Authorization: Bearer <MCP_AUTH_TOKEN>`
+- **Не** отправляйте `X-Otask-*` allow/default headers
 
-### Passthrough (токен O!task у клиента)
-
-Env сервера: без `OTASK_AUTH_KEY` / `OTASK_EMAIL` / `OTASK_PASSWORD`.
-
-n8n **MCP Client Tool**:
+### Passthrough
 
 - URL: `https://otask-mcp.example/mcp`
 - Transport: **HTTP Streamable**
-- Credential / header: `Authorization: Bearer <тот же токен, что и для api.otask.ru>`
-- Опционально: `X-Otask-Allowed-Projects`, `X-Otask-Allowed-Ws`, `X-Otask-Default-Ws`, `X-Otask-Default-Project`
-
-### Stdio (Cursor / OpenCode)
-
-```env
-OTASK_AUTH_KEY=...
-# или OTASK_EMAIL + OTASK_PASSWORD
-OTASK_DEFAULT_WS=...
-OTASK_DEFAULT_PROJECT=my-project
-OTASK_ALLOWED_WS=...
-OTASK_ALLOWED_PROJECTS=my-project
-```
-
-```bash
-bun start
-```
+- Credential / header: `Authorization: Bearer <токен api.otask.ru>`
+- Опционально: `X-Otask-Allowed-*`, `X-Otask-Default-*`
 
 ## Инструменты
 
-Регистрируются в `src/tools/registry.ts` (краткие intent для агентов):
+Регистрируются в `packages/core/src/tools/registry.ts`:
 
 | Инструмент | Назначение |
 |------------|------------|
 | `otask_me` | Текущий пользователь (id, имя, email, timezone) |
 | `otask_list_tasks` | Задачи воркспейса; по умолчанию `mine=true`; фильтры `performer_ids`, `project_ids`, `priority_ids`, `due`, `page` |
-| `otask_get_task` | Получить одну задачу по workspace + slug задачи (посмотреть поля перед обновлением) |
-| `otask_update_task` | Обновить существующую задачу (name, board, performers, tags, description, …) |
-| `otask_list_projects` | Список проектов воркспейса (с фильтром по allow-list, если задан) |
+| `otask_get_task` | Получить одну задачу по workspace + slug задачи |
+| `otask_update_task` | Обновить существующую задачу |
+| `otask_list_projects` | Список проектов воркспейса (с фильтром по allow-list) |
 | `otask_list_project_tasks` | Список задач в проекте |
-| `otask_list_board` | Список досок/колонок (статусов) проекта — узнать `board_id` / `board_column_id` |
-| `otask_list_members` | Список участников воркспейса (ID исполнителей для назначения) |
-| `otask_list_tags` | Список тегов воркспейса для меток |
-| `otask_list_comments` | Список комментариев к задаче |
-| `otask_add_comment` | Добавить комментарий (опционально `parent_id` для ответов) |
-| `otask_create_task` | Создать задачу (обязательно: `ws_slug`, `project_id`, `name`, `board_id`, `board_column_id`, `end_at`) |
-| `otask_move_task` | Переместить задачу в другую колонку доски (статус) |
+| `otask_list_board` | Доски/колонки (статусы) — `board_id` / `board_column_id` |
+| `otask_list_members` | Участники воркспейса |
+| `otask_list_tags` | Теги воркспейса |
+| `otask_list_comments` | Комментарии к задаче |
+| `otask_add_comment` | Добавить комментарий (`parent_id` для ответов) |
+| `otask_create_task` | Создать задачу (`name`, `board_id`, `board_column_id`, `end_at`, …) |
+| `otask_move_task` | Переместить задачу в другую колонку |
 | `otask_archive_task` | Архивировать задачу |
 
-Inbox (после настройки `OTASK_DEFAULT_WS`):
+Inbox (после `OTASK_DEFAULT_WS`):
 
 ```text
-# утренний inbox
 otask_me
 otask_list_tasks  # mine=true
 otask_list_tasks due=today
 otask_list_tasks due=overdue
 ```
-
-Если активен allow-list проектов, project-scoped инструменты проверяют членство (или фильтруют списки); пустой allow-list = доступны все проекты.
 
 ## Defaults и allow-list (ws + projects)
 
@@ -151,33 +281,26 @@ otask_list_tasks due=overdue
 | Limit workspaces | `OTASK_ALLOWED_WS` | `X-Otask-Allowed-Ws` |
 | Limit projects | `OTASK_ALLOWED_PROJECTS` | `X-Otask-Allowed-Projects` |
 
-Формат allow-list: значения через запятую (пробелы обрезаются). Projects: **slug** и/или **numeric id**. WS: только slug. Пусто = off.
-
-```env
-OTASK_DEFAULT_WS=246cd090-27a2-4f00-b4d6-2018d4d7ffe1
-OTASK_DEFAULT_PROJECT=3156e838-b2b8-4537-8379-97131c22f60b
-OTASK_ALLOWED_WS=246cd090-27a2-4f00-b4d6-2018d4d7ffe1
-OTASK_ALLOWED_PROJECTS=3156e838-b2b8-4537-8379-97131c22f60b,product-roadmap,42
-```
+Формат allow-list: значения через запятую. Projects: **slug** и/или **numeric id**. WS: только slug. Пусто = off.
 
 `otask_list_board` по умолчанию шлёт `type=status` (так требует O!task API).
 
 ## Снимок API-документации
 
-Пересобрать локальный каталог API из HTML-доки O!task (Scribe):
-
 ```bash
 bun run docs:parse
 ```
 
-Пишет в `docs/catalog/` с живой HTML-страницы доки (или `bun run docs:parse --file path` для офлайн HTML).
+Пишет в `docs/catalog/` (или `bun run docs:parse --file path` для офлайн HTML).
 
 ## Разработка
 
+Монорепо: `packages/core`, `packages/stdio`, `packages/http-node`, `packages/worker`.
+
 ```bash
 bun install
-bun run build          # tsc → dist/
-bun test               # bun test
+bun run build          # core → stdio → http-node
+bun test
 bun start              # stdio MCP
 bun run start:http     # Streamable HTTP MCP
 bun run dev            # stdio hot reload
@@ -186,12 +309,10 @@ bun run dev:http       # HTTP hot reload
 
 ### Добавление инструмента
 
-1. `src/services/api.ts` / `client.ts` — метод API при необходимости  
-2. `src/schemas/` — Zod input schema  
-3. `src/tools/my-tool.ts` — `createMyTool({ api, guard })` → `ToolDefinition`  
-4. `src/tools/registry.ts` — добавить factory в `toolFactories`  
-
-`server.ts` / `register.ts` править не нужно — регистрация централизована.
+1. `packages/core/src/services/api.ts` / `client.ts` — метод API при необходимости  
+2. `packages/core/src/schemas/` — Zod input schema  
+3. `packages/core/src/tools/my-tool.ts` — factory → `ToolDefinition`  
+4. `packages/core/src/tools/registry.ts` — добавить в `toolFactories`  
 
 ## Contributing
 

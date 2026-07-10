@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseOtaskDocsHtml } from "../src/docs/parser.ts";
+import { parseOtaskDocsHtml } from "../packages/core/src/docs/parser.ts";
 
 const args = process.argv.slice(2);
 const fileIdx = args.indexOf("--file");

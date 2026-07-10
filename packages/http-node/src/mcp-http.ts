@@ -2,7 +2,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import http from "node:http";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { createMcpServer } from "./server.js";
+import { createMcpServer } from "../../core/dist/server.js";
 import {
   authorizeHttpMcpRequest,
   createEnvAuthResolver,
@@ -10,8 +10,12 @@ import {
   extractBearerToken,
   getHttpAuthMode,
   validateHttpAuthConfig,
-} from "./services/auth.js";
-import { assertDefaultsAllowed, resolveHttpScope, scopeFromEnv } from "./services/scope.js";
+} from "../../core/dist/services/auth.js";
+import {
+  assertDefaultsAllowed,
+  resolveHttpScope,
+  scopeFromEnv,
+} from "../../core/dist/services/scope.js";
 
 function getPort(): number {
   const raw = process.env.PORT?.trim() || "3847";

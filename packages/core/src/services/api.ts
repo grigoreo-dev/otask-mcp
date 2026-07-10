@@ -28,6 +28,13 @@ async function parseResponse<T>(response: Response): Promise<T> {
   const body = await response.json().catch(() => ({}));
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new OtaskApiError(
+        "O!task authorization expired or rejected (401). Check OTASK_* credentials, the request Bearer token, or reconnect the remote MCP OAuth session.",
+        401,
+        body
+      );
+    }
     const detail =
       typeof body === "object" && body !== null && "message" in body
         ? String((body as { message: unknown }).message)
@@ -377,7 +384,10 @@ export function formatApiError(error: unknown): string {
     if (error.status === 404) {
       return `Error: Task or workspace not found. Check ws_slug and task_slug. ${error.message}`;
     }
-    if (error.status === 401 || error.status === 403) {
+    if (error.status === 401) {
+      return `Error: ${error.message}`;
+    }
+    if (error.status === 403) {
       return `Error: O!task auth failed. Check Bearer token. ${error.message}`;
     }
     if (error.status === 429) {

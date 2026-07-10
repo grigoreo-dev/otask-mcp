@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { createMcpServer } from "./server.js";
-import { createEnvAuthResolver, validateStdioAuthConfig } from "./services/auth.js";
-import { assertDefaultsAllowed, scopeFromEnv } from "./services/scope.js";
+import { createMcpServer } from "../../core/dist/server.js";
+import { createEnvAuthResolver, validateStdioAuthConfig } from "../../core/dist/services/auth.js";
+import { assertDefaultsAllowed, scopeFromEnv } from "../../core/dist/services/scope.js";
 
 async function main(): Promise<void> {
   try {
