@@ -107,8 +107,14 @@ export function createPassthroughAuthResolver(otaskBearer: string): OtaskAuthRes
   });
 }
 
-async function loginWithPassword(email: string, password: string): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+export async function loginOtaskWithPassword(
+  email: string,
+  password: string,
+  options?: { fetchImpl?: typeof fetch; apiBaseUrl?: string }
+): Promise<{ token: string; expiresInMinutes: number }> {
+  const fetchImpl = options?.fetchImpl ?? fetch;
+  const base = options?.apiBaseUrl ?? API_BASE_URL;
+  const response = await fetchImpl(`${base}/api/v1/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -127,13 +133,19 @@ async function loginWithPassword(email: string, password: string): Promise<strin
     throw new Error(`O!task login failed (${response.status}): ${detail}`);
   }
 
-  const expiresInMinutes = body.expires_in ?? 1_000_000;
-  cachedToken = {
+  return {
     token: body.token,
-    expiresAt: Date.now() + expiresInMinutes * 60 * 1000,
+    expiresInMinutes: body.expires_in ?? 1_000_000,
   };
+}
 
-  return body.token;
+async function loginWithPassword(email: string, password: string): Promise<string> {
+  const result = await loginOtaskWithPassword(email, password);
+  cachedToken = {
+    token: result.token,
+    expiresAt: Date.now() + result.expiresInMinutes * 60 * 1000,
+  };
+  return result.token;
 }
 
 async function getServerAuthToken(): Promise<string> {
