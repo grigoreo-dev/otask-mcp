@@ -95,13 +95,13 @@ bun install
 bun run build
 cd packages/worker
 bunx wrangler kv namespace create OAUTH_KV   # once; update wrangler.toml
-bunx wrangler secret put USER_ID_PEPPER      # once; required for /authorize
-bun run dev                                  # local: put USER_ID_PEPPER in .dev.vars
+bun run dev
 ```
 
-For `wrangler dev`, put the pepper in `packages/worker/.dev.vars` (gitignored):
+For `wrangler dev`, `USER_ID_PEPPER` comes from `packages/worker/.dev.vars`
+(gitignored) — **not** `wrangler secret put`, which targets the deployed Worker:
 
-```
+```dotenv
 USER_ID_PEPPER=local-dev-pepper
 ```
 
