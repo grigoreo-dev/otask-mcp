@@ -2,60 +2,98 @@
 
 Remote MCP endpoint (Streamable HTTP + OAuth) for O!task. Private package; not published to npm.
 
+## Deploy options (pick one)
+
+| Path | Needs long-lived CF API token? | Best for |
+|------|--------------------------------|----------|
+| **Local `wrangler`** | No — `wrangler login` (browser OAuth) | First deploy, solo |
+| **GitHub Actions** | **Yes** — repo secrets | Button deploy from CI |
+| **Cloudflare Workers Builds (Git)** | No — CF GitHub App in dashboard | Auto-deploy on push to `main` |
+
+### 1) Local (simplest first time)
+
+```bash
+# repo root
+bun install
+bunx wrangler login          # once per machine
+
+# create OAuth KV, paste printed id into packages/worker/wrangler.toml
+bun run worker:kv
+
+# edit packages/worker/wrangler.toml:
+#   id = "<from create>"
+#   preview_id = "<same or preview namespace>"
+
+bun run deploy:worker
+```
+
+URL: `https://otask-mcp.<account-subdomain>.workers.dev/mcp`
+
+### 2) GitHub Actions (current workflow)
+
+Workflow: [`.github/workflows/deploy-worker.yml`](../../.github/workflows/deploy-worker.yml) — **manual** `workflow_dispatch` only.
+
+**Yes, you need a key (API token):**
+
+| GitHub secret | What |
+|---------------|------|
+| `CLOUDFLARE_API_TOKEN` | [Create Token](https://dash.cloudflare.com/profile/api-tokens) → template **Edit Cloudflare Workers** (or custom: Account Workers Scripts Edit + Account Workers KV Storage Edit) |
+| `CLOUDFLARE_ACCOUNT_ID` | Dashboard right sidebar / Workers overview |
+
+Also: real KV `id` must already be in committed `wrangler.toml` (or Actions will fail on placeholder).
+
+Then: **Actions → Deploy Worker → Run workflow**.
+
+`publish.yml` (npm OIDC) is unrelated — no CF token there.
+
+### 3) Cloudflare Workers Builds (Git) — no GH secrets
+
+Dashboard → **Workers & Pages** → create/open worker **otask-mcp** → **Settings → Builds** → **Connect repository**.
+
+Suggested settings for this monorepo:
+
+| Field | Value |
+|-------|--------|
+| Repository | `grigoreo-dev/otask-mcp` |
+| Production branch | `main` |
+| Root directory | `/` (repo root) |
+| Build command | `bun install && bun run build` |
+| Deploy command | `bunx wrangler deploy --config packages/worker/wrangler.toml` |
+
+Or set root to `packages/worker` and build command:
+
+```bash
+cd ../.. && bun install && bun run build
+```
+
+deploy:
+
+```bash
+npx wrangler deploy
+```
+
+Still need a real `OAUTH_KV` id in `wrangler.toml` before first successful build.
+
+Optional: enable deploy on every push to `main`.
+
 ## Local development
 
 ```bash
-# from repo root
 bun install
 bun run build
-bun install --cwd packages/worker
-
-# create OAUTH_KV and paste id into wrangler.toml
 cd packages/worker
-bunx wrangler kv namespace create OAUTH_KV
+bunx wrangler kv namespace create OAUTH_KV   # once; update wrangler.toml
 bun run dev
 ```
 
-## Deploy (manual)
+## Rate limiting (dashboard, not code)
 
-### Local
+1. Dashboard → **Security** → Rate limiting / WAF.
+2. `/authorize` POST ≤ 10 / min / IP.
+3. `/mcp` ≤ 120 / min / IP (tune later).
+4. Free tier: WAF custom rule / Managed Challenge on authorize POST.
 
-```bash
-# from repo root first: bun run build
-cd packages/worker
-# replace REPLACE_* in wrangler.toml with real KV namespace ids from:
-#   bunx wrangler kv namespace create OAUTH_KV
-bunx wrangler deploy
-```
+## Notes
 
-Placeholder `id` / `preview_id` values in `wrangler.toml` are intentional until first deploy.
-Do not commit real account-specific KV ids if the repo is public and you prefer secrets elsewhere;
-for this project, pasting the namespace id into `wrangler.toml` after create is the documented path.
-
-### GitHub Actions
-
-Workflow: [`.github/workflows/deploy-worker.yml`](../../.github/workflows/deploy-worker.yml) (`workflow_dispatch` only).
-
-Required repository secrets:
-
-| Secret | Purpose |
-|--------|---------|
-| `CLOUDFLARE_API_TOKEN` | API token with Workers deploy permissions |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account id |
-
-Before first deploy: create `OAUTH_KV` and put the real id into committed `wrangler.toml` (or fork-local override).
-
-Run: **Actions → Deploy Worker → Run workflow**.
-
-`publish.yml` (npm OIDC on `v*` tags) is unchanged and independent of this workflow.
-
-## Rate limiting (dashboard config, not code)
-
-No captcha or in-worker rate limits in v1. Configure in Cloudflare:
-
-1. Dashboard → **Security** → **Rate limiting rules** (or WAF custom rules on free tier).
-2. **Rule A** — path `/authorize`, method `POST`: ≤ **10 requests / minute / IP**.
-3. **Rule B** — path `/mcp`: ≤ **120 requests / minute / IP** (tune under load).
-4. If classic Rate limiting is unavailable (e.g. free plan): use a **WAF custom rule** with rate limiting / challenge, or Managed Challenge on `/authorize` POST as a lighter alternative.
-
-Revisit thresholds after production traffic.
+- Public multi-user Worker: **no** `OTASK_*` / `MCP_AUTH_TOKEN` in `[vars]`.
+- Placeholder KV ids in git are intentional until first `worker:kv`.
