@@ -31,7 +31,7 @@ export const apiHandler = {
         {
           error: "Unauthorized: missing O!task session. Reconnect the MCP server.",
         },
-        { status: 401 },
+        { status: 401 }
       );
     }
     return createMcpHandler(server)(request, env, ctx);
