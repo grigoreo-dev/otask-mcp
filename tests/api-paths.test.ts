@@ -325,6 +325,22 @@ describe("api paths and envelopes", () => {
     ).rejects.toBeInstanceOf(OtaskApiError);
   });
 
+  test("401 maps to reconnect message", async () => {
+    mockFetchWithStatus(401, { message: "Unauthorized" });
+
+    const client = createOtaskClient(auth);
+    try {
+      await client.getMe();
+      expect.unreachable("expected OtaskApiError");
+    } catch (err) {
+      expect(err).toBeInstanceOf(OtaskApiError);
+      expect((err as OtaskApiError).status).toBe(401);
+      expect((err as OtaskApiError).message).toBe(
+        "O!task authorization expired or rejected (401). Reconnect the MCP server and sign in again."
+      );
+    }
+  });
+
   test("listProjects throws on unknown success envelope", async () => {
     mockJsonFetch(() => ({
       success: true,

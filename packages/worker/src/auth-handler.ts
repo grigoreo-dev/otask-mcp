@@ -1,6 +1,6 @@
 import { loginOtaskWithPassword } from "@grigoreo-dev/otask-mcp-core/services/auth.js";
-import type { OtaskSessionProps } from "./session-props.js";
 import { renderLoginPage } from "./login-page.js";
+import type { OtaskSessionProps } from "./session-props.js";
 
 export interface WorkerEnv {
   OAUTH_PROVIDER: {

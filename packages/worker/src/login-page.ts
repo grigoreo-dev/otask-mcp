@@ -1,11 +1,6 @@
-export function renderLoginPage(opts: {
-  query: string;
-  error?: string;
-}): Response {
+export function renderLoginPage(opts: { query: string; error?: string }): Response {
   const action = `/authorize?${opts.query}`;
-  const errorHtml = opts.error
-    ? `<p class="error" role="alert">${escapeHtml(opts.error)}</p>`
-    : "";
+  const errorHtml = opts.error ? `<p class="error" role="alert">${escapeHtml(opts.error)}</p>` : "";
 
   const html = `<!DOCTYPE html>
 <html lang="ru">
