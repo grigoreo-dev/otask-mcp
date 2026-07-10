@@ -1,6 +1,6 @@
 name = "otask-mcp"
 main = "src/index.ts"
-compatibility_date = "2025-03-10"
+compatibility_date = "2026-07-10"
 compatibility_flags = ["nodejs_compat"]
 
 [[kv_namespaces]]

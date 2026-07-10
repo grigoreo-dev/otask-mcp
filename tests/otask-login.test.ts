@@ -18,10 +18,15 @@ describe("loginOtaskWithPassword", () => {
   test("throws on non-ok without leaking password", async () => {
     const fetchImpl = async () =>
       new Response(JSON.stringify({ message: "bad creds" }), { status: 401 });
-    await expect(
-      loginOtaskWithPassword("a@b.c", "super-secret", {
+    let message = "";
+    try {
+      await loginOtaskWithPassword("a@b.c", "super-secret", {
         fetchImpl: fetchImpl as typeof fetch,
-      })
-    ).rejects.toThrow(/login failed/);
+      });
+    } catch (err) {
+      message = err instanceof Error ? err.message : String(err);
+    }
+    expect(message).toMatch(/login failed/);
+    expect(message).not.toContain("super-secret");
   });
 });

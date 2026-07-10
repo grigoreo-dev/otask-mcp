@@ -30,7 +30,7 @@ async function parseResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     if (response.status === 401) {
       throw new OtaskApiError(
-        "O!task authorization expired or rejected (401). Reconnect the MCP server and sign in again.",
+        "O!task authorization expired or rejected (401). Check OTASK_* credentials, the request Bearer token, or reconnect the remote MCP OAuth session.",
         401,
         body
       );

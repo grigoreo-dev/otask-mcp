@@ -23,8 +23,14 @@ bun run dev
 ```bash
 # from repo root first: bun run build
 cd packages/worker
+# replace REPLACE_* in wrangler.toml with real KV namespace ids from:
+#   bunx wrangler kv namespace create OAUTH_KV
 bunx wrangler deploy
 ```
+
+Placeholder `id` / `preview_id` values in `wrangler.toml` are intentional until first deploy.
+Do not commit real account-specific KV ids if the repo is public and you prefer secrets elsewhere;
+for this project, pasting the namespace id into `wrangler.toml` after create is the documented path.
 
 ### GitHub Actions
 
@@ -36,6 +42,8 @@ Required repository secrets:
 |--------|---------|
 | `CLOUDFLARE_API_TOKEN` | API token with Workers deploy permissions |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account id |
+
+Before first deploy: create `OAUTH_KV` and put the real id into committed `wrangler.toml` (or fork-local override).
 
 Run: **Actions → Deploy Worker → Run workflow**.
 

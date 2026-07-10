@@ -28,8 +28,8 @@
   "scripts": {
     "start": "bun run packages/stdio/dist/index.js",
     "start:http": "bun run packages/http-node/dist/mcp-http.js",
-    "dev": "bun --watch packages/stdio/src/index.ts",
-    "dev:http": "bun --watch packages/http-node/src/mcp-http.ts",
+    "dev": "bun run --filter @grigoreo-dev/otask-mcp-core build && bun --watch packages/stdio/src/index.ts",
+    "dev:http": "bun run --filter @grigoreo-dev/otask-mcp-core build && bun --watch packages/http-node/src/mcp-http.ts",
     "build": "bun run --filter @grigoreo-dev/otask-mcp-core build && bun run --filter @grigoreo-dev/otask-mcp-stdio build && bun run --filter @grigoreo-dev/otask-mcp-http build",
     "clean": "rm -rf packages/core/dist packages/stdio/dist packages/http-node/dist",
     "test": "bun test",

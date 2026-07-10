@@ -19,6 +19,8 @@ describe("renderLoginPage", () => {
     expect(html).not.toMatch(/sk-[a-zA-Z0-9]{10,}/);
     expect(html).not.toContain("OTASK_PASSWORD");
     expect(html).not.toContain("password_value");
+    expect(html).not.toContain("cdn.tailwindcss.com");
+    expect(html).not.toMatch(/<script[\s>]/i);
   });
 
   test("shows error message when provided", async () => {

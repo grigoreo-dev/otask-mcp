@@ -336,7 +336,7 @@ describe("api paths and envelopes", () => {
       expect(err).toBeInstanceOf(OtaskApiError);
       expect((err as OtaskApiError).status).toBe(401);
       expect((err as OtaskApiError).message).toBe(
-        "O!task authorization expired or rejected (401). Reconnect the MCP server and sign in again."
+        "O!task authorization expired or rejected (401). Check OTASK_* credentials, the request Bearer token, or reconnect the remote MCP OAuth session."
       );
     }
   });

@@ -1,21 +1,10 @@
+import type { OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 import { loginOtaskWithPassword } from "@grigoreo-dev/otask-mcp-core/services/auth.js";
 import { renderLoginPage } from "./login-page.js";
 import type { OtaskSessionProps } from "./session-props.js";
 
 export interface WorkerEnv {
-  OAUTH_PROVIDER: {
-    parseAuthRequest(request: Request): Promise<{
-      scope: string[];
-      [key: string]: unknown;
-    }>;
-    completeAuthorization(options: {
-      request: unknown;
-      userId: string;
-      metadata: unknown;
-      scope: string[];
-      props: OtaskSessionProps;
-    }): Promise<{ redirectTo: string }>;
-  };
+  OAUTH_PROVIDER: OAuthHelpers;
 }
 
 export const AuthHandler = {
@@ -26,8 +15,17 @@ export const AuthHandler = {
     }
 
     const provider = env.OAUTH_PROVIDER;
-    const oauthReq = await provider.parseAuthRequest(request);
     const query = url.searchParams.toString();
+
+    let oauthReq: Awaited<ReturnType<OAuthHelpers["parseAuthRequest"]>>;
+    try {
+      oauthReq = await provider.parseAuthRequest(request);
+    } catch {
+      return renderLoginPage({
+        query,
+        error: "Некорректный OAuth-запрос. Откройте подключение MCP снова из клиента.",
+      });
+    }
 
     if (request.method === "GET") {
       return renderLoginPage({ query });
@@ -71,6 +69,7 @@ export const AuthHandler = {
       allowedProjects,
     };
 
+    // Single full MCP access for this connector; grant requested scopes as-is (usually empty/MCP defaults).
     const { redirectTo } = await provider.completeAuthorization({
       request: oauthReq,
       userId: email.toLowerCase(),
