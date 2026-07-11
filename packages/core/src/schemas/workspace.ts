@@ -23,10 +23,35 @@ export const ProjectSlugSchema = WsSlugSchema.extend({
 export type ProjectSlugInput = z.infer<typeof ProjectSlugSchema>;
 
 export const ListProjectTasksInputSchema = ProjectSlugSchema.extend({
-  page: z.number().int().optional().describe("Page number for pagination"),
-  status_id: z.number().int().optional().describe("Filter by status id"),
-  board_id: z.number().int().optional().describe("Filter by board id"),
-  board_column_id: z.number().int().optional().describe("Filter by board column id"),
+  page: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe("Page number for legacy task_list mode when active_only=false"),
+  status_id: z
+    .number()
+    .int()
+    .optional()
+    .describe("Legacy/internal O!task status id; project task endpoint may ignore this"),
+  board_id: z
+    .number()
+    .int()
+    .optional()
+    .describe("Client-side board filter in active board snapshot mode"),
+  board_column_id: z
+    .number()
+    .int()
+    .optional()
+    .describe("Client-side column filter in active board snapshot mode"),
+  active_only: z
+    .boolean()
+    .optional()
+    .describe("Default true. Use board snapshot and exclude columns where type=completed."),
+  detail: z
+    .enum(["compact", "full"])
+    .optional()
+    .describe("compact (default): omit HTML description; full: include description"),
 }).strict();
 
 export type ListProjectTasksInput = z.infer<typeof ListProjectTasksInputSchema>;

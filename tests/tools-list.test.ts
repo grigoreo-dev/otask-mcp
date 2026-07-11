@@ -61,7 +61,7 @@ function mockApi(partial: Partial<OtaskClient> = {}): OtaskClient {
       tasks: [],
       meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 },
     })),
-    listBoard: mock(async () => ({ boards: [], columns: [] })),
+    listBoard: mock(async () => ({ boards: [], columns: [], tasks: [] })),
     listMembers: mock(async () => []),
     listTags: mock(async () => []),
     listComments: mock(async () => ({})),
@@ -79,8 +79,12 @@ function emptyScope(projectAllow = ""): ScopeContext {
   };
 }
 
-function deps(apiPartial: Partial<OtaskClient> = {}, allowList = ""): ToolDeps {
-  const scope = emptyScope(allowList);
+function deps(
+  apiPartial: Partial<OtaskClient> = {},
+  allowList = "",
+  scopeOverrides: Partial<ScopeContext> = {}
+): ToolDeps {
+  const scope = { ...emptyScope(allowList), ...scopeOverrides };
   return {
     api: mockApi(apiPartial),
     guard: scope.projectGuard,
@@ -136,6 +140,116 @@ describe("otask_list_projects", () => {
 });
 
 describe("otask_list_project_tasks", () => {
+  test("otask_list_project_tasks defaults to active board snapshot and excludes completed", async () => {
+    const listBoard = mock(async () => ({
+      boards: [{ id: 44237, name: "Поиск Патентов" }],
+      columns: [
+        { id: 230273, name: "Сделать", board_id: 44237, type: "new", tasks_count: 2 },
+        { id: 230276, name: "Завершено", board_id: 44237, type: "completed", tasks_count: 225 },
+      ],
+      tasks: [
+        sampleTask({
+          id: 1,
+          name: "Active",
+          project_id: 5,
+          board_id: 44237,
+          board_column_id: 230273,
+          description: "<p>hidden</p>",
+        }),
+        sampleTask({
+          id: 2,
+          name: "Done",
+          project_id: 5,
+          board_id: 44237,
+          board_column_id: 230276,
+          description: "<p>hidden</p>",
+        }),
+      ],
+    }));
+    const d = deps(
+      {
+        listProjects: mock(async () => [{ id: 5, slug: "proj", name: "Proj" }]),
+        listBoard,
+      },
+      "",
+      { defaultWs: "ws-main", defaultProject: "proj" }
+    );
+    const tool = createListProjectTasksTool(d);
+
+    const result = await tool.handler({});
+    expect(result.isError).toBeUndefined();
+    const payload = parseContent(result) as {
+      summary: string;
+      items: Array<Record<string, unknown>>;
+      meta: Record<string, unknown>;
+    };
+
+    expect(listBoard).toHaveBeenCalledWith(
+      expect.any(String),
+      "proj",
+      expect.objectContaining({
+        type: "status",
+        field_id: "_0",
+        separate_subtasks: 1,
+      })
+    );
+    expect(payload.summary).toContain("1 active task(s)");
+    expect(payload.summary).toContain("excluded 225 completed");
+    expect(payload.items).toHaveLength(1);
+    expect(payload.items[0]).toMatchObject({
+      id: 1,
+      name: "Active",
+      column_name: "Сделать",
+      column_type: "new",
+      is_completed: false,
+    });
+    expect(payload.items[0]).not.toHaveProperty("description");
+    expect(payload.meta).toMatchObject({
+      source: "board_snapshot",
+      completed_column_ids: [230276],
+      excluded_completed_count: 225,
+    });
+  });
+
+  test("otask_list_project_tasks active_only=false uses legacy task list", async () => {
+    const listProjectTasks = mock(async () => ({
+      tasks: [
+        sampleTask({
+          id: 2,
+          name: "Done",
+          project_id: 5,
+          board_column_id: 230276,
+          description: "<p>hidden</p>",
+        }),
+      ],
+      meta: { current_page: 1, total: 248 },
+    }));
+    const d = deps(
+      {
+        listProjects: mock(async () => [{ id: 5, slug: "proj", name: "Proj" }]),
+        listProjectTasks,
+      },
+      "",
+      { defaultWs: "ws-main", defaultProject: "proj" }
+    );
+    const tool = createListProjectTasksTool(d);
+
+    const result = await tool.handler({ active_only: false, page: 1 });
+    expect(result.isError).toBeUndefined();
+    const payload = parseContent(result) as {
+      items: Array<Record<string, unknown>>;
+      meta: Record<string, unknown>;
+    };
+
+    expect(listProjectTasks).toHaveBeenCalledWith(expect.any(String), "proj", { page: 1 });
+    expect(payload.items).toHaveLength(1);
+    expect(payload.items[0]).not.toHaveProperty("description");
+    expect(payload.meta).toMatchObject({
+      source: "task_list",
+      includes_completed: true,
+    });
+  });
+
   test("asserts project slug then returns compact tasks", async () => {
     const d = deps(
       {
@@ -153,6 +267,7 @@ describe("otask_list_project_tasks", () => {
     const result = await tool.handler({
       ws_slug: "ws-1",
       project_slug: "proj-a",
+      active_only: false,
     });
     expect(result.isError).toBeUndefined();
     const body = parseContent(result) as {
@@ -199,6 +314,7 @@ describe("otask_list_project_tasks", () => {
     const result = await tool.handler({
       ws_slug: "ws-1",
       project_slug: "proj-by-id",
+      active_only: false,
     });
     expect(result.isError).toBeUndefined();
     const body = parseContent(result) as { items: unknown[] };
@@ -219,6 +335,7 @@ describe("otask_list_project_tasks", () => {
     await tool.handler({
       ws_slug: "ws-1",
       project_slug: "proj-a",
+      active_only: false,
       page: 2,
       status_id: 7,
     });
