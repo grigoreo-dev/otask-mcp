@@ -1,5 +1,6 @@
 import type {
   CreateTaskBody,
+  ListBoardQuery,
   ListBoardResult,
   ListProjectTasksResult,
   ListWorkspaceTasksQuery,
@@ -41,11 +42,7 @@ export interface OtaskClient {
     wsSlug: string,
     query?: ListWorkspaceTasksQuery
   ): Promise<ListWorkspaceTasksResult>;
-  listBoard(
-    wsSlug: string,
-    projectSlug: string,
-    query?: { type?: string; board_slug?: string }
-  ): Promise<ListBoardResult>;
+  listBoard(wsSlug: string, projectSlug: string, query?: ListBoardQuery): Promise<ListBoardResult>;
   listMembers(wsSlug: string): Promise<unknown[]>;
   listTags(wsSlug: string): Promise<unknown[]>;
   listComments(wsSlug: string, taskSlug: string, body?: object): Promise<unknown>;

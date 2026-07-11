@@ -165,6 +165,53 @@ describe("api paths and envelopes", () => {
     expect(board.columns).toEqual([{ id: 2 }]);
   });
 
+  test("listBoard preserves board snapshot tasks and encodes UI query fields", async () => {
+    let calledUrl = "";
+    mockJsonFetch((url) => {
+      calledUrl = url;
+      return {
+        success: true,
+        data: {
+          boards: [{ id: 44237, name: "Поиск Патентов" }],
+          columns: [{ id: 230276, name: "Завершено", type: "completed", tasks_count: 225 }],
+          tasks: [
+            {
+              id: 1,
+              slug: "task",
+              name: "Done",
+              project_id: 5,
+              board_id: 44237,
+              board_column_id: 230276,
+              priority_id: 0,
+              status_id: 100,
+              description: "",
+              end_at: null,
+            },
+          ],
+          options: { any: true },
+          default_board: { id: 44237 },
+        },
+      };
+    });
+
+    const client = createOtaskClient(auth);
+    const result = await client.listBoard("ws", "proj", {
+      type: "status",
+      date: "2026-07-11T15:34:41+03:00",
+      field_id: "_0",
+      separate_subtasks: 1,
+    });
+
+    expect(calledUrl).toContain(`${API_BASE_URL}/api/v1/ws/ws/projects/proj/boards?`);
+    expect(calledUrl).toContain("type=status");
+    expect(calledUrl).toContain("field_id=_0");
+    expect(calledUrl).toContain("separate_subtasks=1");
+    expect(result.tasks).toHaveLength(1);
+    expect(result.columns[0]).toMatchObject({ type: "completed", tasks_count: 225 });
+    expect(result.options).toEqual({ any: true });
+    expect(result.default_board).toEqual({ id: 44237 });
+  });
+
   test("listMembers and listTags use correct paths", async () => {
     const urls: string[] = [];
     mockJsonFetch((url) => {

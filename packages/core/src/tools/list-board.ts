@@ -19,7 +19,7 @@ Args:
   - type: defaults to "status"
   - board_slug: optional specific board
 
-Returns compact boards and columns (id, name, slug?, color?, board_id?).
+Returns compact boards and columns (id, name, slug?, color?, board_id?, type?, is_system?, tasks_count?). Column type=completed marks done columns used by active task filters.
 
 Docs: https://api.otask.ru/docs`,
       inputSchema: ListBoardInputSchema,
@@ -50,6 +50,9 @@ Docs: https://api.otask.ru/docs`,
               slug?: string;
               color?: string;
               board_id?: number;
+              type?: string | null;
+              is_system?: boolean;
+              tasks_count?: number;
             }
           )
         );

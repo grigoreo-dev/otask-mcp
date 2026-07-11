@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { agentListResult } from "../packages/core/src/services/format.ts";
 import {
   buildUpdateBodyFromTask,
+  compactColumn,
   compactMember,
   compactProject,
   compactTask,
@@ -107,6 +108,79 @@ describe("compactTask", () => {
     expect(out.tags).toEqual([]);
     expect(out.subtasks_count).toBe(0);
   });
+
+  test("compactTask preserves description by default and in full detail", () => {
+    const task = sampleTask({ description: "<p>large html</p>" });
+
+    expect(compactTask(task)).toMatchObject({ description: "<p>large html</p>" });
+    expect(compactTask(task, { detail: "full" })).toMatchObject({
+      description: "<p>large html</p>",
+    });
+  });
+
+  test("compactTask omits description only in compact detail", () => {
+    const task = sampleTask({ description: "<p>large html</p>" });
+
+    expect(compactTask(task, { detail: "compact" })).not.toHaveProperty("description");
+  });
+
+  test("compactTask enriches task with column metadata", () => {
+    const task = sampleTask({ board_column_id: 230276, task_number: 693 });
+
+    expect(
+      compactTask(task, {
+        column: {
+          id: 230276,
+          name: "Завершено",
+          type: "completed",
+          tasks_count: 225,
+        },
+      })
+    ).toMatchObject({
+      task_number: 693,
+      column_name: "Завершено",
+      column_type: "completed",
+      is_completed: true,
+    });
+  });
+
+  test("compactTask column enrichment with non-completed type", () => {
+    const task = sampleTask({ board_column_id: 100 });
+
+    const out = compactTask(task, {
+      column: {
+        id: 100,
+        name: "В работе",
+        type: "active",
+        tasks_count: 10,
+      },
+    });
+
+    expect(out).toMatchObject({
+      column_name: "В работе",
+      column_type: "active",
+      is_completed: false,
+    });
+  });
+
+  test("compactTask marks completed via name fallback when type is null", () => {
+    const task = sampleTask({ board_column_id: 200 });
+
+    const out = compactTask(task, {
+      column: {
+        id: 200,
+        name: "Готово",
+        type: null,
+        tasks_count: 5,
+      },
+    });
+
+    expect(out).toMatchObject({
+      column_name: "Готово",
+      column_type: null,
+      is_completed: true,
+    });
+  });
 });
 
 describe("compactProject", () => {
@@ -125,6 +199,30 @@ describe("compactProject", () => {
       status_id: 2,
     });
     expect(out).not.toHaveProperty("extra");
+  });
+});
+
+describe("compactColumn", () => {
+  test("compactColumn keeps board metadata used by UI completed detection", () => {
+    expect(
+      compactColumn({
+        id: 230276,
+        name: "Завершено",
+        color: "#1DB464",
+        board_id: 44237,
+        type: "completed",
+        is_system: true,
+        tasks_count: 225,
+      })
+    ).toEqual({
+      id: 230276,
+      name: "Завершено",
+      color: "#1DB464",
+      board_id: 44237,
+      type: "completed",
+      is_system: true,
+      tasks_count: 225,
+    });
   });
 });
 
