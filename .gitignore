@@ -11,3 +11,5 @@ opencode.jsonc
 
 .worktrees/
 .codegraph/
+.private-journal/
+.superpowers/
