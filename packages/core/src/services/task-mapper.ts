@@ -1,4 +1,5 @@
 import type { OtaskSubtask, OtaskTask, UpdateTaskBody } from "../types.js";
+import { isCompletedColumn } from "./board-snapshot.js";
 
 export interface CompactTask {
   id: number;
@@ -169,7 +170,7 @@ export function compactTask(task: OtaskTask, options: CompactTaskOptions = {}): 
   if (options.column) {
     out.column_name = options.column.name;
     if (options.column.type !== undefined) out.column_type = options.column.type;
-    out.is_completed = options.column.type === "completed";
+    out.is_completed = isCompletedColumn(options.column);
   }
 
   if (typeof task.comments_count === "number") {

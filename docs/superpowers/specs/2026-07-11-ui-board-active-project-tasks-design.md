@@ -110,7 +110,7 @@ List result keeps the existing agent list envelope:
     "completed_column_ids": [230276],
     "excluded_completed_count": 225,
     "tasks_in_snapshot": 53,
-    "active_column_count": 33
+    "active_tasks_count": 33
   }
 }
 ```

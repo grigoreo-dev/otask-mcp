@@ -846,7 +846,7 @@ if (activeOnly) {
       completed_column_ids: [...completedColumnIds],
       excluded_completed_count: excludedCompletedCount,
       tasks_in_snapshot: snapshot.tasks.length,
-      active_column_count: columns
+      active_tasks_count: columns
         .filter((column) => !completedColumnIds.has(column.id))
         .reduce((sum, column) => sum + (column.tasks_count ?? 0), 0),
     },

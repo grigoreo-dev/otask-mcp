@@ -162,6 +162,25 @@ describe("compactTask", () => {
       is_completed: false,
     });
   });
+
+  test("compactTask marks completed via name fallback when type is null", () => {
+    const task = sampleTask({ board_column_id: 200 });
+
+    const out = compactTask(task, {
+      column: {
+        id: 200,
+        name: "Готово",
+        type: null,
+        tasks_count: 5,
+      },
+    });
+
+    expect(out).toMatchObject({
+      column_name: "Готово",
+      column_type: null,
+      is_completed: true,
+    });
+  });
 });
 
 describe("compactProject", () => {
