@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { agentListResult } from "../packages/core/src/services/format.ts";
 import {
   buildUpdateBodyFromTask,
+  compactColumn,
   compactMember,
   compactProject,
   compactTask,
@@ -125,6 +126,30 @@ describe("compactProject", () => {
       status_id: 2,
     });
     expect(out).not.toHaveProperty("extra");
+  });
+});
+
+describe("compactColumn", () => {
+  test("compactColumn keeps board metadata used by UI completed detection", () => {
+    expect(
+      compactColumn({
+        id: 230276,
+        name: "Завершено",
+        color: "#1DB464",
+        board_id: 44237,
+        type: "completed",
+        is_system: true,
+        tasks_count: 225,
+      })
+    ).toEqual({
+      id: 230276,
+      name: "Завершено",
+      color: "#1DB464",
+      board_id: 44237,
+      type: "completed",
+      is_system: true,
+      tasks_count: 225,
+    });
   });
 });
 

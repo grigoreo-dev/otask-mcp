@@ -45,6 +45,9 @@ export interface CompactColumn {
   slug?: string;
   color?: string;
   board_id?: number;
+  type?: string | null;
+  is_system?: boolean;
+  tasks_count?: number;
 }
 
 export interface CompactTag {
@@ -226,11 +229,17 @@ export function compactColumn(c: {
   slug?: string;
   color?: string;
   board_id?: number;
+  type?: string | null;
+  is_system?: boolean;
+  tasks_count?: number;
 }): CompactColumn {
   const out: CompactColumn = { id: c.id, name: c.name };
   if (c.slug !== undefined) out.slug = c.slug;
   if (c.color !== undefined) out.color = c.color;
   if (c.board_id !== undefined) out.board_id = c.board_id;
+  if (c.type !== undefined) out.type = c.type;
+  if (c.is_system !== undefined) out.is_system = c.is_system;
+  if (c.tasks_count !== undefined) out.tasks_count = c.tasks_count;
   return out;
 }
 

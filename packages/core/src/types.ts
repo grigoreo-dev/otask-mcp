@@ -109,7 +109,18 @@ export interface ListWorkspaceTasksResult {
   };
 }
 
+export interface ListBoardQuery {
+  type?: string;
+  board_slug?: string;
+  date?: string;
+  field_id?: string;
+  separate_subtasks?: number;
+}
+
 export interface ListBoardResult {
   boards: unknown[];
   columns: unknown[];
+  tasks: OtaskTask[];
+  options?: unknown;
+  default_board?: unknown;
 }

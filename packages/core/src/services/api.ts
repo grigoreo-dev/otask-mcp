@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "../constants.js";
 import type {
   CreateTaskBody,
+  ListBoardQuery,
   ListBoardResult,
   ListProjectTasksResult,
   ListWorkspaceTasksQuery,
@@ -246,7 +247,7 @@ export async function listProjectTasks(
 export async function listBoard(
   wsSlug: string,
   projectSlug: string,
-  query: { type?: string; board_slug?: string } | undefined,
+  query: ListBoardQuery | undefined,
   auth: OtaskAuthResolver
 ): Promise<ListBoardResult> {
   const headers = await headersFor(auth);
@@ -273,6 +274,9 @@ export async function listBoard(
   return {
     boards: hasBoards ? (obj!.boards as unknown[]) : [],
     columns: hasColumns ? (obj!.columns as unknown[]) : [],
+    tasks: obj !== null && Array.isArray(obj.tasks) ? (obj.tasks as OtaskTask[]) : [],
+    options: obj?.options,
+    default_board: obj?.default_board,
   };
 }
 
