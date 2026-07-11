@@ -267,8 +267,8 @@ Remote Worker: user credentials **не** через эти env (OAuth-сесси
 | `otask_get_task` | Получить одну задачу по workspace + slug задачи |
 | `otask_update_task` | Обновить существующую задачу |
 | `otask_list_projects` | Список проектов воркспейса (с фильтром по allow-list) |
-| `otask_list_project_tasks` | Список задач в проекте |
-| `otask_list_board` | Доски/колонки (статусы) — `board_id` / `board_column_id` |
+| `otask_list_project_tasks` | Задачи проекта: по умолчанию активные задачи из UI board snapshot; `active_only=false` для полного legacy-списка |
+| `otask_list_board` | Доски/колонки (статусы) с `type`, `is_system`, `tasks_count`; `type=completed` помечает завершённую колонку |
 | `otask_list_members` | Участники воркспейса |
 | `otask_list_tags` | Теги воркспейса |
 | `otask_list_comments` | Комментарии к задаче |

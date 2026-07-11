@@ -371,6 +371,15 @@ describe("otask_list_board", () => {
               pivot: { x: 1 },
               localtz: "UTC",
             },
+            {
+              id: 230276,
+              name: "Завершено",
+              color: "#1DB464",
+              board_id: 44237,
+              type: "completed",
+              is_system: true,
+              tasks_count: 225,
+            },
           ],
         })),
       },
@@ -389,7 +398,18 @@ describe("otask_list_board", () => {
       next: null;
     };
     expect(body.boards).toEqual([{ id: 1, name: "Main", slug: "main", color: "#fff" }]);
-    expect(body.columns).toEqual([{ id: 10, name: "Todo", slug: "todo", board_id: 1 }]);
+    expect(body.columns).toEqual([
+      { id: 10, name: "Todo", slug: "todo", board_id: 1 },
+      {
+        id: 230276,
+        name: "Завершено",
+        color: "#1DB464",
+        board_id: 44237,
+        type: "completed",
+        is_system: true,
+        tasks_count: 225,
+      },
+    ]);
     expect(body.boards[0]).not.toHaveProperty("pivot");
     expect(body.boards[0]).not.toHaveProperty("localtz");
     expect(body.columns[0]).not.toHaveProperty("pivot");
