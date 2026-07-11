@@ -11,11 +11,20 @@ export interface CompactTask {
   board_id: number;
   board_column_id: number;
   status_id?: number;
+  task_number?: number;
+  column_name?: string;
+  column_type?: string | null;
+  is_completed?: boolean;
   performers: Array<{ id: string; name?: string }>;
   tags: Array<{ id: string; name?: string }>;
   comments_count?: number;
   subtasks_count?: number;
   project?: { id: number; name: string };
+}
+
+export interface CompactTaskOptions {
+  detail?: "compact" | "full";
+  column?: CompactColumn;
 }
 
 export interface CompactProject {
@@ -133,12 +142,11 @@ export function buildUpdateBodyFromTask(
   return { ...base, ...overrides };
 }
 
-export function compactTask(task: OtaskTask): CompactTask {
+export function compactTask(task: OtaskTask, options: CompactTaskOptions = {}): CompactTask {
   const out: CompactTask = {
     id: task.id,
     slug: task.slug,
     name: task.name,
-    description: task.description,
     end_at: task.end_at,
     priority_id: task.priority_id,
     project_id: task.project_id,
@@ -149,6 +157,20 @@ export function compactTask(task: OtaskTask): CompactTask {
     tags: compactRefs(task.tags),
     subtasks_count: Array.isArray(task.subtasks) ? task.subtasks.length : 0,
   };
+
+  if (options.detail !== "compact") {
+    out.description = task.description;
+  }
+
+  if (typeof task.task_number === "number") {
+    out.task_number = task.task_number;
+  }
+
+  if (options.column) {
+    out.column_name = options.column.name;
+    if (options.column.type !== undefined) out.column_type = options.column.type;
+    out.is_completed = options.column.type === "completed";
+  }
 
   if (typeof task.comments_count === "number") {
     out.comments_count = task.comments_count;
