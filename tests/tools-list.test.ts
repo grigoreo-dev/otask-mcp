@@ -211,6 +211,64 @@ describe("otask_list_project_tasks", () => {
     });
   });
 
+  test("otask_list_project_tasks scopes snapshot meta counts to board filters", async () => {
+    const listBoard = mock(async () => ({
+      boards: [
+        { id: 100, name: "Board A" },
+        { id: 200, name: "Board B" },
+      ],
+      columns: [
+        { id: 1001, name: "Сделать", board_id: 100, type: "new", tasks_count: 2 },
+        { id: 1002, name: "Завершено", board_id: 100, type: "completed", tasks_count: 10 },
+        { id: 2001, name: "Сделать", board_id: 200, type: "new", tasks_count: 5 },
+        { id: 2002, name: "Завершено", board_id: 200, type: "completed", tasks_count: 40 },
+      ],
+      tasks: [
+        sampleTask({ id: 1, name: "A active", board_id: 100, board_column_id: 1001 }),
+        sampleTask({ id: 2, name: "A done", board_id: 100, board_column_id: 1002 }),
+        sampleTask({ id: 3, name: "B active", board_id: 200, board_column_id: 2001 }),
+        sampleTask({ id: 4, name: "B done", board_id: 200, board_column_id: 2002 }),
+      ],
+    }));
+    const d = deps(
+      {
+        listProjects: mock(async () => [{ id: 5, slug: "proj", name: "Proj" }]),
+        listBoard,
+      },
+      "",
+      { defaultWs: "ws-main", defaultProject: "proj" }
+    );
+    const tool = createListProjectTasksTool(d);
+
+    const byBoard = parseContent(await tool.handler({ board_id: 100 })) as {
+      summary: string;
+      items: Array<Record<string, unknown>>;
+      meta: Record<string, unknown>;
+    };
+    expect(byBoard.items).toHaveLength(1);
+    expect(byBoard.items[0]).toMatchObject({ id: 1, name: "A active" });
+    expect(byBoard.summary).toContain("excluded 10 completed");
+    expect(byBoard.meta).toMatchObject({
+      completed_column_ids: [1002],
+      excluded_completed_count: 10,
+      active_tasks_count: 2,
+    });
+
+    const byColumn = parseContent(await tool.handler({ board_column_id: 2001 })) as {
+      summary: string;
+      items: Array<Record<string, unknown>>;
+      meta: Record<string, unknown>;
+    };
+    expect(byColumn.items).toHaveLength(1);
+    expect(byColumn.items[0]).toMatchObject({ id: 3, name: "B active" });
+    expect(byColumn.summary).toContain("excluded 0 completed");
+    expect(byColumn.meta).toMatchObject({
+      completed_column_ids: [],
+      excluded_completed_count: 0,
+      active_tasks_count: 5,
+    });
+  });
+
   test("otask_list_project_tasks active_only=false uses legacy task list", async () => {
     const listProjectTasks = mock(async () => ({
       tasks: [

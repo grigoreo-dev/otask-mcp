@@ -58,7 +58,22 @@ Docs: https://api.otask.ru/docs`,
           const columns = flattenBoardColumns(snapshot.columns);
           const columnMap = buildColumnMap(columns);
           const completedColumnIds = getCompletedColumnIds(columns);
-          const excludedCompletedCount = sumColumnTaskCounts(columns, completedColumnIds);
+          // Scope meta/summary counts to the same board_id / board_column_id
+          // filters applied to items. Task filtering keeps the snapshot-wide
+          // completed set: a column may lack board_id metadata and fall out of
+          // scopedColumns even though its tasks pass the input filters.
+          const scopedColumns = columns.filter((column) => {
+            if (input.board_id !== undefined && column.board_id !== input.board_id) return false;
+            if (input.board_column_id !== undefined && column.id !== input.board_column_id) {
+              return false;
+            }
+            return true;
+          });
+          const scopedCompletedColumnIds = getCompletedColumnIds(scopedColumns);
+          const excludedCompletedCount = sumColumnTaskCounts(
+            scopedColumns,
+            scopedCompletedColumnIds
+          );
 
           const tasks = snapshot.tasks.filter((task) => {
             if (input.board_id !== undefined && task.board_id !== input.board_id) return false;
@@ -89,11 +104,11 @@ Docs: https://api.otask.ru/docs`,
             meta: {
               source: "board_snapshot",
               filters_applied: filters,
-              completed_column_ids: [...completedColumnIds],
+              completed_column_ids: [...scopedCompletedColumnIds],
               excluded_completed_count: excludedCompletedCount,
               tasks_in_snapshot: snapshot.tasks.length,
-              active_tasks_count: columns
-                .filter((column) => !completedColumnIds.has(column.id))
+              active_tasks_count: scopedColumns
+                .filter((column) => !scopedCompletedColumnIds.has(column.id))
                 .reduce((sum, column) => sum + (column.tasks_count ?? 0), 0),
             },
           };
