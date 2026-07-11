@@ -496,19 +496,19 @@ git commit -m "feat(core): add board snapshot helpers"
 In `tests/format-mapper.test.ts`, add tests near existing `compactTask` tests:
 
 ```ts
-test("compactTask omits description by default and in compact detail", () => {
+test("compactTask preserves description by default and in full detail", () => {
   const task = sampleTask({ description: "<p>large html</p>" });
 
-  expect(compactTask(task)).not.toHaveProperty("description");
-  expect(compactTask(task, { detail: "compact" })).not.toHaveProperty("description");
-});
-
-test("compactTask includes description in full detail", () => {
-  const task = sampleTask({ description: "<p>large html</p>" });
-
+  expect(compactTask(task)).toMatchObject({ description: "<p>large html</p>" });
   expect(compactTask(task, { detail: "full" })).toMatchObject({
     description: "<p>large html</p>",
   });
+});
+
+test("compactTask omits description only in compact detail", () => {
+  const task = sampleTask({ description: "<p>large html</p>" });
+
+  expect(compactTask(task, { detail: "compact" })).not.toHaveProperty("description");
 });
 
 test("compactTask enriches task with column metadata", () => {
@@ -540,7 +540,7 @@ Run:
 bun test tests/format-mapper.test.ts --test-name-pattern "compactTask"
 ```
 
-Expected: FAIL because `compactTask` currently always includes `description` and has no options.
+Expected: FAIL because `compactTask` currently has no options and cannot omit `description` for compact detail.
 
 - [ ] **Step 3: Implement task mapper options**
 
@@ -594,7 +594,7 @@ export function compactTask(task: OtaskTask, options: CompactTaskOptions = {}): 
     subtasks_count: Array.isArray(task.subtasks) ? task.subtasks.length : 0,
   };
 
-  if (options.detail === "full") {
+  if (options.detail !== "compact") {
     out.description = task.description;
   }
 
@@ -615,7 +615,7 @@ Keep existing comments/project logic after the new option logic.
 
 - [ ] **Step 4: Update `summarizeTask` if needed**
 
-Keep current behavior compact by default:
+Keep current behavior legacy/full by default so `otask_get_task` and write-tool responses still include `description`:
 
 ```ts
 export function summarizeTask(task: OtaskTask): CompactTask {
@@ -631,7 +631,7 @@ Run:
 bun test tests/format-mapper.test.ts
 ```
 
-Expected: PASS after updating any old assertion that expected `description` in default compact output. If an old test named `keeps only known CompactTask fields` expected `description`, update it to assert description is absent by default and covered by the new full-detail test.
+Expected: PASS after keeping old assertions that expect `description` by default and adding the new compact-detail omission assertion.
 
 - [ ] **Step 6: Commit Task 3**
 

@@ -178,7 +178,8 @@ Extend compact mapping without leaking raw API payloads:
     column?: CompactColumn;
   }
   ```
-- `detail: "compact"` omits `description`.
+- Default/`detail: "full"` preserves legacy behavior and includes `description`.
+- `detail: "compact"` omits `description`; list tools must pass this explicitly when compact output is desired.
 - When `column` is provided, add `column_name`, `column_type`, and `is_completed`.
 
 ### Board metadata helper
@@ -213,4 +214,4 @@ Add unit tests for:
 
 ## Compatibility
 
-This is a behavior change for `otask_list_project_tasks` because default output becomes active-only and compact. It is intentional for agent UX and context reduction. Completed/archive access remains available with `active_only: false`; full descriptions remain available with `detail: "full"` or via `otask_get_task`.
+This is a behavior change for `otask_list_project_tasks` because default output becomes active-only and compact. It is intentional for agent UX and context reduction. Completed/archive access remains available with `active_only: false`; full descriptions remain available with `detail: "full"` or via `otask_get_task`. `compactTask()` itself keeps legacy/full behavior unless list tools explicitly request `detail: "compact"`.
