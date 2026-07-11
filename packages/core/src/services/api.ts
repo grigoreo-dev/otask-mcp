@@ -253,7 +253,7 @@ export async function listBoard(
   const headers = await headersFor(auth);
   const url = withQuery(
     wsUrl(wsSlug, `/projects/${encodeURIComponent(projectSlug)}/boards`),
-    query
+    query ? { ...query } : undefined
   );
   const response = await fetch(url, { method: "GET", headers });
 
