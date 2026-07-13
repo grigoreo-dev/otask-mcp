@@ -1,0 +1,5 @@
+[test]
+# Worker tests import the `agents` package, which imports Cloudflare runtime
+# built-ins (cloudflare:workers / cloudflare:email) at module load. Stub them so
+# worker code can be imported under `bun test` outside workerd.
+preload = ["./tests/fixtures/cloudflare-stubs.ts"]

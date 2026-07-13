@@ -46,6 +46,15 @@ export const apiHandler = {
     if (!server) {
       return unauthorizedResponse(request);
     }
-    return createMcpHandler(server)(request, env, ctx);
+    // Stateless request/response mode: a Worker forgets everything between
+    // requests, so a stateful transport (default) can't keep an MCP session
+    // alive across the separate initialize -> tools/call requests and the
+    // tool call hangs waiting on an SSE stream. Omitting sessionIdGenerator
+    // disables session management; enableJsonResponse returns plain JSON
+    // instead of an SSE stream — ideal for these request/response tools.
+    return createMcpHandler(server, {
+      sessionIdGenerator: undefined,
+      enableJsonResponse: true,
+    })(request, env, ctx);
   },
 };
