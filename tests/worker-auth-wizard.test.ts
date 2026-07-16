@@ -194,7 +194,7 @@ describe("AuthHandler OAuth wizard", () => {
 
     const html = await res.text();
     expect(html).toContain('<select name="default_ws"');
-    expect(html).toContain('name="step" value="2"');
+    expect(html).not.toContain('name="step"');
     expect(html).toContain("Alpha");
     expect(html).not.toContain('name="password"');
 
@@ -398,5 +398,121 @@ describe("AuthHandler OAuth wizard", () => {
     expect(html).toContain('name="email"');
     expect(html).toContain('name="password"');
     expect(html).not.toContain('<select name="default_ws"');
+  });
+
+  test("step1 POST when teams fetch fails: step1 error, clears cookie, no pending KV, no completeAuthorization", async () => {
+    restoreFetch?.();
+    const original = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.includes("/api/v1/auth/login")) {
+        const body = init?.body ? JSON.parse(String(init.body)) : {};
+        expect(body.email).toBe(EMAIL);
+        expect(body.password).toBe(PASSWORD);
+        return new Response(JSON.stringify({ token: TOKEN, expires_in: 60 }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      if (url.includes("/api/v1/teams")) {
+        return new Response(JSON.stringify({ success: false, message: "teams unavailable" }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({ success: false, message: `unexpected fetch: ${url}` }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }) as typeof fetch;
+    restoreFetch = () => {
+      globalThis.fetch = original;
+    };
+
+    const kv = memKV();
+    const { provider, completeCalls } = createFakeProvider();
+    const env: WorkerEnv = {
+      OAUTH_PROVIDER: provider,
+      OAUTH_KV: kv as unknown as KVNamespace,
+      USER_ID_PEPPER: PEPPER,
+    };
+
+    const res = await AuthHandler.fetch(
+      new Request(AUTHORIZE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formBody({ email: EMAIL, password: PASSWORD }),
+      }),
+      env
+    );
+
+    expect(res.status).toBe(400);
+    const html = await res.text();
+    expect(html).toContain("Не удалось загрузить пространства O!task");
+    expect(html).toContain('name="password"');
+    expect(html).not.toContain('<select name="default_ws"');
+
+    const setCookie = res.headers.get("Set-Cookie") ?? "";
+    expect(setCookie).toContain(`${PENDING_COOKIE}=`);
+    expect(setCookie).toContain("Max-Age=0");
+
+    const pendingKeys = [...kv._map.keys()].filter((k) => k.startsWith("pending:v1:"));
+    expect(pendingKeys).toHaveLength(0);
+    expect(completeCalls).toHaveLength(0);
+  });
+
+  test("step2 when completeAuthorization throws: step1 error, pending kept, cookie not cleared", async () => {
+    const kv = memKV();
+    const { provider, completeCalls } = createFakeProvider();
+    (
+      provider as { completeAuthorization: (opts: CompleteCall) => Promise<{ redirectTo: string }> }
+    ).completeAuthorization = async (opts: CompleteCall) => {
+      completeCalls.push(opts);
+      throw new Error("completeAuthorization failed");
+    };
+
+    const env: WorkerEnv = {
+      OAUTH_PROVIDER: provider,
+      OAUTH_KV: kv as unknown as KVNamespace,
+      USER_ID_PEPPER: PEPPER,
+    };
+
+    const step1 = await AuthHandler.fetch(
+      new Request(AUTHORIZE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formBody({ email: EMAIL, password: PASSWORD }),
+      }),
+      env
+    );
+    const cookiePair = setCookieFromResponse(step1);
+    expect(cookiePair).toBeTruthy();
+    if (!cookiePair) throw new Error("expected Set-Cookie from step1");
+    expect([...kv._map.keys()].filter((k) => k.startsWith("pending:v1:"))).toHaveLength(1);
+
+    const step2 = await AuthHandler.fetch(
+      new Request(AUTHORIZE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Cookie: cookiePair,
+        },
+        body: formBody({
+          default_ws: "ws-a",
+        }),
+      }),
+      env
+    );
+
+    expect(step2.status).toBe(400);
+    const html = await step2.text();
+    expect(html).toContain("Не удалось завершить авторизацию");
+    expect(html).toContain('name="password"');
+    expect(step2.headers.get("Location")).toBeNull();
+    // Pending kept for retry; no success redirect / clear cookie.
+    expect([...kv._map.keys()].filter((k) => k.startsWith("pending:v1:"))).toHaveLength(1);
+    const setCookie = step2.headers.get("Set-Cookie");
+    expect(setCookie).toBeNull();
+    expect(completeCalls).toHaveLength(1);
   });
 });

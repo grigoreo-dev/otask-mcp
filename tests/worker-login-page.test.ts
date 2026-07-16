@@ -59,8 +59,7 @@ describe("renderLoginStep2", () => {
     expect(html).toContain('name="allowed_ws"');
     expect(html).toContain('name="default_project"');
     expect(html).toContain('name="allowed_projects"');
-    expect(html).toContain('name="step"');
-    expect(html).toContain('value="2"');
+    expect(html).not.toContain('name="step"');
     expect(html).toContain("Пространство");
     expect(html).toContain("Не выбрано");
     expect(html).toContain("Не выбрано = доступ ко всем пространствам/проектам аккаунта.");

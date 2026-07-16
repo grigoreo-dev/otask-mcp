@@ -206,7 +206,6 @@ export function renderLoginStep2(opts: {
     ${projectLoadWarnings}
     ${extraWarnings}
     <form method="POST" action="${escapeHtml(action)}">
-      <input type="hidden" name="step" value="2" />
       <label>
         <span>Пространство по умолчанию</span>
         <select name="default_ws" required>
@@ -241,14 +240,6 @@ export function renderLoginStep2(opts: {
     error: opts.error,
     status: opts.error ? 400 : 200,
   });
-}
-
-/**
- * @deprecated Prefer renderLoginStep1 / renderLoginStep2. Kept as alias of step1
- * for any leftover callers until Task 5b rewires AuthHandler.
- */
-export function renderLoginPage(opts: { query: string; error?: string }): Response {
-  return renderLoginStep1(opts);
 }
 
 function escapeHtml(value: string): string {

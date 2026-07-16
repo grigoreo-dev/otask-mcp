@@ -173,8 +173,19 @@ export const AuthHandler = {
       try {
         teams = await listTeams(auth);
       } catch {
-        // Still show step2 with empty teams rather than losing the pending login.
         teams = [];
+      }
+
+      // Total teams failure or empty list → restart login (no empty required select).
+      if (teams.length === 0) {
+        await deletePending(kv, id);
+        return withSetCookie(
+          renderLoginStep1({
+            query,
+            error: "Не удалось загрузить пространства O!task. Попробуйте войти снова.",
+          }),
+          clearPendingCookieHeader()
+        );
       }
 
       const projectsByWs = await mapPool(teams, 5, async (t) => {
@@ -194,12 +205,21 @@ export const AuthHandler = {
         }
       });
 
+      const warnings = projectsByWs
+        .filter((entry) => entry.error)
+        .map((entry) => {
+          const team = teams.find((t) => t.slug === entry.ws);
+          const name = team?.name ?? entry.ws;
+          return `Проекты пространства «${name}» не загрузились`;
+        });
+
       const defaultTeamSlug = teams[0]?.slug;
       const resp = renderLoginStep2({
         query,
         teams: teams.map((t) => ({ slug: t.slug, name: t.name })),
         projectsByWs,
         defaultTeamSlug,
+        warnings: warnings.length ? warnings : undefined,
       });
       const cookieVal = await signPendingCookie(id, pepper);
       return withSetCookie(resp, pendingCookieHeader(cookieVal));
@@ -227,13 +247,23 @@ export const AuthHandler = {
         csv(form.getAll("allowed_projects").map((v) => parseProjectValue(v) ?? "")) || undefined,
     };
 
-    const { redirectTo } = await provider.completeAuthorization({
-      request: oauthReq,
-      userId: pending.userId,
-      metadata: {},
-      scope: oauthReq.scope ?? [],
-      props,
-    });
+    let redirectTo: string;
+    try {
+      const result = await provider.completeAuthorization({
+        request: oauthReq,
+        userId: pending.userId,
+        metadata: {},
+        scope: oauthReq.scope ?? [],
+        props,
+      });
+      redirectTo = result.redirectTo;
+    } catch {
+      // Keep pending until TTL so the user can retry step2 without re-login.
+      return renderLoginStep1({
+        query,
+        error: "Не удалось завершить авторизацию. Попробуйте снова.",
+      });
+    }
 
     if (id) {
       await deletePending(kv, id);
