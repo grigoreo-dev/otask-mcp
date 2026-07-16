@@ -2,6 +2,10 @@
 
 Remote MCP endpoint (Streamable HTTP + OAuth) for O!task. Private package; not published to npm.
 
+> **Unofficial.** otask-mcp is an independent open-source MCP connector for the O!task API. Not affiliated with, endorsed by, or part of the O!task product/team. (**Неофициально** — не продукт O!task.)
+
+Landing `/` and favicon are served by this Worker; OAuth login is a **2-step wizard** (credentials → pick default/allowed пространства & projects from selects).
+
 ## Deploy options (pick one)
 
 | Path | Needs long-lived CF API token? | Best for |
@@ -117,3 +121,5 @@ USER_ID_PEPPER=local-dev-pepper
   namespace, add `id = "..."` locally or bind via dashboard (not required for default flow).
 - **`USER_ID_PEPPER` is a required secret** (`wrangler secret put`), not a `[vars]`
   value — never commit it. Rotating it invalidates existing grants (users re-login).
+- Connect flow: `GET /` landing → client OAuth to `/mcp` → `/authorize` step1 (email/password) → step2 (пространство/project selects). Empty allow-list selects = unrestricted.
+- Slug truth (UUID vs board `#N`): see repo [`docs/SLUGS.md`](../../docs/SLUGS.md).
