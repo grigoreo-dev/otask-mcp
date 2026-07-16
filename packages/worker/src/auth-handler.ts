@@ -1,5 +1,7 @@
 import type { OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 import { loginOtaskWithPassword } from "@grigoreo-dev/otask-mcp-core/services/auth.js";
+import { iconResponse } from "./icon-asset.js";
+import { renderLanding } from "./landing-page.js";
 import { renderLoginPage } from "./login-page.js";
 import type { OtaskSessionProps } from "./session-props.js";
 import { hashUserId } from "./user-id.js";
@@ -13,6 +15,15 @@ export interface WorkerEnv {
 export const AuthHandler = {
   async fetch(request: Request, env: WorkerEnv): Promise<Response> {
     const url = new URL(request.url);
+    if (request.method === "GET" && (url.pathname === "/" || url.pathname === "")) {
+      return renderLanding({ origin: url.origin });
+    }
+    if (
+      request.method === "GET" &&
+      (url.pathname === "/favicon.ico" || url.pathname === "/icon.png")
+    ) {
+      return iconResponse();
+    }
     if (url.pathname !== "/authorize") {
       return new Response("Not found", { status: 404 });
     }
