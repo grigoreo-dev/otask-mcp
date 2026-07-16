@@ -53,28 +53,47 @@ describe("WsGuard", () => {
 });
 
 describe("resolveWsSlug", () => {
-  test("uses explicit arg over default", () => {
+  test("uses explicit arg over default", async () => {
     const s = scope({ defaultWs: "default-ws" });
-    expect(resolveWsSlug("explicit-ws", s)).toBe("explicit-ws");
+    expect(await resolveWsSlug("explicit-ws", s)).toBe("explicit-ws");
   });
 
-  test("falls back to default", () => {
+  test("falls back to default", async () => {
     const s = scope({ defaultWs: "default-ws" });
-    expect(resolveWsSlug(undefined, s)).toBe("default-ws");
-    expect(resolveWsSlug("", s)).toBe("default-ws");
+    expect(await resolveWsSlug(undefined, s)).toBe("default-ws");
+    expect(await resolveWsSlug("", s)).toBe("default-ws");
   });
 
-  test("throws when neither arg nor default", () => {
-    expect(() => resolveWsSlug(undefined, scope())).toThrow(/ws_slug is required/);
+  test("throws when neither arg nor default", async () => {
+    await expect(resolveWsSlug(undefined, scope())).rejects.toThrow(/ws_slug is required/);
   });
 
-  test("asserts workspace allow-list", () => {
+  test("asserts workspace allow-list", async () => {
     const s = scope({
       defaultWs: "blocked",
       wsGuard: createWsGuard(parseWsAllowList("only-this")),
     });
-    expect(() => resolveWsSlug(undefined, s)).toThrow(/Workspace not allowed/);
-    expect(resolveWsSlug("only-this", s)).toBe("only-this");
+    await expect(resolveWsSlug(undefined, s)).rejects.toThrow(/Workspace not allowed/);
+    expect(await resolveWsSlug("only-this", s)).toBe("only-this");
+  });
+
+  test("auto-uses single workspace from listWorkspaces", async () => {
+    const s = scope();
+    const ws = await resolveWsSlug(undefined, s, async () => [{ slug: "only-ws" }]);
+    expect(ws).toBe("only-ws");
+  });
+
+  test("throws with list_workspaces hint when many workspaces", async () => {
+    const s = scope();
+    await expect(
+      resolveWsSlug(undefined, s, async () => [{ slug: "a" }, { slug: "b" }])
+    ).rejects.toThrow(/otask_list_workspaces/);
+  });
+
+  test("throws with list_workspaces hint when zero workspaces", async () => {
+    await expect(resolveWsSlug(undefined, scope(), async () => [])).rejects.toThrow(
+      /otask_list_workspaces/
+    );
   });
 });
 

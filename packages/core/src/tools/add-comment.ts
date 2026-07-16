@@ -34,7 +34,7 @@ Docs: https://api.otask.ru/docs`,
     },
     handler: async ({ ws_slug, task_slug, comment, parent_id }) => {
       try {
-        const ws = resolveWsSlug(ws_slug, scope);
+        const ws = await resolveWsSlug(ws_slug, scope, () => api.listWorkspaces());
         const current = await api.getTask(ws, task_slug);
         const projectSlug =
           typeof current.project_slug === "string" ? current.project_slug : undefined;

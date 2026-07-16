@@ -32,7 +32,7 @@ Docs: https://api.otask.ru/docs`,
     },
     handler: async ({ ws_slug, project_slug, type, board_slug }) => {
       try {
-        const ws = resolveWsSlug(ws_slug, scope);
+        const ws = await resolveWsSlug(ws_slug, scope, () => api.listWorkspaces());
         const project = await resolveProjectSlug(project_slug, scope, () => api.listProjects(ws));
         const query = {
           type: type ?? "status",

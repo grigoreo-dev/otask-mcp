@@ -28,7 +28,7 @@ Docs: https://api.otask.ru/docs`,
     },
     handler: async ({ ws_slug }) => {
       try {
-        const ws = resolveWsSlug(ws_slug, scope);
+        const ws = await resolveWsSlug(ws_slug, scope, () => api.listWorkspaces());
         const tags = await api.listTags(ws);
         const items = tags.map((t) =>
           compactTag(t as { id: number; name: string; slug?: string; color?: string })

@@ -66,10 +66,24 @@ function trimOrUndef(v: string | undefined | null): string | undefined {
   return t ? t : undefined;
 }
 
-export function resolveWsSlug(ws_slug: string | undefined, scope: ScopeContext): string {
-  const ws = trimOrUndef(ws_slug) ?? scope.defaultWs;
+export async function resolveWsSlug(
+  ws_slug: string | undefined,
+  scope: ScopeContext,
+  listWorkspaces?: () => Promise<Array<{ slug: string }>>
+): Promise<string> {
+  let ws = trimOrUndef(ws_slug) ?? scope.defaultWs;
   if (!ws) {
-    throw new Error("ws_slug is required (pass arg or set OTASK_DEFAULT_WS / X-Otask-Default-Ws)");
+    if (listWorkspaces) {
+      const teams = await listWorkspaces();
+      if (teams.length === 1 && teams[0]?.slug) {
+        ws = teams[0].slug;
+      }
+    }
+  }
+  if (!ws) {
+    throw new Error(
+      "ws_slug is required (pass arg or set OTASK_DEFAULT_WS / X-Otask-Default-Ws). Call otask_list_workspaces, then pass ws_slug, or reconnect OAuth with a default workspace."
+    );
   }
   scope.wsGuard.assertAllowed(ws);
   return ws;

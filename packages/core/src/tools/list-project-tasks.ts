@@ -41,7 +41,7 @@ Docs: https://api.otask.ru/docs`,
     },
     handler: async (input) => {
       try {
-        const ws = resolveWsSlug(input.ws_slug, scope);
+        const ws = await resolveWsSlug(input.ws_slug, scope, () => api.listWorkspaces());
         const project = await resolveProjectSlug(input.project_slug, scope, () =>
           api.listProjects(ws)
         );

@@ -32,7 +32,7 @@ Docs: https://api.otask.ru/docs`,
     },
     handler: async ({ ws_slug }) => {
       try {
-        const ws = resolveWsSlug(ws_slug, scope);
+        const ws = await resolveWsSlug(ws_slug, scope, () => api.listWorkspaces());
         const projects = await api.listProjects(ws);
         const allowed = guard.filterProjects(projects);
         const items = allowed.map((p) => compactProject(p));

@@ -32,7 +32,7 @@ Docs: https://api.otask.ru/docs`,
     handler: async (params) => {
       try {
         const { ws_slug, project_id: projectIdArg, ...rest } = params;
-        const ws = resolveWsSlug(ws_slug, scope);
+        const ws = await resolveWsSlug(ws_slug, scope, () => api.listWorkspaces());
         const project_id = await resolveProjectId(projectIdArg, scope, () => api.listProjects(ws));
         const task = await api.createTask(ws, { ...rest, project_id });
         const summary = compactTask(task);

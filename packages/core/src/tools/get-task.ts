@@ -32,7 +32,7 @@ Docs: https://api.otask.ru/docs#zadaci-GETapi-v1-ws--ws_slug--tasks--task_slug`,
     },
     handler: async ({ ws_slug, task_slug }) => {
       try {
-        const ws = resolveWsSlug(ws_slug, scope);
+        const ws = await resolveWsSlug(ws_slug, scope, () => api.listWorkspaces());
         const task = await api.getTask(ws, task_slug);
         const projectSlug = typeof task.project_slug === "string" ? task.project_slug : undefined;
         await assertProjectIdAllowed(
