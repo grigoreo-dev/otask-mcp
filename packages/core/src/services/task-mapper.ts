@@ -209,6 +209,16 @@ export function compactProject(p: {
   return out;
 }
 
+export interface CompactWorkspace {
+  id: number;
+  slug: string;
+  name: string;
+}
+
+export function compactWorkspace(w: { id: number; slug: string; name: string }): CompactWorkspace {
+  return { id: w.id, slug: w.slug, name: w.name };
+}
+
 export function compactMember(m: {
   id?: number;
   user_id?: number;

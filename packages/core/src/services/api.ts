@@ -108,6 +108,25 @@ export async function getMe(auth: OtaskAuthResolver): Promise<unknown> {
   return assertSuccess(result, response.status, "Failed to get me");
 }
 
+export interface OtaskWorkspaceSummary {
+  id: number;
+  slug: string;
+  name: string;
+  [key: string]: unknown;
+}
+
+export async function listTeams(auth: OtaskAuthResolver): Promise<OtaskWorkspaceSummary[]> {
+  const headers = await headersFor(auth);
+  const response = await fetch(`${API_BASE_URL}/api/v1/teams`, {
+    method: "GET",
+    headers,
+  });
+  const result = await parseResponse<OtaskApiResponse<unknown>>(response);
+  const data = assertSuccess(result, response.status, "Failed to list teams");
+  const rows = pickArray(data, "teams", response.status);
+  return rows as OtaskWorkspaceSummary[];
+}
+
 function appendArrayParams(
   params: URLSearchParams,
   key: string,
