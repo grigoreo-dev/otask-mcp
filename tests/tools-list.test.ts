@@ -17,6 +17,7 @@ import { createListProjectTasksTool } from "../packages/core/src/tools/list-proj
 import { createListProjectsTool } from "../packages/core/src/tools/list-projects.ts";
 import { createListTagsTool } from "../packages/core/src/tools/list-tags.ts";
 import { createListTasksTool } from "../packages/core/src/tools/list-tasks.ts";
+import { createListWorkspacesTool } from "../packages/core/src/tools/list-workspaces.ts";
 import { createMeTool } from "../packages/core/src/tools/me.ts";
 import { toolFactories } from "../packages/core/src/tools/registry.ts";
 import type { ToolDeps } from "../packages/core/src/tools/types.ts";
@@ -50,6 +51,7 @@ function mockApi(partial: Partial<OtaskClient> = {}): OtaskClient {
       email: "t@e.st",
       timezone: "Europe/Moscow",
     })),
+    listWorkspaces: mock(async () => [{ id: 1, slug: "ws-a", name: "Alpha" }]),
     getTask: mock(async () => sampleTask()),
     updateTask: mock(async () => ({
       success: true,
@@ -791,10 +793,41 @@ describe("otask_list_tasks", () => {
   });
 });
 
+describe("otask_list_workspaces", () => {
+  test("returns compact workspaces as agent list", async () => {
+    const d = deps({
+      listWorkspaces: mock(async () => [
+        {
+          id: 1,
+          slug: "ws-a",
+          name: "Alpha",
+          owner_email: "secret@example.com",
+          user_id: 999,
+          huge: "x".repeat(50),
+        },
+      ]),
+    });
+    const tool = createListWorkspacesTool(d);
+    const body = parseContent(await tool.handler({})) as {
+      summary: string;
+      items: Array<Record<string, unknown>>;
+      next: null;
+    };
+    expect(body.next).toBeNull();
+    expect(body.items).toEqual([{ id: 1, slug: "ws-a", name: "Alpha" }]);
+    expect(body.items[0]).not.toHaveProperty("owner_email");
+    expect(body.items[0]).not.toHaveProperty("user_id");
+    expect(body.items[0]).not.toHaveProperty("huge");
+    expect(body.summary).toMatch(/1/);
+    expect(d.api.listWorkspaces).toHaveBeenCalled();
+  });
+});
+
 describe("registry", () => {
   test("registers all read tools", () => {
     const names = toolFactories.map((f) => f(deps()).name);
     expect(names).toContain("otask_me");
+    expect(names).toContain("otask_list_workspaces");
     expect(names).toContain("otask_list_projects");
     expect(names).toContain("otask_list_project_tasks");
     expect(names).toContain("otask_list_board");
