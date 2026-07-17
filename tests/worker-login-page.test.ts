@@ -73,7 +73,68 @@ describe("renderLoginStep2", () => {
     expect(html).toContain('action="/authorize?client_id=abc&amp;state=1"');
     expect(html).not.toMatch(/sk-[a-zA-Z0-9]{10,}/);
     expect(html).not.toContain("OTASK_PASSWORD");
-    expect(html).not.toMatch(/<script[\s>]/i);
+  });
+
+  test("marks project options with data-ws for space→project filtering", async () => {
+    const res = await renderLoginStep2({
+      query: "client_id=abc&state=1",
+      teams: [
+        { slug: "ws-a", name: "Alpha" },
+        { slug: "ws-b", name: "Beta" },
+      ],
+      projectsByWs: [
+        {
+          ws: "ws-a",
+          projects: [
+            { id: 1, slug: "p1", name: "Proj 1" },
+            { id: 2, slug: "p2", name: "Proj 2" },
+          ],
+          error: null,
+        },
+        {
+          ws: "ws-b",
+          projects: [{ id: 3, slug: "p3", name: "Proj 3" }],
+          error: null,
+        },
+      ],
+      defaultTeamSlug: "ws-a",
+    });
+    const html = await res.text();
+
+    // default_project options carry data-ws
+    expect(html).toMatch(/name="default_project"[\s\S]*?data-ws="ws-a"[\s\S]*?ws-a::p1/);
+    expect(html).toMatch(/data-ws="ws-a"[^>]*>Proj 2|data-ws="ws-a"[^>]*value="ws-a::p2"/);
+    expect(html).toMatch(/data-ws="ws-b"[^>]*value="ws-b::p3"|value="ws-b::p3"[^>]*data-ws="ws-b"/);
+
+    // allowed_projects options carry data-ws
+    expect(html).toMatch(/name="allowed_projects"[\s\S]*?data-ws="ws-a"/);
+    expect(html).toMatch(/name="allowed_projects"[\s\S]*?data-ws="ws-b"/);
+
+    // empty default option stays without data-ws requirement (value="")
+    expect(html).toContain('value="">— не выбран —</option>');
+  });
+
+  test("includes inline filter script for default_ws and allowed_ws (step2 only)", async () => {
+    const res = await renderLoginStep2({
+      query: "x=1",
+      teams: [{ slug: "ws-a", name: "Alpha" }],
+      projectsByWs: [
+        { ws: "ws-a", projects: [{ id: 1, slug: "p1", name: "P1" }], error: null },
+      ],
+    });
+    const html = await res.text();
+    expect(html).toMatch(/<script[\s>]/i);
+    // script wires both space selects
+    expect(html).toMatch(/default_ws/);
+    expect(html).toMatch(/allowed_ws/);
+    expect(html).toMatch(/default_project/);
+    expect(html).toMatch(/allowed_projects/);
+    expect(html).toMatch(/data-ws/);
+    // runs on load
+    expect(html).toMatch(/DOMContentLoaded|document\.readyState/);
+    // no external CDN
+    expect(html).not.toContain("cdn.");
+    expect(html).not.toMatch(/src=["']https?:/);
   });
 
   test("shows error message when provided", async () => {
@@ -86,5 +147,25 @@ describe("renderLoginStep2", () => {
     expect(res.status).toBe(400);
     const html = await res.text();
     expect(html).toContain("Сессия входа истекла");
+  });
+});
+
+describe("project option filter helpers", () => {
+  test("default filter keeps empty option and matching ws only", async () => {
+    const { projectVisibleForDefaultWs, projectVisibleForAllowedWs } = await import(
+      "../packages/worker/src/login-page.ts"
+    );
+    expect(projectVisibleForDefaultWs("", "ws-a")).toBe(true);
+    expect(projectVisibleForDefaultWs("ws-a", "ws-a")).toBe(true);
+    expect(projectVisibleForDefaultWs("ws-b", "ws-a")).toBe(false);
+  });
+
+  test("allowed filter shows all when no spaces selected; otherwise intersects", async () => {
+    const { projectVisibleForAllowedWs } = await import("../packages/worker/src/login-page.ts");
+    expect(projectVisibleForAllowedWs("ws-a", [])).toBe(true);
+    expect(projectVisibleForAllowedWs("ws-b", [])).toBe(true);
+    expect(projectVisibleForAllowedWs("ws-a", ["ws-a"])).toBe(true);
+    expect(projectVisibleForAllowedWs("ws-b", ["ws-a"])).toBe(false);
+    expect(projectVisibleForAllowedWs("ws-b", ["ws-a", "ws-b"])).toBe(true);
   });
 });

@@ -133,6 +133,106 @@ export type LoginProjectsByWs = {
   error?: string | null;
 };
 
+/** Empty option (no data-ws) is always visible; else option.ws must equal defaultWs. */
+export function projectVisibleForDefaultWs(optionWs: string, defaultWs: string): boolean {
+  if (!optionWs) return true;
+  return optionWs === defaultWs;
+}
+
+/** Empty allowed list = all projects; else option.ws must be in the selected set. */
+export function projectVisibleForAllowedWs(optionWs: string, allowedWs: string[]): boolean {
+  if (allowedWs.length === 0) return true;
+  return allowedWs.includes(optionWs);
+}
+
+/**
+ * Inline step2 script: filter project selects by selected workspaces.
+ * Mirrors projectVisibleForDefaultWs / projectVisibleForAllowedWs.
+ */
+const STEP2_FILTER_SCRIPT = `
+(function () {
+  function optionWs(opt) {
+    return opt.getAttribute("data-ws") || "";
+  }
+  function projectVisibleForDefaultWs(ws, defaultWs) {
+    if (!ws) return true;
+    return ws === defaultWs;
+  }
+  function projectVisibleForAllowedWs(ws, allowed) {
+    if (!allowed.length) return true;
+    return allowed.indexOf(ws) !== -1;
+  }
+  function selectedValues(select) {
+    return Array.prototype.slice
+      .call(select.selectedOptions || [])
+      .map(function (o) { return o.value; })
+      .filter(Boolean);
+  }
+  function syncOptgroups(select) {
+    var groups = select.querySelectorAll("optgroup");
+    for (var g = 0; g < groups.length; g++) {
+      var group = groups[g];
+      var kids = group.querySelectorAll("option");
+      var anyVisible = false;
+      for (var k = 0; k < kids.length; k++) {
+        if (!kids[k].hidden) {
+          anyVisible = true;
+          break;
+        }
+      }
+      group.hidden = !anyVisible;
+    }
+  }
+  function applyDefaultFilter() {
+    var wsSel = document.querySelector('select[name="default_ws"]');
+    var projSel = document.querySelector('select[name="default_project"]');
+    if (!wsSel || !projSel) return;
+    var defaultWs = wsSel.value || "";
+    var opts = projSel.querySelectorAll("option");
+    var keepValue = "";
+    for (var i = 0; i < opts.length; i++) {
+      var opt = opts[i];
+      var ws = optionWs(opt);
+      var visible = projectVisibleForDefaultWs(ws, defaultWs);
+      opt.hidden = !visible;
+      opt.disabled = !visible;
+      if (visible && opt.value === projSel.value) keepValue = opt.value;
+    }
+    if (projSel.value !== keepValue) projSel.value = keepValue || "";
+    syncOptgroups(projSel);
+  }
+  function applyAllowedFilter() {
+    var wsSel = document.querySelector('select[name="allowed_ws"]');
+    var projSel = document.querySelector('select[name="allowed_projects"]');
+    if (!wsSel || !projSel) return;
+    var allowed = selectedValues(wsSel);
+    var opts = projSel.querySelectorAll("option");
+    for (var i = 0; i < opts.length; i++) {
+      var opt = opts[i];
+      var ws = optionWs(opt);
+      var visible = projectVisibleForAllowedWs(ws, allowed);
+      opt.hidden = !visible;
+      opt.disabled = !visible;
+      if (!visible) opt.selected = false;
+    }
+    syncOptgroups(projSel);
+  }
+  function wire() {
+    var defaultWs = document.querySelector('select[name="default_ws"]');
+    var allowedWs = document.querySelector('select[name="allowed_ws"]');
+    if (defaultWs) defaultWs.addEventListener("change", applyDefaultFilter);
+    if (allowedWs) allowedWs.addEventListener("change", applyAllowedFilter);
+    applyDefaultFilter();
+    applyAllowedFilter();
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", wire);
+  } else {
+    wire();
+  }
+})();
+`.trim();
+
 /** Step 2 — scope picks (пространства / проекты) after successful credentials. */
 export function renderLoginStep2(opts: {
   query: string;
@@ -163,12 +263,12 @@ export function renderLoginStep2(opts: {
       const optsHtml = entry.projects
         .map((p) => {
           const value = `${entry.ws}::${p.slug}`;
-          return `<option value="${escapeHtml(value)}">${escapeHtml(p.name)}</option>`;
+          return `<option value="${escapeHtml(value)}" data-ws="${escapeHtml(entry.ws)}">${escapeHtml(p.name)}</option>`;
         })
         .join("\n          ");
       if (!optsHtml) return [];
       return [
-        `<optgroup label="${escapeHtml(teamLabel)}">\n          ${optsHtml}\n        </optgroup>`,
+        `<optgroup label="${escapeHtml(teamLabel)}" data-ws="${escapeHtml(entry.ws)}">\n          ${optsHtml}\n        </optgroup>`,
       ];
     }),
   ].join("\n        ");
@@ -178,7 +278,7 @@ export function renderLoginStep2(opts: {
       entry.projects.map((p) => {
         const value = `${entry.ws}::${p.slug}`;
         const teamLabel = teamNameBySlug.get(entry.ws) ?? entry.ws;
-        return `<option value="${escapeHtml(value)}">${escapeHtml(teamLabel)} / ${escapeHtml(p.name)}</option>`;
+        return `<option value="${escapeHtml(value)}" data-ws="${escapeHtml(entry.ws)}">${escapeHtml(teamLabel)} / ${escapeHtml(p.name)}</option>`;
       })
     )
     .join("\n        ");
@@ -231,7 +331,10 @@ export function renderLoginStep2(opts: {
         </select>
       </label>
       <button type="submit">Войти</button>
-    </form>`;
+    </form>
+    <script>
+${STEP2_FILTER_SCRIPT}
+    </script>`;
 
   return shell({
     title: "Области — O!task MCP",
