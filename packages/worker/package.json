@@ -12,11 +12,11 @@
   "dependencies": {
     "@cloudflare/workers-oauth-provider": "0.8.1",
     "@grigoreo-dev/otask-mcp-core": "workspace:*",
-    "agents": "0.17.3"
+    "agents": "0.24.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "5.20260710.1",
+    "@cloudflare/workers-types": "5.20260925.1",
     "typescript": "5.9.3",
-    "wrangler": "4.110.0"
+    "wrangler": "4.140.0"
   }
 }
